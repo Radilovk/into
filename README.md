@@ -19,13 +19,30 @@
 *   CSS3 (с CSS Custom Properties / Variables)
 *   JavaScript (ES6+)
 *   [Font Awesome](https://fontawesome.com/) (за икони)
-*   [Google Fonts](https://fonts.google.com/) (Playfair Display & Lato)
+*   [Google Fonts](https://fonts.google.com/) (Poppins & Inter)
 
 ## Структура на проекта
 
 *   `main.html`: Основната HTML структура на страницата.
 *   `style.css`: Всички CSS стилове за визията на сайта.
 *   `script.js`: JavaScript код за интерактивност, смяна на тема, мобилно меню и анимации.
+
+## Персонализиране
+
+Променливите за цветовата тема се намират в началото на `style.css`. Там са
+дефинирани и стойностите за тъмния режим, например:
+
+```css
+:root {
+    /* Dark theme variables */
+    --bg-primary-dark: #121212;
+    --bg-secondary-dark: #1e1e1e;
+    /* ... */
+}
+```
+
+Шрифтовете се зареждат чрез Google Fonts в `main.html`. Могат да бъдат сменени,
+като се редактира `<link>` елемента и свойствата `font-family` в `style.css`.
 
 ## Как да разгледате сайта
 
