@@ -92,30 +92,16 @@ body.dark-theme header {
     box-shadow: 0 2px 10px var(--shadow-dark);
 }
 
-header.scrolled {
-    padding: var(--spacing-sm) 0;
-    box-shadow: 0 2px 8px var(--shadow);
-}
-
-body.dark-theme header.scrolled {
-    box-shadow: 0 2px 8px var(--shadow-dark);
-}
-
 .header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-
-.logo-img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-}
-
 .logo {
-    display: inline-block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--accent-primary);
 }
 
@@ -126,27 +112,6 @@ body.dark-theme .logo {
 .nav-links {
     display: flex;
     gap: var(--spacing-xl);
-}
-
-.contact-menu {
-    position: relative;
-}
-
-.contact-toggle {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.contact-dropdown {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-}
-
-.contact-dropdown.open {
-    max-height: 600px;
 }
 
 .nav-links a {
@@ -278,7 +243,6 @@ body.dark-theme .hero-btn {
     background: linear-gradient(to bottom right, #e0d1bb, #d4c1a6);
     z-index: 1;
     clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
-    will-change: transform;
 }
 
 body.dark-theme .hero-bg {
@@ -321,39 +285,6 @@ body.dark-theme .section-title h2::after {
 
 body.dark-theme .section-title p {
     color: var(--text-secondary-dark);
-}
-
-.portfolio-filters {
-    text-align: center;
-    margin-bottom: var(--spacing-lg);
-}
-
-.filter-btn {
-    background-color: transparent;
-    border: 1px solid var(--accent-primary);
-    color: var(--accent-primary);
-    padding: 0.5rem 1rem;
-    margin: 0 0.5rem;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.filter-btn.active,
-.filter-btn:hover {
-    background-color: var(--accent-primary);
-    color: #fff;
-}
-
-body.dark-theme .filter-btn {
-    border-color: var(--accent-primary-dark);
-    color: var(--accent-primary-dark);
-}
-
-body.dark-theme .filter-btn.active,
-body.dark-theme .filter-btn:hover {
-    background-color: var(--accent-primary-dark);
-    color: #fff;
 }
 
 /* Portfolio Section */
@@ -615,11 +546,6 @@ body.dark-theme .contact-form-section {
     box-shadow: 0 5px 15px var(--shadow);
 }
 
-.menu-inquiry-form {
-    max-width: 300px;
-    margin: 0;
-}
-
 body.dark-theme .inquiry-form {
     background-color: var(--card-bg-dark);
     box-shadow: 0 5px 15px var(--shadow-dark);
@@ -808,36 +734,6 @@ body.dark-theme .contact-icon {
 
 body.dark-theme .copyright {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Back to top button */
-.back-to-top {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    background-color: var(--accent-primary);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 999;
-}
-
-.back-to-top.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-body.dark-theme .back-to-top {
-    background-color: var(--accent-primary-dark);
 }
 
 /* Animations */
