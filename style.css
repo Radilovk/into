@@ -103,6 +103,9 @@ body.dark-theme header {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-primary);
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 1;
 }
 
 body.dark-theme .logo {
@@ -115,6 +118,18 @@ body.dark-theme .logo {
     margin-right: 2px;
     padding: 0 4px;
     font-weight: 700;
+}
+
+.logo-main {
+    display: flex;
+}
+
+.logo-sub {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+    text-transform: lowercase;
 }
 
 .nav-links {
@@ -823,6 +838,10 @@ body.dark-theme .mobile-toggle {
         font-size: 2.8rem;
     }
 
+    .logo {
+        font-size: 1.5rem;
+    }
+
     .section-title h2 {
         font-size: 2rem;
     }
@@ -831,6 +850,10 @@ body.dark-theme .mobile-toggle {
 @media (max-width: 576px) {
     .hero h1 {
         font-size: 2.2rem;
+    }
+
+    .logo {
+        font-size: 1.3rem;
     }
 
     .portfolio-grid,
