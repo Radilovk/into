@@ -1,36 +1,37 @@
 :root {
-   /* Light Theme - Етерична дневна светлина */
-    --bg-primary: #fafafa;           /* Чист леко топъл бял */
-    --bg-secondary: rgba(255, 255, 255, 0.85); /* Полупрозрачен бял */
-    --text-primary: #2c2c2c;         /* Мек тъмно сив */
-    --text-secondary: #6d6d6d;       /* Приглушен средно сив */
-    --accent-primary: #c4b7a6;       /* Светъл модерен бронз */
-    --accent-secondary: #d8caaf;     /* Патинирано старо злато */
-    --overlay-light: rgba(255, 253, 250, 0.92);
-    --shadow: rgba(180, 180, 180, 0.1); /* Много фини сенки */
-    --card-bg: rgba(255, 255, 255, 0.75); /* Стеклен ефект */
-    --nav-bg: rgba(250, 250, 250, 0.85); /* Frosted glass */
+  /* Light Theme - Свеж модерен минимализъм */
+    --bg-primary: #f8f9fb;           /* Леко синьо-сив фон */
+    --bg-secondary: rgba(255, 255, 255, 0.92); /* Чист полупрозрачен бял */
+    --text-primary: #1e2a38;          /* Дълбок морско синьо */
+    --text-secondary: #5a6d82;        /* Приглушен синьо-сив */
+    --accent-primary: #a78e6f;        /* Топъл пясъчен бежов */
+    --accent-secondary: #8c9ba9;      /* Студен сив акцент */
+    --overlay-light: rgba(248, 249, 251, 0.95);
+    --shadow: rgba(142, 158, 173, 0.08); /* Мек сив оттенък */
+    --card-bg: rgba(255, 255, 255, 0.85); /* Стеклен ефект */
+    --nav-bg: rgba(248, 249, 251, 0.92); /* Frosted glass */
     
-    /* Dark Theme - Луксозен вечерен модерен */
-    --bg-primary-dark: #0f0f0f;      /* Дълбок антрацит */
-    --bg-secondary-dark: rgba(30, 30, 30, 0.8); /* Полупрозрачен тъмен */
-    --text-primary-dark: #f0f0f0;    /* Мяка слонова кост */
-    --text-secondary-dark: #b0b0b0;  /* Приглушен металик */
-    --accent-primary-dark: #d4c19c;  /* Блестящ бронз */
-    --accent-secondary-dark: #e6d9b8;/* Топло старо злато */
-    --overlay-dark: rgba(20, 20, 20, 0.95);
-    --shadow-dark: rgba(0, 0, 0, 0.15);
-    --card-bg-dark: rgba(40, 40, 40, 0.7); /* Тъмен стеклен ефект */
-    --nav-bg-dark: rgba(15, 15, 15, 0.85); /* Frosted dark glass */
+    /* Dark Theme - Луксозен нощен модерен */
+    --bg-primary-dark: #0d1218;       /* Дълбок полунощно синьо */
+    --bg-secondary-dark: rgba(26, 33, 42, 0.85); /* Наситен синьо-черен */
+    --text-primary-dark: #e3eaf1;      /* Мек сребрист бял */
+    --text-secondary-dark: #9ba9b8;    /* Синьо-сив металик */
+    --accent-primary-dark: #c1aa8a;    /* Топъл пясъчен акцент */
+    --accent-secondary-dark: #6d7f92;  /* Студен сив акцент */
+    --overlay-dark: rgba(13, 18, 24, 0.95);
+    --shadow-dark: rgba(0, 0, 0, 0.2);
+    --card-bg-dark: rgba(33, 42, 53, 0.75); /* Тъмен стеклен ефект */
+    --nav-bg-dark: rgba(13, 18, 24, 0.92);
     
     /* Common variables */
-    --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); /* Плавна анимация */
+    --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     --border-radius: 8px;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
     --spacing-lg: 2rem;
     --spacing-xl: 4rem;
-    --glass-effect: blur(12px); /* Ефект на матирано стъкло */
+    --glass-effect: blur(12px);
+    --thin-border: 1px solid rgba(142, 158, 173, 0.15);
 }
 
 * {
