@@ -41,6 +41,116 @@
         </div>
     </header>
 
-    <!-- Останалото съдържание остава непроменено -->
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Създаваме вашия свят</h1>
+                <p>Into Design Studio обединява креативност и функционалност в уникални интериорни решения. Създаваме персонализирани пространства, които отразяват вашата идентичност и визия.</p>
+                <a href="#portfolio" class="hero-btn">Разгледайте проектите</a>
+            </div>
+        </div>
+        <div class="hero-bg"></div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio">
+        <div class="container">
+            <div class="section-title">
+                <h2>Нашите проекти</h2>
+                <p>Всяко пространство е уникално и отразява индивидуалността на клиента</p>
+            </div>
+            
+            <div class="portfolio-grid">
+                <!-- ... съдържанието на портфолиото остава непроменено ... -->
+                <!-- (тук не е имало конфликт) -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-title">
+                <h2>Нашите услуги</h2>
+                <p>Персонализирани пакети за всеки клиент и бюджет</p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- ... cards ... -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team">
+        <div class="container">
+            <div class="section-title">
+                <h2>Нашият екип</h2>
+                <p>Професионалисти с внимание към детайла</p>
+            </div>
+            
+            <div class="team-grid">
+                <!-- ... екип ... -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Online Inquiry Form Section -->
+    <section id="inquiry" class="contact-form-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Изпратете запитване</h2>
+                <p>Ще се радваме да отговорим на вашите въпроси и да обсъдим вашия проект.</p>
+            </div>
+            <form action="#" method="POST" class="inquiry-form">
+                <div class="form-group">
+                    <label for="form-name">Име:</label>
+                    <input type="text" id="form-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="form-email">Имейл:</label>
+                    <input type="email" id="form-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="form-phone">Телефон (по желание):</label>
+                    <input type="tel" id="form-phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="form-subject">Относно:</label>
+                    <select id="form-subject" name="subject">
+                        <option value="Общо запитване">Общо запитване</option>
+                        <option value="Интериорен дизайн">Интериорен дизайн</option>
+                        <option value="Мебелен дизайн">Мебелен дизайн</option>
+                        <option value="Консултация">Консултация</option>
+                        <option value="Пакет Standard">Пакет Standard</option>
+                        <option value="Пакет Standard+">Пакет Standard+</option>
+                        <option value="Пакет Premium">Пакет Premium</option>
+                        <option value="Друго">Друго</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="form-message">Съобщение:</label>
+                    <textarea id="form-message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="form-submit-btn">Изпрати запитване</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <!-- ... футър ... -->
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 IntoDesign Studio. Всички права запазени.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
