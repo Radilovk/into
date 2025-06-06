@@ -1,27 +1,29 @@
 :root {
-  /* Light Theme - Свеж модерен минимализъм */
-    --bg-primary: #f8f9fb;           /* Леко синьо-сив фон */
-    --bg-secondary: rgba(255, 255, 255, 0.92); /* Чист полупрозрачен бял */
-    --text-primary: #1e2a38;          /* Дълбок морско синьо */
-    --text-secondary: #5a6d82;        /* Приглушен синьо-сив */
-    --accent-primary: #a78e6f;        /* Топъл пясъчен бежов */
-    --accent-secondary: #8c9ba9;      /* Студен сив акцент */
-    --overlay-light: rgba(248, 249, 251, 0.95);
-    --shadow: rgba(142, 158, 173, 0.08); /* Мек сив оттенък */
+  /* Light Theme - Топла модерна палитра */
+    --bg-primary: #fdf7f0;           /* Топъл кремав фон */
+    --bg-secondary: rgba(255, 250, 240, 0.92); /* Полупрозрачен крем */
+    --text-primary: #3b2b20;          /* Тъмно кафяво */
+    --text-secondary: #705a4e;        /* Приглушен топъл тон */
+    --accent-primary: #c07d48;        /* Топъл оранжево-кафяв */
+    --accent-secondary: #b59a8a;      /* Мек бежов акцент */
+    --gold-accent: #d4af37;           /* Златист акцент */
+    --overlay-light: rgba(253, 247, 240, 0.95);
+    --shadow: rgba(97, 74, 54, 0.1);  /* Мек кафяв оттенък */
     --card-bg: rgba(255, 255, 255, 0.85); /* Стеклен ефект */
-    --nav-bg: rgba(248, 249, 251, 0.92); /* Frosted glass */
+    --nav-bg: rgba(253, 247, 240, 0.92); /* Frosted glass */
     
-    /* Dark Theme - Луксозен нощен модерен */
-    --bg-primary-dark: #0d1218;       /* Дълбок полунощно синьо */
-    --bg-secondary-dark: rgba(26, 33, 42, 0.85); /* Наситен синьо-черен */
-    --text-primary-dark: #e3eaf1;      /* Мек сребрист бял */
-    --text-secondary-dark: #9ba9b8;    /* Синьо-сив металик */
-    --accent-primary-dark: #c1aa8a;    /* Топъл пясъчен акцент */
-    --accent-secondary-dark: #6d7f92;  /* Студен сив акцент */
-    --overlay-dark: rgba(13, 18, 24, 0.95);
+    /* Dark Theme - Топла нощна визия */
+    --bg-primary-dark: #2a211b;       /* Тъмно кафяво */
+    --bg-secondary-dark: rgba(44, 35, 29, 0.85); /* Наситен кафяв */
+    --text-primary-dark: #f3e8df;      /* Светъл бежов */
+    --text-secondary-dark: #d4c4b8;    /* Мек топъл тон */
+    --accent-primary-dark: #e0a96d;    /* Топъл златист акцент */
+    --accent-secondary-dark: #b3896d;  /* Приглушен кафяв */
+    --gold-accent-dark: #d4af37;       /* Златист акцент */
+    --overlay-dark: rgba(42, 33, 27, 0.95);
     --shadow-dark: rgba(0, 0, 0, 0.2);
-    --card-bg-dark: rgba(33, 42, 53, 0.75); /* Тъмен стеклен ефект */
-    --nav-bg-dark: rgba(13, 18, 24, 0.92);
+    --card-bg-dark: rgba(60, 48, 39, 0.75); /* Тъмен стеклен ефект */
+    --nav-bg-dark: rgba(42, 33, 27, 0.92);
     
     /* Common variables */
     --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
@@ -41,7 +43,7 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
@@ -54,7 +56,7 @@ body.dark-theme {
 }
 
 h1, h2, h3, h4, h5 {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
     line-height: 1.2;
 }
@@ -101,7 +103,7 @@ body.dark-theme header {
 }
 
 .logo {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-primary);
@@ -120,6 +122,11 @@ body.dark-theme .logo {
     margin-right: 2px;
     padding: 0 4px;
     font-weight: 700;
+    color: var(--gold-accent);
+}
+
+body.dark-theme .logo-box {
+    color: var(--gold-accent-dark);
 }
 
 .logo-main {
@@ -600,7 +607,7 @@ body.dark-theme .form-group label {
     padding: 0.75rem;
     border: 1px solid var(--accent-secondary);
     border-radius: var(--border-radius);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
     background-color: var(--bg-secondary); /* Use secondary for inputs to distinguish from primary bg */
     color: var(--text-primary);
