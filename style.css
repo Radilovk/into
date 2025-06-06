@@ -1,15 +1,15 @@
 :root {
     /* Light theme variables */
-    --bg-primary: #f8f8f6;
-    --bg-secondary: #ffffff;
-    --text-primary: #1a1a1a;
-    --text-secondary: #5f6b78;
-    --accent-primary: #caa67a;
-    --accent-secondary: #d4c1a6;
-    --overlay-light: rgba(255, 255, 255, 0.85);
-    --shadow: rgba(0, 0, 0, 0.05);
+      --bg-primary: #f9f7f2;          /* Кремаво-бял фон (лунен камък) */
+    --bg-secondary: #ffffff;         /* Чист бял */
+    --text-primary: #2a2620;         /* Богат кафяв (орехово дърво) */
+    --text-secondary: #7d7468;       /* Топъл сивокафяв (пясъчник) */
+    --accent-primary: #B08D57;       /* Старо злато (антично позлата) */
+    --accent-secondary: #CD7F32;     /* Бронз (патиниран метал) */
+    --overlay-light: rgba(255, 253, 249, 0.92);
+    --shadow: rgba(176, 141, 87, 0.1);
     --card-bg: #ffffff;
-    --nav-bg: rgba(248, 248, 246, 0.95);
+    --nav-bg: rgba(249, 247, 242, 0.97);
     
     /* Dark theme variables */
     --bg-primary-dark: #1d1b18;      /* Дълбок ебеново-кафяв */
