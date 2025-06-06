@@ -12,16 +12,16 @@
     --nav-bg: rgba(248, 248, 246, 0.95);
     
     /* Dark theme variables */
-    --bg-primary-dark: #1a1918;      /* Дълбок черно-кафяв (ебеново дърво) */
-    --bg-secondary-dark: #252321;    /* Топъл тъмен сив (вулканична скала) */
-    --text-primary-dark: #e8e2d9;    /* Мек слонова кост */
-    --text-secondary-dark: #a79e91;  /* Светло бежово (пясъчник) */
-    --accent-primary-dark: #c9a87e;  /* Златист бежов (метална апликация) */
-    --accent-secondary-dark: #8c7b66;/* Тъмен терракот (кожа) */
-    --overlay-dark: rgba(26, 25, 24, 0.95); /* Интензивен тъмен оверлей */
-    --shadow-dark: rgba(0, 0, 0, 0.25);
-    --card-bg-dark: #2a2826;         /* Богат кафяв (оформено желязо) */
-    --nav-bg-dark: rgba(26, 25, 24, 0.97); /* Полупрозрачно ебеново */
+    --bg-primary-dark: #1d1b18;      /* Дълбок ебеново-кафяв */
+    --bg-secondary-dark: #292520;    /* Богат шоколадов нюанс */
+    --text-primary-dark: #e8dfd0;    /* Слонова кост със златен оттенък */
+    --text-secondary-dark: #a99e8f;  /* Патиниран бронз */
+    --accent-primary-dark: #D4AF37;  /* Антично злато */
+    --accent-secondary-dark: #C19A6B;/* Топъл бронз */
+    --overlay-dark: rgba(29, 27, 24, 0.95);
+    --shadow-dark: rgba(212, 175, 55, 0.15);
+    --card-bg-dark: #2c2924;         /* Патинирано желязо със златен отблясък */
+    --nav-bg-dark: rgba(29, 27, 24, 0.97);
     
     /* Common variables */
     --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
