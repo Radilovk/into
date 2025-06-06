@@ -12,16 +12,16 @@
     --nav-bg: rgba(248, 248, 246, 0.95);
     
     /* Dark theme variables */
-    --bg-primary-dark: #121212;
-    --bg-secondary-dark: #1e1e1e;
-    --text-primary-dark: #e0e0e0;
-    --text-secondary-dark: #9ca1a6;
-    --accent-primary-dark: #c69c6d;
-    --accent-secondary-dark: #a68055;
-    --overlay-dark: rgba(26, 26, 26, 0.9);
-    --shadow-dark: rgba(0, 0, 0, 0.2);
-    --card-bg-dark: #2d2d2d;
-    --nav-bg-dark: rgba(26, 26, 26, 0.95);
+    --bg-primary-dark: #1a1918;      /* Дълбок черно-кафяв (ебеново дърво) */
+    --bg-secondary-dark: #252321;    /* Топъл тъмен сив (вулканична скала) */
+    --text-primary-dark: #e8e2d9;    /* Мек слонова кост */
+    --text-secondary-dark: #a79e91;  /* Светло бежово (пясъчник) */
+    --accent-primary-dark: #c9a87e;  /* Златист бежов (метална апликация) */
+    --accent-secondary-dark: #8c7b66;/* Тъмен терракот (кожа) */
+    --overlay-dark: rgba(26, 25, 24, 0.95); /* Интензивен тъмен оверлей */
+    --shadow-dark: rgba(0, 0, 0, 0.25);
+    --card-bg-dark: #2a2826;         /* Богат кафяв (оформено желязо) */
+    --nav-bg-dark: rgba(26, 25, 24, 0.97); /* Полупрозрачно ебеново */
     
     /* Common variables */
     --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
