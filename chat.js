@@ -1,5 +1,17 @@
 const apiEndpoint = 'https://api.cloudflare.com/client/v4/accounts/c2015f4060e04bc3c414f78a9946668e/ai/run/@cf/meta/llama-2-7b-chat-fp16';
-const apiToken = 'pFvYgzuxMS5fJU0GJjR5CnuxwOllvpkJ-HSRDFGl';
+
+let apiToken = sessionStorage.getItem('apiToken') || '';
+const tokenInput = document.getElementById('api-token');
+const saveTokenBtn = document.getElementById('save-token');
+
+tokenInput.value = apiToken;
+
+saveTokenBtn.addEventListener('click', () => {
+    apiToken = tokenInput.value.trim();
+    if (apiToken) {
+        sessionStorage.setItem('apiToken', apiToken);
+    }
+});
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -13,6 +25,11 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const userText = input.value.trim();
     if (!userText) return;
+
+    if (!apiToken) {
+        alert('Моля въведете API токен.');
+        return;
+    }
 
     appendMessage('user', userText);
     chatHistory.push({ role: 'user', content: userText });

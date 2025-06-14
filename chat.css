@@ -1,3 +1,15 @@
+#settings {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    gap: 10px;
+}
+
+#settings input {
+    flex: 1;
+    padding: 5px;
+}
+
 #chat-container {
     max-width: 600px;
     margin: 40px auto;
