@@ -1,0 +1,45 @@
+const apiEndpoint = 'https://api.cloudflare.com/client/v4/accounts/c2015f4060e04bc3c414f78a9946668e/ai/run/@cf/meta/llama-2-7b-chat-fp16';
+const apiToken = 'pFvYgzuxMS5fJU0GJjR5CnuxwOllvpkJ-HSRDFGl';
+
+const messagesEl = document.getElementById('messages');
+const form = document.getElementById('chat-form');
+const input = document.getElementById('user-input');
+
+const chatHistory = [
+    { role: 'system', content: 'You are a helpful assistant.' }
+];
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userText = input.value.trim();
+    if (!userText) return;
+
+    appendMessage('user', userText);
+    chatHistory.push({ role: 'user', content: userText });
+    input.value = '';
+
+    try {
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ messages: chatHistory })
+        });
+        const data = await response.json();
+        const aiText = data.result.response;
+        chatHistory.push({ role: 'assistant', content: aiText });
+        appendMessage('assistant', aiText);
+    } catch (err) {
+        appendMessage('assistant', 'Грешка при заявката.');
+    }
+});
+
+function appendMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `message ${role}`;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
