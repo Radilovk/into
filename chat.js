@@ -1,5 +1,6 @@
-const apiEndpoint = 'https://api.cloudflare.com/client/v4/accounts/c2015f4060e04bc3c414f78a9946668e/ai/run/@cf/meta/llama-3-8b-instruct
-
+// URL на бекенда, който препраща заявките към Cloudflare Workers AI
+// Чат страницата използва worker, достъпен на този адрес
+const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 let apiToken = sessionStorage.getItem('apiToken') || '';
 const tokenInput = document.getElementById('api-token');
 const saveTokenBtn = document.getElementById('save-token');
