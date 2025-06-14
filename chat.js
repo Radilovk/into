@@ -1,4 +1,4 @@
-const apiEndpoint = 'https://api.cloudflare.com/client/v4/accounts/c2015f4060e04bc3c414f78a9946668e/ai/run/@cf/meta/llama-2-7b-chat-fp16';
+const apiEndpoint = 'https://api.cloudflare.com/client/v4/accounts/c2015f4060e04bc3c414f78a9946668e/ai/run/@cf/meta/llama-3-8b-instruct
 
 let apiToken = sessionStorage.getItem('apiToken') || '';
 const tokenInput = document.getElementById('api-token');
