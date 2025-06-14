@@ -1,5 +1,5 @@
-// URL на бекенда, който препраща заявките към Cloudflare Workers AI
-const apiEndpoint = 'https://openapichatbot.radilov-k.workers.dev/';
+// URL на Cloudflare Worker AI бекенда
+const apiEndpoint = "https://workerai.radilov-k.workers.dev/";
 let apiToken = sessionStorage.getItem('apiToken') || '';
 const tokenInput = document.getElementById('api-token');
 const saveTokenBtn = document.getElementById('save-token');
