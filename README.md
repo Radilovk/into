@@ -62,3 +62,7 @@
 ---
 
 Разработено от [Вашето име/Име на екипа, ако е приложимо]
+
+### Worker AI бекенд
+
+Скриптът `worker-backend.js` съдържа примерна Cloudflare Worker функция, която препраща POST заявките към модела `llama-3-8b-instruct`. Той очаква променливи `ACCOUNT_ID`, `MODEL` и `AI_TOKEN`, конфигурирани като Worker Secrets.
