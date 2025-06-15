@@ -3,6 +3,8 @@
 const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 
 const modelSelect = document.getElementById('model-select');
+const modelSelect2 = document.getElementById('model-select-2');
+const debateToggle = document.getElementById('debate-mode');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
@@ -11,6 +13,7 @@ let isRecording = false;
 let mediaRecorder;
 let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
+modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -29,7 +32,7 @@ form.addEventListener('submit', async (e) => {
     chatHistory.push({ role: 'user', content: userText });
     input.value = '';
 
-    await sendRequest();
+    await handleSend();
 });
 
 sendFileBtn.addEventListener('click', () => {
@@ -48,7 +51,7 @@ fileInput.addEventListener('change', () => {
             appendMessage('user', file.name);
         }
         chatHistory.push({ role: 'user', content: '[file]' });
-        await sendRequest(reader.result);
+        await handleSend(reader.result);
         fileInput.value = '';
     };
     reader.readAsDataURL(file);
@@ -56,6 +59,10 @@ fileInput.addEventListener('change', () => {
 
 modelSelect.addEventListener('change', () => {
     voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
+});
+
+debateToggle.addEventListener('change', () => {
+    modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 });
 
 voiceBtn.addEventListener('click', async () => {
@@ -74,7 +81,7 @@ voiceBtn.addEventListener('click', async () => {
             if (transcript) {
                 appendMessage('user', transcript);
                 chatHistory.push({ role: 'user', content: transcript });
-                await sendRequest();
+                await handleSend();
             }
         };
         mediaRecorder.start();
@@ -83,11 +90,20 @@ voiceBtn.addEventListener('click', async () => {
     }
 });
 
-async function sendRequest(fileData) {
+async function handleSend(fileData) {
+    const model1 = getModel(modelSelect);
+    await sendRequest(model1, debateToggle.checked ? 'assistant-1' : 'assistant', fileData);
+    if (debateToggle.checked) {
+        const model2 = getModel(modelSelect2);
+        await sendRequest(model2, 'assistant-2');
+    }
+}
+
+async function sendRequest(model, displayRole, fileData) {
 
     const payload = {
         messages: chatHistory,
-        model: getModel()
+        model
     };
     if (fileData) {
         payload.file = fileData;
@@ -104,9 +120,9 @@ async function sendRequest(fileData) {
         const data = await response.json();
         const aiText = data.result.response;
         chatHistory.push({ role: 'assistant', content: aiText });
-        appendMessage('assistant', aiText);
+        appendMessage(displayRole, aiText);
     } catch (err) {
-        appendMessage('assistant', 'Грешка при заявката.');
+        appendMessage(displayRole, 'Грешка при заявката.');
     }
 }
 
@@ -128,10 +144,10 @@ function appendImageMessage(role, src) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function getModel() {
-    return modelSelect.value === 'voice-chat'
+function getModel(selectEl) {
+    return selectEl.value === 'voice-chat'
         ? '@cf/meta/llama-3.1-8b-instruct'
-        : modelSelect.value;
+        : selectEl.value;
 }
 
 function blobToBase64(blob) {
