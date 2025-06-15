@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudflare Workers AI Chat</title>
+    <title>Into AI Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="chat.css">
 </head>
 <body>
-    <div id="chat-container">
-        <select id="model-select">
-            <option value="@cf/meta/llama-3-8b-instruct">Llama 3 8B Instruct</option>
-            <option value="@cf/meta/llama-2-7b-chat-int8">Llama 2 7B Chat</option>
-        </select>
-        <div id="messages"></div>
-        <form id="chat-form">
-            <input type="text" id="user-input" placeholder="Въведете съобщение..." required>
-            <input type="file" id="file-input" accept="image/*">
-            <button type="button" id="send-file">Качи файл</button>
-            <button type="submit">Изпрати</button>
+    <div id="chat-container" class="chat-container">
+        <header class="chat-header">
+            <h1><i class="fas fa-comments"></i> Into AI Chat</h1>
+            <select id="model-select">
+                <option value="@cf/meta/llama-3.1-8b-instruct">🧠 Разговор</option>
+                <option value="@cf/flux-1-schnell">🎨 Генериране на изображение</option>
+                <option value="@cf/llama-3.2-11b-vision-instruct">🖼 Анализ на изображение</option>
+                <option value="@cf/openai/whisper-large-v3">🔊 Разпознаване на реч</option>
+                <option value="voice-chat">🗣 Гласов чат</option>
+            </select>
+        </header>
+        <div id="messages" class="messages"></div>
+        <form id="chat-form" class="chat-form">
+            <button type="button" id="send-file" class="file-btn"><i class="fas fa-paperclip"></i></button>
+            <input type="file" id="file-input" accept="image/*" hidden>
+            <button type="button" id="voice-btn" class="voice-btn"><i class="fas fa-microphone"></i></button>
+            <input type="text" id="user-input" placeholder="Напишете съобщение..." required autocomplete="off">
+            <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </form>
     </div>
     <script src="chat.js"></script>
