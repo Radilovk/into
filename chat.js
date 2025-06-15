@@ -1,16 +1,6 @@
 // URL на бекенда, който препраща заявките към Cloudflare Workers AI
 // Чат страницата използва worker, достъпен на този адрес
 const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
-let apiToken = sessionStorage.getItem('apiToken') || '';
-
-function ensureToken() {
-    if (!apiToken) {
-        apiToken = prompt('Въведете API токен за Workers AI:');
-        if (apiToken) {
-            sessionStorage.setItem('apiToken', apiToken);
-        }
-    }
-}
 
 const modelSelect = document.getElementById('model-select');
 const fileInput = document.getElementById('file-input');
@@ -94,11 +84,6 @@ voiceBtn.addEventListener('click', async () => {
 });
 
 async function sendRequest(fileData) {
-    ensureToken();
-    if (!apiToken) {
-        alert('Липсва API токен.');
-        return;
-    }
 
     const payload = {
         messages: chatHistory,
@@ -112,7 +97,6 @@ async function sendRequest(fileData) {
         const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${apiToken}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
@@ -170,7 +154,6 @@ async function transcribeAudio(blob) {
         const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${apiToken}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
