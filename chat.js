@@ -5,18 +5,22 @@ const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 const modelSelect = document.getElementById('model-select');
 const modelSelect2 = document.getElementById('model-select-2');
 const debateToggle = document.getElementById('debate-mode');
+const autoDebateToggle = document.getElementById('auto-debate');
+const autoDebateLabel = document.querySelector('.auto-debate-toggle');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
 
-const system1 = { role: 'system', content: 'Ти си Бот 1. Отговаряй кратко и съдържателно, защитавайки позицията си.' };
-const system2 = { role: 'system', content: 'Ти си Бот 2. Опонирай на Бот 1 и бъди също така кратък.' };
+const system1 = { role: 'system', content: 'Ти си Бот 1. Подкрепяш пълната автоматизация с AI и настояваш за нея. Бъди провокативен и кратък.' };
+const system2 = { role: 'system', content: 'Ти си Бот 2. Защитаваш човешкия труд и се противопоставяш на пълната автоматизация. Отговаряй емоционално и кратко.' };
 
 let isRecording = false;
 let mediaRecorder;
 let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
 modelSelect2.classList.toggle('hidden', !debateToggle.checked);
+let autoDebate = false;
+let debateLoopRunning = false;
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -28,6 +32,15 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const userText = input.value.trim();
     if (!userText) return;
+
+    if (userText.toLowerCase() === 'стоп' || userText.toLowerCase() === 'stop') {
+        autoDebate = false;
+        autoDebateToggle.checked = false;
+        autoDebateLabel.classList.remove('running');
+        appendMessage('assistant', 'Автодебатът е спрян.');
+        input.value = '';
+        return;
+    }
 
     appendMessage('user', userText);
     chatHistory.push({ role: 'user', content: userText });
@@ -64,6 +77,14 @@ modelSelect.addEventListener('change', () => {
 
 debateToggle.addEventListener('change', () => {
     modelSelect2.classList.toggle('hidden', !debateToggle.checked);
+});
+
+autoDebateToggle.addEventListener('change', () => {
+    autoDebate = autoDebateToggle.checked;
+    autoDebateLabel.classList.toggle('running', autoDebate);
+    if (autoDebate) {
+        runDebateLoop();
+    }
 });
 
 voiceBtn.addEventListener('click', async () => {
@@ -188,4 +209,14 @@ async function transcribeAudio(blob) {
         appendMessage('assistant', 'Грешка при транскрипция.');
         return null;
     }
+}
+
+async function runDebateLoop() {
+    if (debateLoopRunning) return;
+    debateLoopRunning = true;
+    while (autoDebate) {
+        await handleSend();
+        await new Promise(r => setTimeout(r, 3000));
+    }
+    debateLoopRunning = false;
 }
