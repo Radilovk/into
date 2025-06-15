@@ -2,17 +2,19 @@
 // Чат страницата използва worker, достъпен на този адрес
 const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 let apiToken = sessionStorage.getItem('apiToken') || '';
-const tokenInput = document.getElementById('api-token');
-const saveTokenBtn = document.getElementById('save-token');
 
-tokenInput.value = apiToken;
-
-saveTokenBtn.addEventListener('click', () => {
-    apiToken = tokenInput.value.trim();
-    if (apiToken) {
-        sessionStorage.setItem('apiToken', apiToken);
+function ensureToken() {
+    if (!apiToken) {
+        apiToken = prompt('Въведете API токен за Workers AI:');
+        if (apiToken) {
+            sessionStorage.setItem('apiToken', apiToken);
+        }
     }
-});
+}
+
+const modelSelect = document.getElementById('model-select');
+const fileInput = document.getElementById('file-input');
+const sendFileBtn = document.getElementById('send-file');
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -27,14 +29,40 @@ form.addEventListener('submit', async (e) => {
     const userText = input.value.trim();
     if (!userText) return;
 
-    if (!apiToken) {
-        alert('Моля въведете API токен.');
-        return;
-    }
-
     appendMessage('user', userText);
     chatHistory.push({ role: 'user', content: userText });
     input.value = '';
+
+    await sendRequest();
+});
+
+sendFileBtn.addEventListener('click', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+        appendMessage('user', '[файл]');
+        chatHistory.push({ role: 'user', content: '[file]' });
+        await sendRequest(reader.result);
+    };
+    reader.readAsDataURL(file);
+});
+
+async function sendRequest(fileData) {
+    ensureToken();
+    if (!apiToken) {
+        alert('Липсва API токен.');
+        return;
+    }
+
+    const payload = {
+        messages: chatHistory,
+        model: modelSelect.value
+    };
+    if (fileData) {
+        payload.file = fileData;
+    }
 
     try {
         const response = await fetch(apiEndpoint, {
@@ -43,7 +71,7 @@ form.addEventListener('submit', async (e) => {
                 'Authorization': `Bearer ${apiToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ messages: chatHistory })
+            body: JSON.stringify(payload)
         });
         const data = await response.json();
         const aiText = data.result.response;
@@ -52,7 +80,7 @@ form.addEventListener('submit', async (e) => {
     } catch (err) {
         appendMessage('assistant', 'Грешка при заявката.');
     }
-});
+}
 
 function appendMessage(role, text) {
     const div = document.createElement('div');

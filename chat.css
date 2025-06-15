@@ -1,12 +1,7 @@
-#settings {
+
+#model-select {
     max-width: 600px;
     margin: 20px auto;
-    display: flex;
-    gap: 10px;
-}
-
-#settings input {
-    flex: 1;
     padding: 5px;
 }
 
@@ -43,6 +38,14 @@
 #user-input {
     flex: 1;
     padding: 5px;
+}
+
+#file-input {
+    margin-left: 5px;
+}
+
+#send-file {
+    margin-left: 5px;
 }
 
 button {
