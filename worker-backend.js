@@ -23,7 +23,13 @@ export default {
     }
 
     const messages = data.messages || [];
-    const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/ai/run/${env.MODEL}`;
+    const model = data.model || env.MODEL;
+    const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/ai/run/${model}`;
+
+    const payload = { messages };
+    if (data.file) {
+      payload.file = data.file;
+    }
 
     let response;
     try {
@@ -33,7 +39,7 @@ export default {
           'Authorization': `Bearer ${env.AI_TOKEN}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ messages })
+        body: JSON.stringify(payload)
       });
     } catch (err) {
       return new Response(JSON.stringify({ error: 'Request failed' }), {
