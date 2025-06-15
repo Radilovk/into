@@ -100,3 +100,5 @@ return new Response(result, {
   }
 });
 ```
+
+Допълнителни примери за заявки към различни AI модели ще откриете във файла `WORKERS_AI_EXAMPLES.md`.
