@@ -14,19 +14,26 @@ export default {
     const messages = data.messages || [];
     const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/ai/run/${env.MODEL}`;
 
-    const response = await fetch(cfEndpoint, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.AI_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ messages })
-    });
+    try {
+      const response = await fetch(cfEndpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.AI_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messages })
+      });
 
-    const result = await response.text();
-    return new Response(result, {
-      status: response.status,
-      headers: { 'Content-Type': 'application/json' }
-    });
+      const result = await response.text();
+      return new Response(result, {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (err) {
+      return new Response(JSON.stringify({ error: 'Request failed' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
   }
 };
