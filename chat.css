@@ -66,6 +66,16 @@ body {
   user-select: none;
 }
 
+.auto-debate-toggle {
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.auto-debate-toggle.running {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
 .hidden {
   display: none;
 }
