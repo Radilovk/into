@@ -7,16 +7,14 @@
     <link rel="stylesheet" href="chat.css">
 </head>
 <body>
+    <div id="settings">
+        <input type="password" id="api-token" placeholder="Въведете API токен">
+        <button type="button" id="save-token">Запази токена</button>
+    </div>
     <div id="chat-container">
-        <select id="model-select">
-            <option value="@cf/meta/llama-3-8b-instruct">Llama 3 8B Instruct</option>
-            <option value="@cf/meta/llama-2-7b-chat-int8">Llama 2 7B Chat</option>
-        </select>
         <div id="messages"></div>
         <form id="chat-form">
             <input type="text" id="user-input" placeholder="Въведете съобщение..." required>
-            <input type="file" id="file-input" accept="image/*">
-            <button type="button" id="send-file">Качи файл</button>
             <button type="submit">Изпрати</button>
         </form>
     </div>
