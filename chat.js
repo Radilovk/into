@@ -95,19 +95,20 @@ async function handleSend(fileData) {
     const baseHistory = [...chatHistory];
     const model1 = getModel(modelSelect);
     const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
-    const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', fileData);
-    if (reply1) chatHistory.push({ role: 'assistant', content: reply1 });
+    const label1 = debateToggle.checked ? 'Бот 1' : null;
+    const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData);
+    if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
 
     if (debateToggle.checked) {
         await new Promise(r => setTimeout(r, 700));
         const model2 = getModel(modelSelect2);
         const messages2 = [system2, ...chatHistory];
-        const reply2 = await sendRequest(model2, messages2, 'assistant-2');
-        if (reply2) chatHistory.push({ role: 'assistant', content: reply2 });
+        const reply2 = await sendRequest(model2, messages2, 'assistant-2', 'Бот 2');
+        if (reply2) chatHistory.push({ role: 'assistant', content: `Бот 2: ${reply2}` });
     }
 }
 
-async function sendRequest(model, messages, displayRole, fileData) {
+async function sendRequest(model, messages, displayRole, speaker, fileData) {
     const payload = { messages, model };
     if (fileData) payload.file = fileData;
 
@@ -119,18 +120,24 @@ async function sendRequest(model, messages, displayRole, fileData) {
         });
         const data = await response.json();
         const aiText = data.result.response;
-        appendMessage(displayRole, aiText);
+        appendMessage(displayRole, aiText, speaker);
         return aiText;
     } catch {
-        appendMessage(displayRole, 'Грешка при заявката.');
+        appendMessage(displayRole, 'Грешка при заявката.', speaker);
         return null;
     }
 }
 
-function appendMessage(role, text) {
+function appendMessage(role, text, speaker) {
     const div = document.createElement('div');
     div.className = `message ${role}`;
-    div.textContent = text;
+    if (speaker) {
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = speaker + ': ';
+        div.appendChild(label);
+    }
+    div.appendChild(document.createTextNode(text));
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }

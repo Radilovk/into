@@ -114,6 +114,11 @@ body {
   border-bottom-left-radius: 0;
 }
 
+.message .label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
 .chat-form {
   background: #242424;
   padding: 10px;
