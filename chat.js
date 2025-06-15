@@ -46,7 +46,11 @@ form.addEventListener('submit', async (e) => {
     chatHistory.push({ role: 'user', content: userText });
     input.value = '';
 
-    await handleSend();
+    try {
+        await handleSend();
+    } catch (err) {
+        console.error('Грешка при handleSend:', err);
+    }
 });
 
 sendFileBtn.addEventListener('click', () => {
@@ -65,7 +69,11 @@ fileInput.addEventListener('change', () => {
             appendMessage('user', file.name);
         }
         chatHistory.push({ role: 'user', content: '[file]' });
-        await handleSend(reader.result);
+        try {
+            await handleSend(reader.result);
+        } catch (err) {
+            console.error('Грешка при handleSend:', err);
+        }
         fileInput.value = '';
     };
     reader.readAsDataURL(file);
@@ -103,7 +111,11 @@ voiceBtn.addEventListener('click', async () => {
             if (transcript) {
                 appendMessage('user', transcript);
                 chatHistory.push({ role: 'user', content: transcript });
-                await handleSend();
+                try {
+                    await handleSend();
+                } catch (err) {
+                    console.error('Грешка при handleSend:', err);
+                }
             }
         };
         mediaRecorder.start();
@@ -215,8 +227,15 @@ async function runDebateLoop() {
     if (debateLoopRunning) return;
     debateLoopRunning = true;
     while (autoDebate) {
-        await handleSend();
+        console.log('Започва итерация на дебат цикъла');
+        try {
+            await handleSend();
+        } catch (err) {
+            console.error('Грешка при handleSend в дебат цикъл:', err);
+        }
+        console.log('Приключва итерация на дебат цикъла');
         await new Promise(r => setTimeout(r, 3000));
     }
     debateLoopRunning = false;
+    console.log('Дебат цикълът е спрян, debateLoopRunning:', debateLoopRunning);
 }
