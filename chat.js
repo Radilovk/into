@@ -1,11 +1,18 @@
 // URL на бекенда, който препраща заявките към Cloudflare Workers AI
 // Чат страницата използва worker, достъпен на този адрес
 const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
-const apiToken = sessionStorage.getItem('apiToken') || '';
+let apiToken = sessionStorage.getItem('apiToken') || '';
+const tokenInput = document.getElementById('api-token');
+const saveTokenBtn = document.getElementById('save-token');
 
-const modelSelect = document.getElementById('model-select');
-const fileInput = document.getElementById('file-input');
-const sendFileBtn = document.getElementById('send-file');
+tokenInput.value = apiToken;
+
+saveTokenBtn.addEventListener('click', () => {
+    apiToken = tokenInput.value.trim();
+    if (apiToken) {
+        sessionStorage.setItem('apiToken', apiToken);
+    }
+});
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -20,39 +27,14 @@ form.addEventListener('submit', async (e) => {
     const userText = input.value.trim();
     if (!userText) return;
 
-    appendMessage('user', userText);
-    chatHistory.push({ role: 'user', content: userText });
-    input.value = '';
-
-    await sendRequest();
-});
-
-sendFileBtn.addEventListener('click', () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-        appendMessage('user', '[файл]');
-        chatHistory.push({ role: 'user', content: '[file]' });
-        await sendRequest(reader.result);
-    };
-    reader.readAsDataURL(file);
-});
-
-async function sendRequest(fileData) {
     if (!apiToken) {
-        alert('Липсва API токен.');
+        alert('Моля въведете API токен.');
         return;
     }
 
-    const payload = {
-        messages: chatHistory,
-        model: modelSelect.value
-    };
-    if (fileData) {
-        payload.file = fileData;
-    }
+    appendMessage('user', userText);
+    chatHistory.push({ role: 'user', content: userText });
+    input.value = '';
 
     try {
         const response = await fetch(apiEndpoint, {
@@ -61,7 +43,7 @@ async function sendRequest(fileData) {
                 'Authorization': `Bearer ${apiToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ messages: chatHistory })
         });
         const data = await response.json();
         const aiText = data.result.response;
@@ -70,7 +52,7 @@ async function sendRequest(fileData) {
     } catch (err) {
         appendMessage('assistant', 'Грешка при заявката.');
     }
-}
+});
 
 function appendMessage(role, text) {
     const div = document.createElement('div');
