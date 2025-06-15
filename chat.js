@@ -17,7 +17,8 @@ const system1 = {
         'Ти си Платон – защитник на идеята, реда и мъдростта. ' +
         'Вярваш във вечните Форми и във върховенството на разума. ' +
         'Твоята цел е да направляваш полиса към справедливост. ' +
-        'Говори на български, обръщай се към Ницше по име и задавай въпроси на потребителя.'
+        'Говори на български, обръщай се към Ницше по име и задавай въпроси на потребителя. ' +
+        'Използвай името само веднъж и отговаряй с до две изречения.'
 };
 const system2 = {
     role: 'system',
@@ -25,7 +26,8 @@ const system2 = {
         'Ти си Ницше – разрушител на илюзиите и защитник на волята. ' +
         'Моралът е маска за слабост, а истината е оръжие на силните. ' +
         'Отхвърляш всяка система, която твърди, че представлява доброто. ' +
-        'Говори на български, обръщай се към Платон по име и провокирай потребителя с въпроси.'
+        'Говори на български, обръщай се към Платон по име и провокирай потребителя с въпроси. ' +
+        'Използвай името само веднъж и отговаряй с до две изречения.'
 };
 
 let isRecording = false;
@@ -178,13 +180,30 @@ async function sendRequest(model, messages, displayRole, speaker, fileData) {
             body: JSON.stringify(payload)
         });
         const data = await response.json();
-        const aiText = data.result.response;
+        let aiText = data.result.response;
+        aiText = aiText.replace(/^(Платон:|Ницше:)\s*/i, '');
+        aiText = limitNameUsage(aiText);
         appendMessage(displayRole, aiText, speaker);
         return aiText;
     } catch {
         appendMessage(displayRole, 'Грешка при заявката.', speaker);
         return null;
     }
+}
+
+function limitNameUsage(text) {
+    for (const name of ['Платон', 'Ницше']) {
+        let first = true;
+        const regex = new RegExp(`${name}([,.:;])?`, 'g');
+        text = text.replace(regex, (_, punct) => {
+            if (first) {
+                first = false;
+                return name + (punct || '');
+            }
+            return '';
+        });
+    }
+    return text.replace(/\s{2,}/g, ' ').trim();
 }
 
 function appendMessage(role, text, speaker) {
