@@ -185,6 +185,17 @@ body {
     border-radius: 0;
   }
 
+  .chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
   .chat-header h1 {
     font-size: 0.95rem;
   }
