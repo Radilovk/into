@@ -11,8 +11,22 @@ const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
 
-const system1 = { role: 'system', content: 'Ти си Бот 1. Подкрепяш пълната автоматизация с AI и настояваш за нея. Бъди провокативен и кратък.' };
-const system2 = { role: 'system', content: 'Ти си Бот 2. Защитаваш човешкия труд и се противопоставяш на пълната автоматизация. Отговаряй емоционално и кратко.' };
+const system1 = {
+    role: 'system',
+    content:
+        'Ти си Платон – защитник на идеята, реда и мъдростта. ' +
+        'Вярваш във вечните Форми и във върховенството на разума. ' +
+        'Твоята цел е да направляваш полиса към справедливост. ' +
+        'Говори на български, обръщай се към Ницше по име и задавай въпроси на потребителя.'
+};
+const system2 = {
+    role: 'system',
+    content:
+        'Ти си Ницше – разрушител на илюзиите и защитник на волята. ' +
+        'Моралът е маска за слабост, а истината е оръжие на силните. ' +
+        'Отхвърляш всяка система, която твърди, че представлява доброто. ' +
+        'Говори на български, обръщай се към Платон по име и провокирай потребителя с въпроси.'
+};
 
 let isRecording = false;
 let mediaRecorder;
@@ -27,6 +41,15 @@ const form = document.getElementById('chat-form');
 const input = document.getElementById('user-input');
 
 const chatHistory = [];
+
+input.addEventListener('input', () => {
+    if (input.value.trim() && autoDebate) {
+        autoDebate = false;
+        autoDebateToggle.checked = false;
+        autoDebateLabel.classList.remove('running');
+        console.log('Автодебатът е паузиран заради въвеждане от потребителя.');
+    }
+});
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -46,7 +69,11 @@ form.addEventListener('submit', async (e) => {
     chatHistory.push({ role: 'user', content: userText });
     input.value = '';
 
-    await handleSend();
+    try {
+        await handleSend();
+    } catch (err) {
+        console.error('Грешка при handleSend:', err);
+    }
 });
 
 sendFileBtn.addEventListener('click', () => {
@@ -65,7 +92,11 @@ fileInput.addEventListener('change', () => {
             appendMessage('user', file.name);
         }
         chatHistory.push({ role: 'user', content: '[file]' });
-        await handleSend(reader.result);
+        try {
+            await handleSend(reader.result);
+        } catch (err) {
+            console.error('Грешка при handleSend:', err);
+        }
         fileInput.value = '';
     };
     reader.readAsDataURL(file);
@@ -103,7 +134,11 @@ voiceBtn.addEventListener('click', async () => {
             if (transcript) {
                 appendMessage('user', transcript);
                 chatHistory.push({ role: 'user', content: transcript });
-                await handleSend();
+                try {
+                    await handleSend();
+                } catch (err) {
+                    console.error('Грешка при handleSend:', err);
+                }
             }
         };
         mediaRecorder.start();
@@ -116,16 +151,17 @@ async function handleSend(fileData) {
     const baseHistory = [...chatHistory];
     const model1 = getModel(modelSelect);
     const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
-    const label1 = debateToggle.checked ? 'Бот 1' : null;
+    const label1 = debateToggle.checked ? 'Платон' : null;
     const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData);
     if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
 
     if (debateToggle.checked) {
-        await new Promise(r => setTimeout(r, 700));
+        const delay = Math.floor(Math.random() * 2000) + 3000;
+        await new Promise(r => setTimeout(r, delay));
         const model2 = getModel(modelSelect2);
         const messages2 = [system2, ...chatHistory];
-        const reply2 = await sendRequest(model2, messages2, 'assistant-2', 'Бот 2');
-        if (reply2) chatHistory.push({ role: 'assistant', content: `Бот 2: ${reply2}` });
+        const reply2 = await sendRequest(model2, messages2, 'assistant-2', 'Ницше');
+        if (reply2) chatHistory.push({ role: 'assistant', content: `Ницше: ${reply2}` });
     }
 }
 
@@ -215,8 +251,16 @@ async function runDebateLoop() {
     if (debateLoopRunning) return;
     debateLoopRunning = true;
     while (autoDebate) {
-        await handleSend();
-        await new Promise(r => setTimeout(r, 3000));
+        console.log('Започва итерация на дебат цикъла');
+        try {
+            await handleSend();
+        } catch (err) {
+            console.error('Грешка при handleSend в дебат цикъл:', err);
+        }
+        console.log('Приключва итерация на дебат цикъла');
+        const delay = Math.floor(Math.random() * 2000) + 3000;
+        await new Promise(r => setTimeout(r, delay));
     }
     debateLoopRunning = false;
+    console.log('Дебат цикълът е спрян, debateLoopRunning:', debateLoopRunning);
 }
