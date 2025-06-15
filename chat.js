@@ -9,6 +9,9 @@ const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
 
+const system1 = { role: 'system', content: 'Ти си Бот 1. Отговаряй кратко и съдържателно, защитавайки позицията си.' };
+const system2 = { role: 'system', content: 'Ти си Бот 2. Опонирай на Бот 1 и бъди също така кратък.' };
+
 let isRecording = false;
 let mediaRecorder;
 let audioChunks = [];
@@ -19,9 +22,7 @@ const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
 const input = document.getElementById('user-input');
 
-const chatHistory = [
-    { role: 'system', content: 'You are a helpful assistant.' }
-];
+const chatHistory = [];
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -91,38 +92,38 @@ voiceBtn.addEventListener('click', async () => {
 });
 
 async function handleSend(fileData) {
+    const baseHistory = [...chatHistory];
     const model1 = getModel(modelSelect);
-    await sendRequest(model1, debateToggle.checked ? 'assistant-1' : 'assistant', fileData);
+    const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
+    const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', fileData);
+    if (reply1) chatHistory.push({ role: 'assistant', content: reply1 });
+
     if (debateToggle.checked) {
+        await new Promise(r => setTimeout(r, 700));
         const model2 = getModel(modelSelect2);
-        await sendRequest(model2, 'assistant-2');
+        const messages2 = [system2, ...chatHistory];
+        const reply2 = await sendRequest(model2, messages2, 'assistant-2');
+        if (reply2) chatHistory.push({ role: 'assistant', content: reply2 });
     }
 }
 
-async function sendRequest(model, displayRole, fileData) {
-
-    const payload = {
-        messages: chatHistory,
-        model
-    };
-    if (fileData) {
-        payload.file = fileData;
-    }
+async function sendRequest(model, messages, displayRole, fileData) {
+    const payload = { messages, model };
+    if (fileData) payload.file = fileData;
 
     try {
         const response = await fetch(apiEndpoint, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         const data = await response.json();
         const aiText = data.result.response;
-        chatHistory.push({ role: 'assistant', content: aiText });
         appendMessage(displayRole, aiText);
-    } catch (err) {
+        return aiText;
+    } catch {
         appendMessage(displayRole, 'Грешка при заявката.');
+        return null;
     }
 }
 
