@@ -14,7 +14,7 @@ Respond like a person who doesn't just talk — destabilizes. Let people feel th
   ],
   "max_tokens": 700,
   "temperature": 0.65,
-  "model": "@cf/meta/llama-3.1-8b-instruct"
+  "model": "@cf/qwen/qwen1.5-32b-chat"
 }
 ```
 
