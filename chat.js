@@ -20,7 +20,7 @@ let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
 modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 let autoDebate = false;
-let autoDebateTimer;
+let debateLoopRunning = false;
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -37,7 +37,6 @@ form.addEventListener('submit', async (e) => {
         autoDebate = false;
         autoDebateToggle.checked = false;
         autoDebateLabel.classList.remove('running');
-        if (autoDebateTimer) clearTimeout(autoDebateTimer);
         appendMessage('assistant', 'Автодебатът е спрян.');
         input.value = '';
         return;
@@ -85,8 +84,6 @@ autoDebateToggle.addEventListener('change', () => {
     autoDebateLabel.classList.toggle('running', autoDebate);
     if (autoDebate) {
         runDebateLoop();
-    } else if (autoDebateTimer) {
-        clearTimeout(autoDebateTimer);
     }
 });
 
@@ -215,7 +212,11 @@ async function transcribeAudio(blob) {
 }
 
 async function runDebateLoop() {
-    if (!autoDebate) return;
-    await handleSend();
-    autoDebateTimer = setTimeout(runDebateLoop, 3000);
+    if (debateLoopRunning) return;
+    debateLoopRunning = true;
+    while (autoDebate) {
+        await handleSend();
+        await new Promise(r => setTimeout(r, 3000));
+    }
+    debateLoopRunning = false;
 }
