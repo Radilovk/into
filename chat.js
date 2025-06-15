@@ -156,8 +156,10 @@ async function handleSend(fileData) {
     if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
 
     if (debateToggle.checked) {
-        const delay = Math.floor(Math.random() * 2000) + 3000;
-        await new Promise(r => setTimeout(r, delay));
+        // При автоматичния режим runDebateLoop() вече вмъква пауза между
+        // ходовете, затова тук не чакаме допълнително.
+        const delay = autoDebate ? 0 : Math.floor(Math.random() * 2000) + 3000;
+        if (delay > 0) await new Promise(r => setTimeout(r, delay));
         const model2 = getModel(modelSelect2);
         const messages2 = [system2, ...chatHistory];
         const reply2 = await sendRequest(model2, messages2, 'assistant-2', 'Ницше');
@@ -258,6 +260,9 @@ async function runDebateLoop() {
             console.error('Грешка при handleSend в дебат цикъл:', err);
         }
         console.log('Приключва итерация на дебат цикъла');
+        // Пауза между ходовете, за да не се преплитат отговорите
+        // на ботовете при включен автодебат. handleSend() не
+        // добавя допълнително забавяне в този режим.
         const delay = Math.floor(Math.random() * 2000) + 3000;
         await new Promise(r => setTimeout(r, delay));
     }
