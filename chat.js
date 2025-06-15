@@ -5,6 +5,7 @@ const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 const modelSelect = document.getElementById('model-select');
 const modelSelect2 = document.getElementById('model-select-2');
 const debateToggle = document.getElementById('debate-mode');
+const autoDebateToggle = document.getElementById('auto-debate');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
@@ -17,6 +18,8 @@ let mediaRecorder;
 let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
 modelSelect2.classList.toggle('hidden', !debateToggle.checked);
+let autoDebate = false;
+let autoDebateTimer;
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -28,6 +31,16 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const userText = input.value.trim();
     if (!userText) return;
+
+    if (userText.toLowerCase() === 'стоп' || userText.toLowerCase() === 'stop') {
+        autoDebate = false;
+        autoDebateToggle.checked = false;
+        autoDebateToggle.classList.remove('running');
+        if (autoDebateTimer) clearTimeout(autoDebateTimer);
+        appendMessage('assistant', 'Автодебатът е спрян.');
+        input.value = '';
+        return;
+    }
 
     appendMessage('user', userText);
     chatHistory.push({ role: 'user', content: userText });
@@ -64,6 +77,16 @@ modelSelect.addEventListener('change', () => {
 
 debateToggle.addEventListener('change', () => {
     modelSelect2.classList.toggle('hidden', !debateToggle.checked);
+});
+
+autoDebateToggle.addEventListener('change', () => {
+    autoDebate = autoDebateToggle.checked;
+    autoDebateToggle.classList.toggle('running', autoDebate);
+    if (autoDebate) {
+        runDebateLoop();
+    } else if (autoDebateTimer) {
+        clearTimeout(autoDebateTimer);
+    }
 });
 
 voiceBtn.addEventListener('click', async () => {
@@ -188,4 +211,10 @@ async function transcribeAudio(blob) {
         appendMessage('assistant', 'Грешка при транскрипция.');
         return null;
     }
+}
+
+function runDebateLoop() {
+    if (!autoDebate) return;
+    handleSend();
+    autoDebateTimer = setTimeout(runDebateLoop, 3000);
 }
