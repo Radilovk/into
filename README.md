@@ -66,3 +66,25 @@
 ### Worker AI бекенд
 
 Скриптът `worker-backend.js` съдържа примерна Cloudflare Worker функция, която препраща POST заявките към модела `llama-3-8b-instruct`. Той очаква променливи `ACCOUNT_ID`, `MODEL` и `AI_TOKEN`, конфигурирани като Worker Secrets.
+
+Ако отваряте `chat.html` от различен домейн или локално като файл, Worker-ът трябва да връща CORS заглавки, за да позволи заявките. Примерните стойности са:
+
+```text
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Allow-Methods: POST
+```
+
+За да ги активирате, добавете ги в полето `headers` при създаване на `Response` в `worker-backend.js`:
+
+```javascript
+return new Response(result, {
+  status: response.status,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST'
+  }
+});
+```
