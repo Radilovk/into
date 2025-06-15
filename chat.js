@@ -3,22 +3,26 @@
 const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 
 const modelSelect = document.getElementById('model-select');
+const modelSelect2 = document.getElementById('model-select-2');
+const debateToggle = document.getElementById('debate-mode');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
+
+const system1 = { role: 'system', content: 'Ти си Бот 1. Отговаряй кратко и съдържателно, защитавайки позицията си.' };
+const system2 = { role: 'system', content: 'Ти си Бот 2. Опонирай на Бот 1 и бъди също така кратък.' };
 
 let isRecording = false;
 let mediaRecorder;
 let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
+modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
 const input = document.getElementById('user-input');
 
-const chatHistory = [
-    { role: 'system', content: 'You are a helpful assistant.' }
-];
+const chatHistory = [];
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -29,7 +33,7 @@ form.addEventListener('submit', async (e) => {
     chatHistory.push({ role: 'user', content: userText });
     input.value = '';
 
-    await sendRequest();
+    await handleSend();
 });
 
 sendFileBtn.addEventListener('click', () => {
@@ -48,7 +52,7 @@ fileInput.addEventListener('change', () => {
             appendMessage('user', file.name);
         }
         chatHistory.push({ role: 'user', content: '[file]' });
-        await sendRequest(reader.result);
+        await handleSend(reader.result);
         fileInput.value = '';
     };
     reader.readAsDataURL(file);
@@ -56,6 +60,10 @@ fileInput.addEventListener('change', () => {
 
 modelSelect.addEventListener('change', () => {
     voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
+});
+
+debateToggle.addEventListener('change', () => {
+    modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 });
 
 voiceBtn.addEventListener('click', async () => {
@@ -74,7 +82,7 @@ voiceBtn.addEventListener('click', async () => {
             if (transcript) {
                 appendMessage('user', transcript);
                 chatHistory.push({ role: 'user', content: transcript });
-                await sendRequest();
+                await handleSend();
             }
         };
         mediaRecorder.start();
@@ -83,37 +91,53 @@ voiceBtn.addEventListener('click', async () => {
     }
 });
 
-async function sendRequest(fileData) {
+async function handleSend(fileData) {
+    const baseHistory = [...chatHistory];
+    const model1 = getModel(modelSelect);
+    const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
+    const label1 = debateToggle.checked ? 'Бот 1' : null;
+    const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData);
+    if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
 
-    const payload = {
-        messages: chatHistory,
-        model: getModel()
-    };
-    if (fileData) {
-        payload.file = fileData;
+    if (debateToggle.checked) {
+        await new Promise(r => setTimeout(r, 700));
+        const model2 = getModel(modelSelect2);
+        const messages2 = [system2, ...chatHistory];
+        const reply2 = await sendRequest(model2, messages2, 'assistant-2', 'Бот 2');
+        if (reply2) chatHistory.push({ role: 'assistant', content: `Бот 2: ${reply2}` });
     }
+}
+
+async function sendRequest(model, messages, displayRole, speaker, fileData) {
+    const payload = { messages, model };
+    if (fileData) payload.file = fileData;
 
     try {
         const response = await fetch(apiEndpoint, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
         const data = await response.json();
         const aiText = data.result.response;
-        chatHistory.push({ role: 'assistant', content: aiText });
-        appendMessage('assistant', aiText);
-    } catch (err) {
-        appendMessage('assistant', 'Грешка при заявката.');
+        appendMessage(displayRole, aiText, speaker);
+        return aiText;
+    } catch {
+        appendMessage(displayRole, 'Грешка при заявката.', speaker);
+        return null;
     }
 }
 
-function appendMessage(role, text) {
+function appendMessage(role, text, speaker) {
     const div = document.createElement('div');
     div.className = `message ${role}`;
-    div.textContent = text;
+    if (speaker) {
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = speaker + ': ';
+        div.appendChild(label);
+    }
+    div.appendChild(document.createTextNode(text));
     messagesEl.appendChild(div);
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }
@@ -128,10 +152,10 @@ function appendImageMessage(role, src) {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
-function getModel() {
-    return modelSelect.value === 'voice-chat'
+function getModel(selectEl) {
+    return selectEl.value === 'voice-chat'
         ? '@cf/meta/llama-3.1-8b-instruct'
-        : modelSelect.value;
+        : selectEl.value;
 }
 
 function blobToBase64(blob) {

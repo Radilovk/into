@@ -12,13 +12,22 @@
     <div id="chat-container" class="chat-container">
         <header class="chat-header">
             <h1><i class="fas fa-comments"></i> Into AI Chat</h1>
-            <select id="model-select">
-                <option value="@cf/meta/llama-3.1-8b-instruct">🧠 Разговор</option>
-                <option value="@cf/flux-1-schnell">🎨 Генериране на изображение</option>
-                <option value="@cf/llama-3.2-11b-vision-instruct">🖼 Анализ на изображение</option>
-                <option value="@cf/openai/whisper-large-v3">🔊 Разпознаване на реч</option>
-                <option value="voice-chat">🗣 Гласов чат</option>
-            </select>
+            <div class="controls">
+                <select id="model-select">
+                    <option value="@cf/meta/llama-3.1-8b-instruct">🧠 Разговор</option>
+                    <option value="@cf/flux-1-schnell">🎨 Генериране на изображение</option>
+                    <option value="@cf/llama-3.2-11b-vision-instruct">🖼 Анализ на изображение</option>
+                    <option value="@cf/openai/whisper-large-v3">🔊 Разпознаване на реч</option>
+                    <option value="voice-chat">🗣 Гласов чат</option>
+                </select>
+                <label class="debate-toggle"><input type="checkbox" id="debate-mode"> Дебат</label>
+                <select id="model-select-2" class="hidden" aria-label="Модел за Бот 2">
+                    <option value="@cf/meta/llama-3.1-8b-instruct">🧠 Разговор</option>
+                    <option value="@cf/flux-1-schnell">🎨 Генериране на изображение</option>
+                    <option value="@cf/llama-3.2-11b-vision-instruct">🖼 Анализ на изображение</option>
+                    <option value="@cf/openai/whisper-large-v3">🔊 Разпознаване на реч</option>
+                </select>
+            </div>
         </header>
         <div id="messages" class="messages"></div>
         <form id="chat-form" class="chat-form">
