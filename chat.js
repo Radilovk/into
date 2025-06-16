@@ -30,6 +30,8 @@ const system2 = {
         'Използвай името само веднъж и отговаряй с до две изречения.'
 };
 
+const participantNames = ['Платон', 'Ницше'];
+
 let isRecording = false;
 let mediaRecorder;
 let audioChunks = [];
@@ -37,6 +39,10 @@ voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
 modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 let autoDebate = false;
 let debateLoopRunning = false;
+
+function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
@@ -181,7 +187,9 @@ async function sendRequest(model, messages, displayRole, speaker, fileData) {
         });
         const data = await response.json();
         let aiText = data.result.response;
-        aiText = aiText.replace(/^(Платон:|Ницше:)\s*/i, '');
+        const escaped = participantNames.map(escapeRegExp).join('|');
+        const nameRegex = new RegExp(`^(${escaped}):\\s*`, 'i');
+        aiText = aiText.replace(nameRegex, '');
         aiText = limitNameUsage(aiText);
         appendMessage(displayRole, aiText, speaker);
         return aiText;
@@ -192,9 +200,9 @@ async function sendRequest(model, messages, displayRole, speaker, fileData) {
 }
 
 function limitNameUsage(text) {
-    for (const name of ['Платон', 'Ницше']) {
+    for (const name of participantNames) {
         let first = true;
-        const regex = new RegExp(`${name}([,.:;])?`, 'g');
+        const regex = new RegExp(`${escapeRegExp(name)}([,.:;])?`, 'g');
         text = text.replace(regex, (_, punct) => {
             if (first) {
                 first = false;
