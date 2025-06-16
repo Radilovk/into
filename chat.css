@@ -155,7 +155,9 @@ body {
   background: #0058f5;
   border: none;
   color: #fff;
-  padding: 0 15px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  height: 44px;
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.3s;
@@ -274,7 +276,15 @@ body {
   }
 
   .chat-form button {
-    padding: 0 12px;
+    padding: 10px 12px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-form button {
+    font-size: 1.1rem;
+    padding: 10px 15px;
   }
 }
 
