@@ -10,6 +10,10 @@ const autoDebateLabel = document.querySelector('.auto-debate-toggle');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const modalContent = settingsModal ? settingsModal.querySelector('.modal-content') : null;
+const closeSettingsBtn = document.getElementById('close-settings');
 
 const system1 = {
     role: 'system',
@@ -287,4 +291,29 @@ async function runDebateLoop() {
     }
     debateLoopRunning = false;
     console.log('Дебат цикълът е спрян, debateLoopRunning:', debateLoopRunning);
+}
+
+// Настройки - отваряне и затваряне на модала
+if (settingsBtn && settingsModal) {
+    settingsBtn.addEventListener('click', () => {
+        settingsModal.classList.remove('hidden');
+    });
+
+    if (closeSettingsBtn) {
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('hidden');
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !settingsModal.classList.contains('hidden')) {
+            settingsModal.classList.add('hidden');
+        }
+    });
+
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            settingsModal.classList.add('hidden');
+        }
+    });
 }
