@@ -40,6 +40,39 @@ let bot2Name = localStorage.getItem('bot2Name') || 'Ницше';
 let prompt1 = localStorage.getItem('prompt1') || defaultPrompt1;
 let prompt2 = localStorage.getItem('prompt2') || defaultPrompt2;
 
+async function loadStoredSettings() {
+    try {
+        const resp = await fetch(apiEndpoint + 'settings');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data.userName) userName = data.userName;
+        if (data.bot1Name) bot1Name = data.bot1Name;
+        if (data.bot2Name) bot2Name = data.bot2Name;
+        if (data.prompt1) prompt1 = data.prompt1;
+        if (data.prompt2) prompt2 = data.prompt2;
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('bot1Name', bot1Name);
+        localStorage.setItem('bot2Name', bot2Name);
+        localStorage.setItem('prompt1', prompt1);
+        localStorage.setItem('prompt2', prompt2);
+    } catch (err) {
+        console.error('Неуспешно зареждане на настройки:', err);
+    }
+}
+
+async function saveStoredSettings() {
+    const payload = { userName, bot1Name, bot2Name, prompt1, prompt2 };
+    try {
+        await fetch(apiEndpoint + 'settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (err) {
+        console.error('Неуспешно записване на настройки:', err);
+    }
+}
+
 function buildPrompt(base, user, bot1, bot2) {
     return base
         .replace(/\{user\}/g, user)
@@ -350,6 +383,7 @@ function applySettings() {
     localStorage.setItem('prompt2', prompt2);
     system1.content = buildPrompt(prompt1, userName, bot1Name, bot2Name);
     system2.content = buildPrompt(prompt2, userName, bot1Name, bot2Name);
+    saveStoredSettings();
 }
 
 settingsBtn.addEventListener('click', openSettings);
@@ -359,4 +393,7 @@ saveSettingsBtn.addEventListener('click', () => {
     closeSettings();
 });
 
-applySettings();
+(async () => {
+    await loadStoredSettings();
+    applySettings();
+})();

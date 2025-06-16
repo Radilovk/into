@@ -1,5 +1,33 @@
 export default {
   async fetch(request, env) {
+    const { pathname } = new URL(request.url);
+
+    if (pathname === '/settings') {
+      if (request.method === 'GET') {
+        const data = await env.SETTINGS.get('chat', 'json');
+        return new Response(JSON.stringify(data || {}), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+      if (request.method === 'POST') {
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        await env.SETTINGS.put('chat', JSON.stringify(body));
+        return new Response('OK', {
+          headers: {
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+      return new Response('Method Not Allowed', { status: 405 });
+    }
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         status: 204,
