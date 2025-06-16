@@ -28,8 +28,9 @@
                     <option value="@cf/llama-3.2-11b-vision-instruct">🖼 Анализ на изображение</option>
                     <option value="@cf/openai/whisper-large-v3">🔊 Разпознаване на реч</option>
                 </select>
-            </div>
-        </header>
+                <button type="button" id="settings-btn" class="settings-btn"><i class="fas fa-cog"></i></button>
+                </div>
+            </header>
         <div id="messages" class="messages"></div>
         <form id="chat-form" class="chat-form">
             <button type="button" id="send-file" class="file-btn"><i class="fas fa-paperclip"></i></button>
@@ -39,6 +40,13 @@
             <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
         </form>
     </div>
-    <script src="chat.js"></script>
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <button id="close-settings" class="close-btn" aria-label="Затвори">&times;</button>
+                <h2>Настройки</h2>
+                <!-- Съдържанието на модала ще бъде добавено при нужда -->
+            </div>
+        </div>
+        <script src="chat.js"></script>
 </body>
 </html>
