@@ -175,6 +175,14 @@ body {
   background: #d32f2f;
 }
 
+#clear-chat {
+  background: #d32f2f;
+}
+
+#clear-chat:hover {
+  background: #e64a4a;
+}
+
 .message img {
   max-width: 100%;
   border-radius: 6px;

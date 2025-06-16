@@ -143,6 +143,7 @@ function escapeRegExp(str) {
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
 const input = document.getElementById('user-input');
+const clearChatBtn = document.getElementById('clear-chat');
 
 const chatHistory = [];
 
@@ -411,6 +412,11 @@ async function runDebateLoop() {
     console.log('Дебат цикълът е спрян, debateLoopRunning:', debateLoopRunning);
 }
 
+function clearChat() {
+    messagesEl.innerHTML = '';
+    chatHistory.length = 0;
+}
+
 function openSettings() {
     userNameInput.value = userName;
     bot1NameInput.value = bot1Name;
@@ -472,6 +478,11 @@ cancelSettingsBtn.addEventListener('click', closeSettings);
 saveSettingsBtn.addEventListener('click', () => {
     applySettings();
     closeSettings();
+});
+clearChatBtn.addEventListener('click', () => {
+    if (confirm('Да изчистя ли историята на чата?')) {
+        clearChat();
+    }
 });
 
 (async () => {
