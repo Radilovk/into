@@ -4,6 +4,8 @@ const apiEndpoint = 'https://workerai.radilov-k.workers.dev/';
 
 const modelSelect = document.getElementById('model-select');
 const modelSelect2 = document.getElementById('model-select-2');
+const modelDesc1 = document.getElementById('model-desc-1');
+const modelDesc2 = document.getElementById('model-desc-2');
 const debateToggle = document.getElementById('debate-mode');
 const autoDebateToggle = document.getElementById('auto-debate');
 const autoDebateLabel = document.querySelector('.auto-debate-toggle');
@@ -18,6 +20,14 @@ const bot2NameInput = document.getElementById('bot2-name-input');
 const commonPromptInput = document.getElementById('common-prompt');
 const prompt1Input = document.getElementById('prompt-1');
 const prompt2Input = document.getElementById('prompt-2');
+const length1Input = document.getElementById('length-1');
+const temp1Input = document.getElementById('temp-1');
+const length2Input = document.getElementById('length-2');
+const temp2Input = document.getElementById('temp-2');
+const humorInput = document.getElementById('humor-level');
+const sarcasmInput = document.getElementById('sarcasm-level');
+const aggressionInput = document.getElementById('aggression-level');
+const delayInput = document.getElementById('delay-level');
 const saveSettingsBtn = document.getElementById('save-settings');
 const cancelSettingsBtn = document.getElementById('cancel-settings');
 const defaultPrompt1 =
@@ -42,6 +52,14 @@ let bot2Name = localStorage.getItem('bot2Name') || 'Ницше';
 let commonPrompt = localStorage.getItem('commonPrompt') || defaultCommonPrompt;
 let prompt1 = localStorage.getItem('prompt1') || defaultPrompt1;
 let prompt2 = localStorage.getItem('prompt2') || defaultPrompt2;
+let length1 = parseInt(localStorage.getItem('length1')) || 60;
+let temp1 = parseFloat(localStorage.getItem('temp1')) || 0.7;
+let length2 = parseInt(localStorage.getItem('length2')) || 60;
+let temp2 = parseFloat(localStorage.getItem('temp2')) || 0.7;
+let humorLevel = parseInt(localStorage.getItem('humorLevel')) || 0;
+let sarcasmLevel = parseInt(localStorage.getItem('sarcasmLevel')) || 0;
+let aggressionLevel = parseInt(localStorage.getItem('aggressionLevel')) || 0;
+let delayLevel = parseInt(localStorage.getItem('delayLevel')) || 3;
 
 async function loadStoredSettings() {
     try {
@@ -54,19 +72,35 @@ async function loadStoredSettings() {
         if (data.commonPrompt) commonPrompt = data.commonPrompt;
         if (data.prompt1) prompt1 = data.prompt1;
         if (data.prompt2) prompt2 = data.prompt2;
+        if (data.length1) length1 = parseInt(data.length1);
+        if (data.temp1) temp1 = parseFloat(data.temp1);
+        if (data.length2) length2 = parseInt(data.length2);
+        if (data.temp2) temp2 = parseFloat(data.temp2);
+        if (data.humorLevel) humorLevel = parseInt(data.humorLevel);
+        if (data.sarcasmLevel) sarcasmLevel = parseInt(data.sarcasmLevel);
+        if (data.aggressionLevel) aggressionLevel = parseInt(data.aggressionLevel);
+        if (data.delayLevel) delayLevel = parseInt(data.delayLevel);
         localStorage.setItem('userName', userName);
         localStorage.setItem('bot1Name', bot1Name);
         localStorage.setItem('bot2Name', bot2Name);
         localStorage.setItem('commonPrompt', commonPrompt);
         localStorage.setItem('prompt1', prompt1);
         localStorage.setItem('prompt2', prompt2);
+        localStorage.setItem('length1', length1);
+        localStorage.setItem('temp1', temp1);
+        localStorage.setItem('length2', length2);
+        localStorage.setItem('temp2', temp2);
+        localStorage.setItem('humorLevel', humorLevel);
+        localStorage.setItem('sarcasmLevel', sarcasmLevel);
+        localStorage.setItem('aggressionLevel', aggressionLevel);
+        localStorage.setItem('delayLevel', delayLevel);
     } catch (err) {
         console.error('Неуспешно зареждане на настройки:', err);
     }
 }
 
 async function saveStoredSettings() {
-    const payload = { userName, bot1Name, bot2Name, commonPrompt, prompt1, prompt2 };
+    const payload = { userName, bot1Name, bot2Name, commonPrompt, prompt1, prompt2, length1, temp1, length2, temp2, humorLevel, sarcasmLevel, aggressionLevel, delayLevel };
     try {
         await fetch(apiEndpoint + 'settings', {
             method: 'POST',
@@ -78,15 +112,17 @@ async function saveStoredSettings() {
     }
 }
 
-function buildPrompt(base, user, bot1, bot2) {
-    return base
+function buildPrompt(base, user, bot1, bot2, humor, sarcasm, aggression) {
+    let text = base
         .replace(/\{user\}/g, user)
         .replace(/\{bot1\}/g, bot1)
         .replace(/\{bot2\}/g, bot2);
+    text += `\nХумор: ${humor}/10. Сарказъм: ${sarcasm}/10. Агресия: ${aggression}/10.`;
+    return text;
 }
 
-let system1 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name) };
-let system2 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name) };
+let system1 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel) };
+let system2 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel) };
 
 function participantNames() {
     return [bot1Name, bot2Name];
@@ -174,10 +210,16 @@ fileInput.addEventListener('change', () => {
 
 modelSelect.addEventListener('change', () => {
     voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
+    updateDescription(modelSelect, modelDesc1);
+});
+
+modelSelect2.addEventListener('change', () => {
+    updateDescription(modelSelect2, modelDesc2);
 });
 
 debateToggle.addEventListener('change', () => {
     modelSelect2.classList.toggle('hidden', !debateToggle.checked);
+    modelDesc2.classList.toggle('hidden', !debateToggle.checked);
 });
 
 autoDebateToggle.addEventListener('change', () => {
@@ -223,25 +265,27 @@ async function handleSend(fileData) {
     const model1 = getModel(modelSelect);
     const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
     const label1 = debateToggle.checked ? bot1Name : null;
-    const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData);
+    const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData, temp1, length1);
     if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
     if (chatHistory.length > 10) chatHistory.shift();
 
     if (debateToggle.checked) {
         // При автоматичния режим runDebateLoop() вече вмъква пауза между
         // ходовете, затова тук не чакаме допълнително.
-        const delay = autoDebate ? 0 : Math.floor(Math.random() * 2000) + 3000;
+        const delay = autoDebate ? 0 : delayLevel * 1000;
         if (delay > 0) await new Promise(r => setTimeout(r, delay));
         const model2 = getModel(modelSelect2);
         const messages2 = [system2, ...chatHistory.slice(-10)];
-        const reply2 = await sendRequest(model2, messages2, 'assistant-2', bot2Name);
+        const reply2 = await sendRequest(model2, messages2, 'assistant-2', bot2Name, null, temp2, length2);
         if (reply2) chatHistory.push({ role: 'assistant', content: `${bot2Name}: ${reply2}` });
         if (chatHistory.length > 10) chatHistory.shift();
     }
 }
 
-async function sendRequest(model, messages, displayRole, speaker, fileData) {
+async function sendRequest(model, messages, displayRole, speaker, fileData, temp, maxTokens) {
     const payload = { messages, model };
+    if (temp !== undefined) payload.temperature = temp;
+    if (maxTokens !== undefined) payload.max_tokens = maxTokens;
     if (fileData) payload.file = fileData;
 
     try {
@@ -309,6 +353,11 @@ function getModel(selectEl) {
         : selectEl.value;
 }
 
+function updateDescription(selectEl, descEl) {
+    const option = selectEl.selectedOptions[0];
+    descEl.textContent = option ? option.dataset.desc || '' : '';
+}
+
 function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -355,8 +404,8 @@ async function runDebateLoop() {
         // Пауза между ходовете, за да не се преплитат отговорите
         // на ботовете при включен автодебат. handleSend() не
         // добавя допълнително забавяне в този режим.
-        const delay = Math.floor(Math.random() * 2000) + 6000;
-        await new Promise(r => setTimeout(r, delay));
+        const delay = delayLevel * 1000;
+        if (delay > 0) await new Promise(r => setTimeout(r, delay));
     }
     debateLoopRunning = false;
     console.log('Дебат цикълът е спрян, debateLoopRunning:', debateLoopRunning);
@@ -369,6 +418,14 @@ function openSettings() {
     commonPromptInput.value = commonPrompt;
     prompt1Input.value = prompt1;
     prompt2Input.value = prompt2;
+    length1Input.value = length1;
+    temp1Input.value = temp1;
+    length2Input.value = length2;
+    temp2Input.value = temp2;
+    humorInput.value = humorLevel;
+    sarcasmInput.value = sarcasmLevel;
+    aggressionInput.value = aggressionLevel;
+    delayInput.value = delayLevel;
     settingsModal.classList.remove('hidden');
 }
 
@@ -389,8 +446,24 @@ function applySettings() {
     localStorage.setItem('commonPrompt', commonPrompt);
     localStorage.setItem('prompt1', prompt1);
     localStorage.setItem('prompt2', prompt2);
-    system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name);
-    system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name);
+    localStorage.setItem('length1', length1Input.value);
+    localStorage.setItem('temp1', temp1Input.value);
+    localStorage.setItem('length2', length2Input.value);
+    localStorage.setItem('temp2', temp2Input.value);
+    localStorage.setItem('humorLevel', humorInput.value);
+    localStorage.setItem('sarcasmLevel', sarcasmInput.value);
+    localStorage.setItem('aggressionLevel', aggressionInput.value);
+    localStorage.setItem('delayLevel', delayInput.value);
+    length1 = parseInt(length1Input.value);
+    temp1 = parseFloat(temp1Input.value);
+    length2 = parseInt(length2Input.value);
+    temp2 = parseFloat(temp2Input.value);
+    humorLevel = parseInt(humorInput.value);
+    sarcasmLevel = parseInt(sarcasmInput.value);
+    aggressionLevel = parseInt(aggressionInput.value);
+    delayLevel = parseInt(delayInput.value);
+    system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
+    system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
     saveStoredSettings();
 }
 
@@ -404,4 +477,6 @@ saveSettingsBtn.addEventListener('click', () => {
 (async () => {
     await loadStoredSettings();
     applySettings();
+    updateDescription(modelSelect, modelDesc1);
+    updateDescription(modelSelect2, modelDesc2);
 })();

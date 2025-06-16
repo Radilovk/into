@@ -38,6 +38,11 @@ body {
   gap: 6px;
   margin: 0;
 }
+.model-description {
+  font-size: 0.8rem;
+  margin: 2px 0 8px;
+  color: #ccc;
+}
 
 #model-select {
   background: #1e1e1e;
