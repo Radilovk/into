@@ -10,27 +10,49 @@ const autoDebateLabel = document.querySelector('.auto-debate-toggle');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const userNameInput = document.getElementById('user-name-input');
+const bot1NameInput = document.getElementById('bot1-name-input');
+const bot2NameInput = document.getElementById('bot2-name-input');
+const prompt1Input = document.getElementById('prompt-1');
+const prompt2Input = document.getElementById('prompt-2');
+const saveSettingsBtn = document.getElementById('save-settings');
+const cancelSettingsBtn = document.getElementById('cancel-settings');
+const defaultPrompt1 =
+    'Ти си {bot1} – защитник на идеята, реда и мъдростта. ' +
+    'Вярваш във вечните Форми и във върховенството на разума. ' +
+    'Твоята цел е да направляваш полиса към справедливост. ' +
+    'Говори на български, обръщай се към {bot2} по име и задавай въпроси на {user}. ' +
+    'Изчакай {user} да отговори и никога не го прави вместо него. ' +
+    'Използвай името само веднъж и отговаряй с до две изречения.';
+const defaultPrompt2 =
+    'Ти си {bot2} – разрушител на илюзиите и защитник на волята. ' +
+    'Моралът е маска за слабост, а истината е оръжие на силните. ' +
+    'Отхвърляш всяка система, която твърди, че представлява доброто. ' +
+    'Говори на български, обръщай се към {bot1} по име и провокирай {user} с въпроси. ' +
+    'Изчакай {user} да отговори и никога не говори вместо него. ' +
+    'Използвай името само веднъж и отговаряй с до две изречения.';
 
-const system1 = {
-    role: 'system',
-    content:
-        'Ти си Платон – защитник на идеята, реда и мъдростта. ' +
-        'Вярваш във вечните Форми и във върховенството на разума. ' +
-        'Твоята цел е да направляваш полиса към справедливост. ' +
-        'Говори на български, обръщай се към Ницше по име и задавай въпроси на потребителя. ' +
-        'Използвай името само веднъж и отговаряй с до две изречения.'
-};
-const system2 = {
-    role: 'system',
-    content:
-        'Ти си Ницше – разрушител на илюзиите и защитник на волята. ' +
-        'Моралът е маска за слабост, а истината е оръжие на силните. ' +
-        'Отхвърляш всяка система, която твърди, че представлява доброто. ' +
-        'Говори на български, обръщай се към Платон по име и провокирай потребителя с въпроси. ' +
-        'Използвай името само веднъж и отговаряй с до две изречения.'
-};
+let userName = localStorage.getItem('userName') || 'Потребител';
+let bot1Name = localStorage.getItem('bot1Name') || 'Платон';
+let bot2Name = localStorage.getItem('bot2Name') || 'Ницше';
+let prompt1 = localStorage.getItem('prompt1') || defaultPrompt1;
+let prompt2 = localStorage.getItem('prompt2') || defaultPrompt2;
 
-const participantNames = ['Платон', 'Ницше'];
+function buildPrompt(base, user, bot1, bot2) {
+    return base
+        .replace(/\{user\}/g, user)
+        .replace(/\{bot1\}/g, bot1)
+        .replace(/\{bot2\}/g, bot2);
+}
+
+let system1 = { role: 'system', content: buildPrompt(prompt1, userName, bot1Name, bot2Name) };
+let system2 = { role: 'system', content: buildPrompt(prompt2, userName, bot1Name, bot2Name) };
+
+function participantNames() {
+    return [bot1Name, bot2Name];
+}
 
 let isRecording = false;
 let mediaRecorder;
@@ -75,6 +97,7 @@ form.addEventListener('submit', async (e) => {
 
     appendMessage('user', userText);
     chatHistory.push({ role: 'user', content: userText });
+    if (chatHistory.length > 10) chatHistory.shift();
     input.value = '';
 
     try {
@@ -100,6 +123,7 @@ fileInput.addEventListener('change', () => {
             appendMessage('user', file.name);
         }
         chatHistory.push({ role: 'user', content: '[file]' });
+        if (chatHistory.length > 10) chatHistory.shift();
         try {
             await handleSend(reader.result);
         } catch (err) {
@@ -142,6 +166,7 @@ voiceBtn.addEventListener('click', async () => {
             if (transcript) {
                 appendMessage('user', transcript);
                 chatHistory.push({ role: 'user', content: transcript });
+                if (chatHistory.length > 10) chatHistory.shift();
                 try {
                     await handleSend();
                 } catch (err) {
@@ -156,12 +181,13 @@ voiceBtn.addEventListener('click', async () => {
 });
 
 async function handleSend(fileData) {
-    const baseHistory = [...chatHistory];
+    const baseHistory = chatHistory.slice(-10);
     const model1 = getModel(modelSelect);
     const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
-    const label1 = debateToggle.checked ? 'Платон' : null;
+    const label1 = debateToggle.checked ? bot1Name : null;
     const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData);
     if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
+    if (chatHistory.length > 10) chatHistory.shift();
 
     if (debateToggle.checked) {
         // При автоматичния режим runDebateLoop() вече вмъква пауза между
@@ -169,9 +195,10 @@ async function handleSend(fileData) {
         const delay = autoDebate ? 0 : Math.floor(Math.random() * 2000) + 3000;
         if (delay > 0) await new Promise(r => setTimeout(r, delay));
         const model2 = getModel(modelSelect2);
-        const messages2 = [system2, ...chatHistory];
-        const reply2 = await sendRequest(model2, messages2, 'assistant-2', 'Ницше');
-        if (reply2) chatHistory.push({ role: 'assistant', content: `Ницше: ${reply2}` });
+        const messages2 = [system2, ...chatHistory.slice(-10)];
+        const reply2 = await sendRequest(model2, messages2, 'assistant-2', bot2Name);
+        if (reply2) chatHistory.push({ role: 'assistant', content: `${bot2Name}: ${reply2}` });
+        if (chatHistory.length > 10) chatHistory.shift();
     }
 }
 
@@ -187,8 +214,8 @@ async function sendRequest(model, messages, displayRole, speaker, fileData) {
         });
         const data = await response.json();
         let aiText = data.result.response;
-        const escaped = participantNames.map(escapeRegExp).join('|');
-        const nameRegex = new RegExp(`^(${escaped}):\\s*`, 'i');
+        const escaped = participantNames().map(escapeRegExp).join('|');
+        const nameRegex = new RegExp(`^(${escaped}):?\\s*`, 'i');
         aiText = aiText.replace(nameRegex, '');
         aiText = limitNameUsage(aiText);
         appendMessage(displayRole, aiText, speaker);
@@ -200,7 +227,7 @@ async function sendRequest(model, messages, displayRole, speaker, fileData) {
 }
 
 function limitNameUsage(text) {
-    for (const name of participantNames) {
+    for (const name of participantNames()) {
         let first = true;
         const regex = new RegExp(`${escapeRegExp(name)}([,.:;])?`, 'g');
         text = text.replace(regex, (_, punct) => {
@@ -290,9 +317,46 @@ async function runDebateLoop() {
         // Пауза между ходовете, за да не се преплитат отговорите
         // на ботовете при включен автодебат. handleSend() не
         // добавя допълнително забавяне в този режим.
-        const delay = Math.floor(Math.random() * 2000) + 3000;
+        const delay = Math.floor(Math.random() * 2000) + 6000;
         await new Promise(r => setTimeout(r, delay));
     }
     debateLoopRunning = false;
     console.log('Дебат цикълът е спрян, debateLoopRunning:', debateLoopRunning);
 }
+
+function openSettings() {
+    userNameInput.value = userName;
+    bot1NameInput.value = bot1Name;
+    bot2NameInput.value = bot2Name;
+    prompt1Input.value = prompt1;
+    prompt2Input.value = prompt2;
+    settingsModal.classList.remove('hidden');
+}
+
+function closeSettings() {
+    settingsModal.classList.add('hidden');
+}
+
+function applySettings() {
+    userName = userNameInput.value.trim() || 'Потребител';
+    bot1Name = bot1NameInput.value.trim() || 'Платон';
+    bot2Name = bot2NameInput.value.trim() || 'Ницше';
+    prompt1 = prompt1Input.value || defaultPrompt1;
+    prompt2 = prompt2Input.value || defaultPrompt2;
+    localStorage.setItem('userName', userName);
+    localStorage.setItem('bot1Name', bot1Name);
+    localStorage.setItem('bot2Name', bot2Name);
+    localStorage.setItem('prompt1', prompt1);
+    localStorage.setItem('prompt2', prompt2);
+    system1.content = buildPrompt(prompt1, userName, bot1Name, bot2Name);
+    system2.content = buildPrompt(prompt2, userName, bot1Name, bot2Name);
+}
+
+settingsBtn.addEventListener('click', openSettings);
+cancelSettingsBtn.addEventListener('click', closeSettings);
+saveSettingsBtn.addEventListener('click', () => {
+    applySettings();
+    closeSettings();
+});
+
+applySettings();
