@@ -22,6 +22,7 @@
                 </select>
                 <label class="debate-toggle"><input type="checkbox" id="debate-mode"> Дебат</label>
                 <label class="auto-debate-toggle"><input type="checkbox" id="auto-debate"> Автодебат</label>
+                <button type="button" id="settings-btn" class="settings-btn"><i class="fas fa-cog"></i></button>
                 <select id="model-select-2" class="hidden" aria-label="Модел за Ницше">
                     <option value="@cf/meta/llama-3.1-8b-instruct">🧠 Разговор</option>
                     <option value="@cf/flux-1-schnell">🎨 Генериране на изображение</option>
@@ -30,6 +31,30 @@
                 </select>
             </div>
         </header>
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Настройки</h2>
+                <label>Име на потребител:
+                    <input type="text" id="user-name-input" placeholder="Вашето име">
+                </label>
+                <label>Име на първия бот:
+                    <input type="text" id="bot1-name-input" placeholder="Платон">
+                </label>
+                <label>Име на втория бот:
+                    <input type="text" id="bot2-name-input" placeholder="Ницше">
+                </label>
+                <label>Промпт за първия бот:
+                    <textarea id="prompt-1" rows="3"></textarea>
+                </label>
+                <label>Промпт за втория бот:
+                    <textarea id="prompt-2" rows="3"></textarea>
+                </label>
+                <div class="modal-actions">
+                    <button type="button" id="save-settings">Запази</button>
+                    <button type="button" id="cancel-settings">Отказ</button>
+                </div>
+            </div>
+        </div>
         <div id="messages" class="messages"></div>
         <form id="chat-form" class="chat-form">
             <button type="button" id="send-file" class="file-btn"><i class="fas fa-paperclip"></i></button>
