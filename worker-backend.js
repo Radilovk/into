@@ -69,6 +69,12 @@ export default {
     if (data.file) {
       payload.file = data.file;
     }
+    if (data.temperature !== undefined) {
+      payload.temperature = data.temperature;
+    }
+    if (data.max_tokens !== undefined) {
+      payload.max_tokens = data.max_tokens;
+    }
 
     let response;
     try {
