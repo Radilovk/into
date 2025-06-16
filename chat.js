@@ -476,6 +476,21 @@ saveSettingsBtn.addEventListener('click', () => {
 
 (async () => {
     await loadStoredSettings();
+    // Попълване на формата с заредените стойности
+    userNameInput.value = userName;
+    bot1NameInput.value = bot1Name;
+    bot2NameInput.value = bot2Name;
+    commonPromptInput.value = commonPrompt;
+    prompt1Input.value = prompt1;
+    prompt2Input.value = prompt2;
+    length1Input.value = length1;
+    temp1Input.value = temp1;
+    length2Input.value = length2;
+    temp2Input.value = temp2;
+    humorInput.value = humorLevel;
+    sarcasmInput.value = sarcasmLevel;
+    aggressionInput.value = aggressionLevel;
+    delayInput.value = delayLevel;
     applySettings();
     updateDescription(modelSelect, modelDesc1);
     updateDescription(modelSelect2, modelDesc2);
