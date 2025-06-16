@@ -15,6 +15,7 @@ const settingsModal = document.getElementById('settings-modal');
 const userNameInput = document.getElementById('user-name-input');
 const bot1NameInput = document.getElementById('bot1-name-input');
 const bot2NameInput = document.getElementById('bot2-name-input');
+const commonPromptInput = document.getElementById('common-prompt');
 const prompt1Input = document.getElementById('prompt-1');
 const prompt2Input = document.getElementById('prompt-2');
 const saveSettingsBtn = document.getElementById('save-settings');
@@ -33,10 +34,12 @@ const defaultPrompt2 =
     'Говори на български, обръщай се към {bot1} по име и провокирай {user} с въпроси. ' +
     'Изчакай {user} да отговори и никога не говори вместо него. ' +
     'Използвай името само веднъж и отговаряй с до две изречения.';
+const defaultCommonPrompt = '';
 
 let userName = localStorage.getItem('userName') || 'Потребител';
 let bot1Name = localStorage.getItem('bot1Name') || 'Платон';
 let bot2Name = localStorage.getItem('bot2Name') || 'Ницше';
+let commonPrompt = localStorage.getItem('commonPrompt') || defaultCommonPrompt;
 let prompt1 = localStorage.getItem('prompt1') || defaultPrompt1;
 let prompt2 = localStorage.getItem('prompt2') || defaultPrompt2;
 
@@ -48,11 +51,13 @@ async function loadStoredSettings() {
         if (data.userName) userName = data.userName;
         if (data.bot1Name) bot1Name = data.bot1Name;
         if (data.bot2Name) bot2Name = data.bot2Name;
+        if (data.commonPrompt) commonPrompt = data.commonPrompt;
         if (data.prompt1) prompt1 = data.prompt1;
         if (data.prompt2) prompt2 = data.prompt2;
         localStorage.setItem('userName', userName);
         localStorage.setItem('bot1Name', bot1Name);
         localStorage.setItem('bot2Name', bot2Name);
+        localStorage.setItem('commonPrompt', commonPrompt);
         localStorage.setItem('prompt1', prompt1);
         localStorage.setItem('prompt2', prompt2);
     } catch (err) {
@@ -61,7 +66,7 @@ async function loadStoredSettings() {
 }
 
 async function saveStoredSettings() {
-    const payload = { userName, bot1Name, bot2Name, prompt1, prompt2 };
+    const payload = { userName, bot1Name, bot2Name, commonPrompt, prompt1, prompt2 };
     try {
         await fetch(apiEndpoint + 'settings', {
             method: 'POST',
@@ -80,8 +85,8 @@ function buildPrompt(base, user, bot1, bot2) {
         .replace(/\{bot2\}/g, bot2);
 }
 
-let system1 = { role: 'system', content: buildPrompt(prompt1, userName, bot1Name, bot2Name) };
-let system2 = { role: 'system', content: buildPrompt(prompt2, userName, bot1Name, bot2Name) };
+let system1 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name) };
+let system2 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name) };
 
 function participantNames() {
     return [bot1Name, bot2Name];
@@ -361,6 +366,7 @@ function openSettings() {
     userNameInput.value = userName;
     bot1NameInput.value = bot1Name;
     bot2NameInput.value = bot2Name;
+    commonPromptInput.value = commonPrompt;
     prompt1Input.value = prompt1;
     prompt2Input.value = prompt2;
     settingsModal.classList.remove('hidden');
@@ -374,15 +380,17 @@ function applySettings() {
     userName = userNameInput.value.trim() || 'Потребител';
     bot1Name = bot1NameInput.value.trim() || 'Платон';
     bot2Name = bot2NameInput.value.trim() || 'Ницше';
+    commonPrompt = commonPromptInput.value || defaultCommonPrompt;
     prompt1 = prompt1Input.value || defaultPrompt1;
     prompt2 = prompt2Input.value || defaultPrompt2;
     localStorage.setItem('userName', userName);
     localStorage.setItem('bot1Name', bot1Name);
     localStorage.setItem('bot2Name', bot2Name);
+    localStorage.setItem('commonPrompt', commonPrompt);
     localStorage.setItem('prompt1', prompt1);
     localStorage.setItem('prompt2', prompt2);
-    system1.content = buildPrompt(prompt1, userName, bot1Name, bot2Name);
-    system2.content = buildPrompt(prompt2, userName, bot1Name, bot2Name);
+    system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name);
+    system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name);
     saveStoredSettings();
 }
 
