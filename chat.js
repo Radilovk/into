@@ -72,7 +72,11 @@ let humorLevel = parseInt(localStorage.getItem('humorLevel')) || 0;
 let sarcasmLevel = parseInt(localStorage.getItem('sarcasmLevel')) || 0;
 let aggressionLevel = parseInt(localStorage.getItem('aggressionLevel')) || 0;
 let delayLevel = parseInt(localStorage.getItem('delayLevel')) || 3;
-let menuCollapsed = localStorage.getItem('menuCollapsed') === 'true';
+let menuCollapsedStored = localStorage.getItem('menuCollapsed');
+let menuCollapsed = menuCollapsedStored === 'true';
+if (menuCollapsedStored === null && window.innerWidth < 600) {
+    menuCollapsed = true;
+}
 
 async function loadStoredSettings() {
     try {
@@ -550,9 +554,10 @@ saveSettingsBtn.addEventListener('click', () => {
 });
 
 menuToggle.addEventListener('click', () => {
-    chatHeader.classList.toggle('collapsed');
-    menuCollapsed = chatHeader.classList.contains('collapsed');
-    localStorage.setItem('menuCollapsed', menuCollapsed);
+    const collapsed = chatHeader.classList.toggle('collapsed');
+    menuToggle.setAttribute('aria-expanded', String(!collapsed));
+    menuCollapsed = collapsed;
+    localStorage.setItem('menuCollapsed', collapsed);
 });
 
 length1Input.addEventListener('input', () => {
@@ -628,6 +633,7 @@ clearChatBtn.addEventListener('click', () => {
     if (menuCollapsed) {
         chatHeader.classList.add('collapsed');
     }
+    menuToggle.setAttribute('aria-expanded', String(!menuCollapsed));
     applySettings();
     updateSliderDisplays();
     updateDescription(modelSelect, modelDesc1);
