@@ -161,6 +161,7 @@ let mediaRecorder;
 let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
 modelSelect2.classList.toggle('hidden', !debateToggle.checked);
+modelDesc2.classList.toggle('hidden', !debateToggle.checked);
 let autoDebate = false;
 let isPaused = false;
 let debateLoopRunning = false;
