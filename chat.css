@@ -54,6 +54,12 @@ body {
 .icon-btn:hover {
   color: #0b73ff;
 }
+.icon-btn.active {
+  color: #2ecc71;
+}
+.icon-btn.inactive {
+  color: #e74c3c;
+}
 
 .collapsed-only {
   display: none;
@@ -88,6 +94,12 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+.controls label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .chat-header.collapsed .controls {
