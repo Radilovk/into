@@ -36,12 +36,21 @@ function updateThemeIcon() {
 // Mobile menu toggle
 const mobileToggle = document.querySelector('.mobile-toggle');
 const navLinks = document.querySelector('.nav-links');
+const menuOverlay = document.querySelector('.menu-overlay');
 
 mobileToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    document.body.classList.toggle('menu-open', navLinks.classList.contains('active'));
-    mobileToggle.innerHTML = navLinks.classList.contains('active') ?
+    const isActive = navLinks.classList.toggle('active');
+    document.body.classList.toggle('menu-open', isActive);
+    menuOverlay.classList.toggle('active', isActive);
+    mobileToggle.innerHTML = isActive ?
         '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+});
+
+menuOverlay.addEventListener('click', () => {
+    navLinks.classList.remove('active');
+    document.body.classList.remove('menu-open');
+    menuOverlay.classList.remove('active');
+    mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
 });
 
 // Close mobile menu when clicking a link
@@ -50,6 +59,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
         if (navLinks.classList.contains('active')) { // Only if menu is active
             navLinks.classList.remove('active');
             document.body.classList.remove('menu-open');
+            menuOverlay.classList.remove('active');
             mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
         }
     });
