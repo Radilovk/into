@@ -286,6 +286,11 @@ body.dark-theme {
   margin-bottom: 10px;
 }
 
+.modal-content .value {
+  margin-left: 6px;
+  font-weight: 600;
+}
+
 .modal-content input,
 .modal-content textarea {
   width: 100%;

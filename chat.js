@@ -32,6 +32,15 @@ const humorInput = document.getElementById('humor-level');
 const sarcasmInput = document.getElementById('sarcasm-level');
 const aggressionInput = document.getElementById('aggression-level');
 const delayInput = document.getElementById('delay-level');
+
+const length1Value = length1Input.nextElementSibling;
+const temp1Value = temp1Input.nextElementSibling;
+const length2Value = length2Input.nextElementSibling;
+const temp2Value = temp2Input.nextElementSibling;
+const humorValue = humorInput.nextElementSibling;
+const sarcasmValue = sarcasmInput.nextElementSibling;
+const aggressionValue = aggressionInput.nextElementSibling;
+const delayValue = delayInput.nextElementSibling;
 const saveSettingsBtn = document.getElementById('save-settings');
 const cancelSettingsBtn = document.getElementById('cancel-settings');
 
@@ -154,6 +163,24 @@ function buildPrompt(base, user, bot1, bot2, humor, sarcasm, aggression) {
 
 let system1 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel) };
 let system2 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel) };
+
+function updateSystemPrompts() {
+    system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1,
+        userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
+    system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2,
+        userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
+}
+
+function updateSliderDisplays() {
+    length1Value.textContent = length1Input.value;
+    temp1Value.textContent = temp1Input.value;
+    length2Value.textContent = length2Input.value;
+    temp2Value.textContent = temp2Input.value;
+    humorValue.textContent = humorInput.value;
+    sarcasmValue.textContent = sarcasmInput.value;
+    aggressionValue.textContent = aggressionInput.value;
+    delayValue.textContent = delayInput.value;
+}
 
 function participantNames() {
     return [bot1Name, bot2Name];
@@ -498,6 +525,7 @@ function openSettings() {
     sarcasmInput.value = sarcasmLevel;
     aggressionInput.value = aggressionLevel;
     delayInput.value = delayLevel;
+    updateSliderDisplays();
     settingsModal.classList.remove('hidden');
 }
 
@@ -534,8 +562,8 @@ function applySettings() {
     sarcasmLevel = parseInt(sarcasmInput.value);
     aggressionLevel = parseInt(aggressionInput.value);
     delayLevel = parseInt(delayInput.value);
-    system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
-    system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
+    updateSystemPrompts();
+    updateSliderDisplays();
     saveStoredSettings();
     showToast('Настройките са запазени');
 }
@@ -545,6 +573,54 @@ cancelSettingsBtn.addEventListener('click', closeSettings);
 saveSettingsBtn.addEventListener('click', () => {
     applySettings();
     closeSettings();
+});
+
+length1Input.addEventListener('input', () => {
+    length1 = parseInt(length1Input.value);
+    length1Value.textContent = length1Input.value;
+    updateSystemPrompts();
+});
+
+temp1Input.addEventListener('input', () => {
+    temp1 = parseFloat(temp1Input.value);
+    temp1Value.textContent = temp1Input.value;
+    updateSystemPrompts();
+});
+
+length2Input.addEventListener('input', () => {
+    length2 = parseInt(length2Input.value);
+    length2Value.textContent = length2Input.value;
+    updateSystemPrompts();
+});
+
+temp2Input.addEventListener('input', () => {
+    temp2 = parseFloat(temp2Input.value);
+    temp2Value.textContent = temp2Input.value;
+    updateSystemPrompts();
+});
+
+humorInput.addEventListener('input', () => {
+    humorLevel = parseInt(humorInput.value);
+    humorValue.textContent = humorInput.value;
+    updateSystemPrompts();
+});
+
+sarcasmInput.addEventListener('input', () => {
+    sarcasmLevel = parseInt(sarcasmInput.value);
+    sarcasmValue.textContent = sarcasmInput.value;
+    updateSystemPrompts();
+});
+
+aggressionInput.addEventListener('input', () => {
+    aggressionLevel = parseInt(aggressionInput.value);
+    aggressionValue.textContent = aggressionInput.value;
+    updateSystemPrompts();
+});
+
+delayInput.addEventListener('input', () => {
+    delayLevel = parseInt(delayInput.value);
+    delayValue.textContent = delayInput.value;
+    updateSystemPrompts();
 });
 clearChatBtn.addEventListener('click', () => {
     if (confirm('Да изчистя ли историята на чата?')) {
@@ -570,6 +646,7 @@ clearChatBtn.addEventListener('click', () => {
     aggressionInput.value = aggressionLevel;
     delayInput.value = delayLevel;
     applySettings();
+    updateSliderDisplays();
     updateDescription(modelSelect, modelDesc1);
     updateDescription(modelSelect2, modelDesc2);
 })();
