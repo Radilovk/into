@@ -51,6 +51,9 @@ const aggressionValue = aggressionInput.nextElementSibling;
 const delayValue = delayInput.nextElementSibling;
 const saveSettingsBtn = document.getElementById('save-settings');
 const cancelSettingsBtn = document.getElementById('cancel-settings');
+const profileSelect = document.getElementById('profile-select');
+const loadProfileBtn = document.getElementById('load-profile');
+const saveProfileBtn = document.getElementById('save-profile');
 const defaultPrompt1 =
     'Ти си {bot1} – защитник на идеята, реда и мъдростта. ' +
     'Вярваш във вечните Форми и във върховенството на разума. ' +
@@ -86,6 +89,7 @@ let menuCollapsed = menuCollapsedStored === 'true';
 if (menuCollapsedStored === null && window.innerWidth < 600) {
     menuCollapsed = true;
 }
+let profiles = JSON.parse(localStorage.getItem('chatProfiles')) || {};
 
 async function loadStoredSettings() {
     try {
@@ -516,6 +520,50 @@ function clearChat() {
     chatHistory.length = 0;
 }
 
+function getSettingsObject() {
+    return {
+        userName, bot1Name, bot2Name,
+        commonPrompt, prompt1, prompt2,
+        length1, temp1, length2, temp2,
+        humorLevel, sarcasmLevel, aggressionLevel, delayLevel,
+        model1: modelSelect.value,
+        model2: modelSelect2.value
+    };
+}
+
+function applyProfile(profile) {
+    if (!profile) return;
+    userNameInput.value = profile.userName || 'Потребител';
+    bot1NameInput.value = profile.bot1Name || 'Платон';
+    bot2NameInput.value = profile.bot2Name || 'Ницше';
+    commonPromptInput.value = profile.commonPrompt || '';
+    prompt1Input.value = profile.prompt1 || defaultPrompt1;
+    prompt2Input.value = profile.prompt2 || defaultPrompt2;
+    length1Input.value = profile.length1 || 60;
+    temp1Input.value = profile.temp1 || 0.7;
+    length2Input.value = profile.length2 || 60;
+    temp2Input.value = profile.temp2 || 0.7;
+    humorInput.value = profile.humorLevel || 0;
+    sarcasmInput.value = profile.sarcasmLevel || 0;
+    aggressionInput.value = profile.aggressionLevel || 0;
+    delayInput.value = profile.delayLevel || 3;
+    if (profile.model1) modelSelect.value = profile.model1;
+    if (profile.model2) modelSelect2.value = profile.model2;
+    updateDescription(modelSelect, modelDesc1);
+    updateDescription(modelSelect2, modelDesc2);
+    applySettings();
+}
+
+function populateProfileSelect() {
+    profileSelect.innerHTML = '<option value="">--Профил--</option>';
+    for (const name of Object.keys(profiles)) {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        profileSelect.appendChild(opt);
+    }
+}
+
 function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -615,6 +663,25 @@ cancelSettingsBtn.addEventListener('click', closeSettings);
 saveSettingsBtn.addEventListener('click', () => {
     applySettings();
     closeSettings();
+});
+saveProfileBtn.addEventListener('click', () => {
+    applySettings();
+    const name = prompt('Име на профила:');
+    if (!name) return;
+    profiles[name] = getSettingsObject();
+    localStorage.setItem('chatProfiles', JSON.stringify(profiles));
+    populateProfileSelect();
+    showToast('Профилът е запазен');
+});
+
+loadProfileBtn.addEventListener('click', () => {
+    const name = profileSelect.value;
+    if (!name || !profiles[name]) {
+        showToast('Изберете профил');
+        return;
+    }
+    applyProfile(profiles[name]);
+    showToast('Профилът е зареден');
 });
 promptOverlayClose.addEventListener('click', closePromptEditor);
 promptOverlayText.addEventListener('keydown', (e) => {
@@ -730,4 +797,5 @@ restartBtn.addEventListener('click', () => {
     updateSliderDisplays();
     updateDescription(modelSelect, modelDesc1);
     updateDescription(modelSelect2, modelDesc2);
+    populateProfileSelect();
 })();
