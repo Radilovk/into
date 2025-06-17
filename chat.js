@@ -13,6 +13,9 @@ const pauseBtn = document.getElementById('pause-btn');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
+const themeToggle = document.querySelector('.theme-toggle');
+const body = document.body;
+const themeIcon = themeToggle.querySelector('i');
 const settingsBtn = document.getElementById('settings-btn');
 const settingsModal = document.getElementById('settings-modal');
 const userNameInput = document.getElementById('user-name-input');
@@ -31,6 +34,33 @@ const aggressionInput = document.getElementById('aggression-level');
 const delayInput = document.getElementById('delay-level');
 const saveSettingsBtn = document.getElementById('save-settings');
 const cancelSettingsBtn = document.getElementById('cancel-settings');
+
+// Настройки на темата
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    body.classList.add(savedTheme);
+    updateThemeIcon();
+}
+
+themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-theme');
+    if (body.classList.contains('dark-theme')) {
+        localStorage.setItem('theme', 'dark-theme');
+    } else {
+        localStorage.removeItem('theme');
+    }
+    updateThemeIcon();
+});
+
+function updateThemeIcon() {
+    if (body.classList.contains('dark-theme')) {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+    } else {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+    }
+}
 const defaultPrompt1 =
     'Ти си {bot1} – защитник на идеята, реда и мъдростта. ' +
     'Вярваш във вечните Форми и във върховенството на разума. ' +
