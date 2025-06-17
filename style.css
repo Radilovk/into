@@ -819,20 +819,27 @@ body.dark-theme .mobile-toggle {
         top: 70px; /* Height of header approx */
         left: 0;
         width: 100%;
+        height: calc(100% - 70px);
         background-color: var(--bg-secondary);
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         padding: var(--spacing-lg) 0;
         gap: var(--spacing-md);
+        overflow-y: auto;
         transform: translateY(-150%);
         transition: var(--transition);
         box-shadow: 0 5px 15px var(--shadow);
         z-index: 999; /* Below header but above content */
     }
 
-    body.dark-theme .nav-links {
+body.dark-theme .nav-links {
         background-color: var(--bg-secondary-dark);
         box-shadow: 0 5px 15px var(--shadow-dark);
+    }
+
+    body.menu-open {
+        overflow: hidden;
     }
 
     .nav-links.active {
