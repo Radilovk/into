@@ -38,6 +38,12 @@ body {
   gap: 6px;
   margin: 0;
 }
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .model-description {
   font-size: 0.8rem;
   margin: 2px 0 8px;
@@ -67,6 +73,10 @@ body {
 }
 
 .chat-header.collapsed .controls {
+  display: none;
+}
+
+.chat-header.collapsed h1 {
   display: none;
 }
 
@@ -203,6 +213,12 @@ body {
 
 #clear-chat {
   background: #d32f2f;
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 #clear-chat:hover {
@@ -232,11 +248,13 @@ body {
 }
 
 .menu-toggle {
-  background: none;
+  background: rgba(0, 0, 0, 0.3);
   border: none;
   color: #fff;
   cursor: pointer;
   font-size: 1.1rem;
+  padding: 5px 8px;
+  border-radius: 4px;
 }
 
 .menu-toggle:hover {
@@ -389,6 +407,7 @@ body {
   }
   .menu-toggle {
     font-size: 1.3rem;
+    padding: 6px 10px;
   }
 }
 
