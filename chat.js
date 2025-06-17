@@ -275,8 +275,12 @@ modelSelect2.addEventListener('change', () => {
 });
 
 debateToggle.addEventListener('change', () => {
-    modelSelect2.classList.toggle('hidden', !debateToggle.checked);
-    modelDesc2.classList.toggle('hidden', !debateToggle.checked);
+    const enabled = debateToggle.checked;
+    modelSelect2.classList.toggle('hidden', !enabled);
+    modelDesc2.classList.toggle('hidden', !enabled);
+    debateIcon.classList.toggle('active', enabled);
+    debateIcon.classList.toggle('inactive', !enabled);
+    showToast(`Дебат: ${enabled ? 'включен' : 'изключен'}`);
 });
 
 autoDebateToggle.addEventListener('change', () => {
@@ -287,6 +291,9 @@ autoDebateToggle.addEventListener('change', () => {
     pauseIcon.querySelector("i").className = "fas fa-pause";
     pauseIcon.classList.toggle("hidden", !autoDebate);
     autoDebateLabel.classList.toggle('running', autoDebate);
+    autoDebateIcon.classList.toggle('active', autoDebate);
+    autoDebateIcon.classList.toggle('inactive', !autoDebate);
+    showToast(`Автодебат: ${autoDebate ? 'включен' : 'изключен'}`);
     if (autoDebate) {
         runDebateLoop();
     }
@@ -298,12 +305,18 @@ pauseBtn.addEventListener('click', () => {
         pauseBtn.textContent = 'Продължи';
         autoDebateLabel.classList.remove('running');
         pauseIcon.querySelector("i").className = "fas fa-play";
+        pauseIcon.classList.add('inactive');
+        pauseIcon.classList.remove('active');
+        showToast('Автодебат: пауза');
     } else {
         isPaused = false;
         pauseBtn.textContent = 'Пауза';
         autoDebateLabel.classList.add('running');
         pauseIcon.querySelector("i").className = "fas fa-pause";
         runDebateLoop();
+        pauseIcon.classList.add('active');
+        pauseIcon.classList.remove('inactive');
+        showToast('Автодебат: продължи');
     }
 });
 
@@ -522,10 +535,14 @@ function openSettings() {
     delayInput.value = delayLevel;
     updateSliderDisplays();
     settingsModal.classList.remove('hidden');
+    settingsIcon.classList.add('active');
+    showToast('Отворени настройки');
 }
 
 function closeSettings() {
     settingsModal.classList.add('hidden');
+    settingsIcon.classList.remove('active');
+    showToast('Настройките затворени');
 }
 
 function openPromptEditor(field) {
@@ -604,6 +621,8 @@ menuToggle.addEventListener('click', () => {
     menuToggle.setAttribute('aria-expanded', String(!collapsed));
     menuCollapsed = collapsed;
     localStorage.setItem('menuCollapsed', collapsed);
+    menuToggle.classList.toggle('active', collapsed);
+    showToast(`Меню: ${collapsed ? 'компактно' : 'разширено'}`);
 });
 
 length1Input.addEventListener('input', () => {
@@ -656,6 +675,7 @@ delayInput.addEventListener('input', () => {
 clearChatBtn.addEventListener('click', () => {
     if (confirm('Да изчистя ли историята на чата?')) {
         clearChat();
+        showToast('Чатът е изчистен');
     }
 });
 
@@ -680,6 +700,13 @@ clearChatBtn.addEventListener('click', () => {
         chatHeader.classList.add('collapsed');
     }
     menuToggle.setAttribute('aria-expanded', String(!menuCollapsed));
+    debateIcon.classList.toggle('active', debateToggle.checked);
+    debateIcon.classList.toggle('inactive', !debateToggle.checked);
+    autoDebateIcon.classList.toggle('active', autoDebateToggle.checked);
+    autoDebateIcon.classList.toggle('inactive', !autoDebateToggle.checked);
+    menuToggle.classList.toggle('active', menuCollapsed);
+    pauseIcon.classList.toggle('active', autoDebateToggle.checked && !isPaused);
+    pauseIcon.classList.toggle('inactive', autoDebateToggle.checked && isPaused);
     applySettings();
     updateSliderDisplays();
     updateDescription(modelSelect, modelDesc1);
