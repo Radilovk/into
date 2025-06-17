@@ -441,6 +441,18 @@ function clearChat() {
     chatHistory.length = 0;
 }
 
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+    }, 2000);
+}
+
 function openSettings() {
     userNameInput.value = userName;
     bot1NameInput.value = bot1Name;
@@ -495,6 +507,7 @@ function applySettings() {
     system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
     system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
     saveStoredSettings();
+    showToast('Настройките са запазени');
 }
 
 settingsBtn.addEventListener('click', openSettings);
