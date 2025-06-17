@@ -14,6 +14,8 @@ const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
 const settingsBtn = document.getElementById('settings-btn');
+const menuToggle = document.getElementById('menu-toggle');
+const chatHeader = document.querySelector('.chat-header');
 const settingsModal = document.getElementById('settings-modal');
 const userNameInput = document.getElementById('user-name-input');
 const bot1NameInput = document.getElementById('bot1-name-input');
@@ -70,6 +72,7 @@ let humorLevel = parseInt(localStorage.getItem('humorLevel')) || 0;
 let sarcasmLevel = parseInt(localStorage.getItem('sarcasmLevel')) || 0;
 let aggressionLevel = parseInt(localStorage.getItem('aggressionLevel')) || 0;
 let delayLevel = parseInt(localStorage.getItem('delayLevel')) || 3;
+let menuCollapsed = localStorage.getItem('menuCollapsed') === 'true';
 
 async function loadStoredSettings() {
     try {
@@ -546,6 +549,12 @@ saveSettingsBtn.addEventListener('click', () => {
     closeSettings();
 });
 
+menuToggle.addEventListener('click', () => {
+    chatHeader.classList.toggle('collapsed');
+    menuCollapsed = chatHeader.classList.contains('collapsed');
+    localStorage.setItem('menuCollapsed', menuCollapsed);
+});
+
 length1Input.addEventListener('input', () => {
     length1 = parseInt(length1Input.value);
     length1Value.textContent = length1Input.value;
@@ -616,6 +625,9 @@ clearChatBtn.addEventListener('click', () => {
     sarcasmInput.value = sarcasmLevel;
     aggressionInput.value = aggressionLevel;
     delayInput.value = delayLevel;
+    if (menuCollapsed) {
+        chatHeader.classList.add('collapsed');
+    }
     applySettings();
     updateSliderDisplays();
     updateDescription(modelSelect, modelDesc1);
