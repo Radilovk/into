@@ -366,3 +366,18 @@ body.dark-theme {
   opacity: 1;
 }
 
+@media (max-width: 400px) {
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .pause-btn {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+  .settings-btn {
+    font-size: 1.3rem;
+  }
+}
+
