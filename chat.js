@@ -147,7 +147,7 @@ function buildPrompt(base, user, bot1, bot2, humor, sarcasm, aggression) {
         .replace(/\{user\}/g, user)
         .replace(/\{bot1\}/g, bot1)
         .replace(/\{bot2\}/g, bot2);
-    text += `\nХумор: ${humor}/10. Сарказъм: ${sarcasm}/10. Агресия: ${aggression}/10.`;
+    text += `\nВ изказа си използвай следното ниво на хумор: ${humor}/10, сарказъм: ${sarcasm}/10, агресия: ${aggression}/10.`;
     return text;
 }
 
