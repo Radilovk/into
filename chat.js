@@ -35,6 +35,11 @@ const debateIcon = document.getElementById("debate-icon");
 const autoDebateIcon = document.getElementById("auto-debate-icon");
 const settingsIcon = document.getElementById("settings-icon");
 const pauseIcon = document.getElementById("pause-icon");
+const promptOverlay = document.getElementById('prompt-overlay');
+const promptOverlayText = document.getElementById('prompt-overlay-text');
+const promptOverlayClose = document.getElementById('prompt-overlay-close');
+
+let activePromptField = null;
 
 const length1Value = length1Input.nextElementSibling;
 const temp1Value = temp1Input.nextElementSibling;
@@ -523,6 +528,22 @@ function closeSettings() {
     settingsModal.classList.add('hidden');
 }
 
+function openPromptEditor(field) {
+    activePromptField = field;
+    promptOverlayText.value = field.value;
+    promptOverlay.classList.remove('hidden');
+    promptOverlayText.focus();
+}
+
+function closePromptEditor() {
+    if (activePromptField) {
+        activePromptField.value = promptOverlayText.value;
+        activePromptField.focus();
+        activePromptField = null;
+    }
+    promptOverlay.classList.add('hidden');
+}
+
 function applySettings() {
     userName = userNameInput.value.trim() || 'Потребител';
     bot1Name = bot1NameInput.value.trim() || 'Платон';
@@ -568,6 +589,15 @@ saveSettingsBtn.addEventListener('click', () => {
     applySettings();
     closeSettings();
 });
+promptOverlayClose.addEventListener('click', closePromptEditor);
+promptOverlayText.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePromptEditor();
+    }
+});
+commonPromptInput.addEventListener('focus', () => openPromptEditor(commonPromptInput));
+prompt1Input.addEventListener('focus', () => openPromptEditor(prompt1Input));
+prompt2Input.addEventListener('focus', () => openPromptEditor(prompt2Input));
 
 menuToggle.addEventListener('click', () => {
     const collapsed = chatHeader.classList.toggle('collapsed');

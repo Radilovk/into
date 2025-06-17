@@ -410,6 +410,48 @@ body {
   opacity: 1;
 }
 
+.prompt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 1100;
+}
+
+.prompt-overlay textarea {
+  width: 100%;
+  max-width: 800px;
+  height: 70vh;
+  background: #1e1e1e;
+  border: 1px solid #555;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.prompt-overlay button {
+  margin-top: 10px;
+  background: #0b73ff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.prompt-overlay:not(.hidden) {
+  display: flex;
+}
+
 @media (max-width: 400px) {
   .controls {
     flex-direction: column;
