@@ -39,7 +39,8 @@ const navLinks = document.querySelector('.nav-links');
 
 mobileToggle.addEventListener('click', () => {
     navLinks.classList.toggle('active');
-    mobileToggle.innerHTML = navLinks.classList.contains('active') ? 
+    document.body.classList.toggle('menu-open', navLinks.classList.contains('active'));
+    mobileToggle.innerHTML = navLinks.classList.contains('active') ?
         '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
 });
 
@@ -48,6 +49,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     link.addEventListener('click', () => {
         if (navLinks.classList.contains('active')) { // Only if menu is active
             navLinks.classList.remove('active');
+            document.body.classList.remove('menu-open');
             mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
         }
     });
