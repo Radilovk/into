@@ -142,23 +142,23 @@ async function saveStoredSettings() {
     }
 }
 
-function buildPrompt(base, user, bot1, bot2, humor, sarcasm, aggression) {
+function buildPrompt(base, user, bot1, bot2, humor, sarcasm, aggression, delay) {
     let text = base
         .replace(/\{user\}/g, user)
         .replace(/\{bot1\}/g, bot1)
         .replace(/\{bot2\}/g, bot2);
-    text += `\nВ изказа си използвай следното ниво на хумор: ${humor}/10, сарказъм: ${sarcasm}/10, агресия: ${aggression}/10.`;
+    text += `\nВ изказа си използвай следното ниво на хумор: ${humor}/10, сарказъм: ${sarcasm}/10, агресия: ${aggression}/10, забавяне на отговора: ${delay} сек.`;
     return text;
 }
 
-let system1 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel) };
-let system2 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel) };
+let system1 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel, delayLevel) };
+let system2 = { role: 'system', content: buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2, userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel, delayLevel) };
 
 function updateSystemPrompts() {
     system1.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt1,
-        userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
+        userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel, delayLevel);
     system2.content = buildPrompt((commonPrompt ? commonPrompt + '\n' : '') + prompt2,
-        userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel);
+        userName, bot1Name, bot2Name, humorLevel, sarcasmLevel, aggressionLevel, delayLevel);
 }
 
 function updateSliderDisplays() {
