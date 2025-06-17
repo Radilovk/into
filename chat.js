@@ -323,7 +323,7 @@ voiceBtn.addEventListener('click', async () => {
 async function handleSend(fileData) {
     const baseHistory = chatHistory.slice(-10);
     const model1 = getModel(modelSelect);
-    const messages1 = debateToggle.checked ? [system1, ...baseHistory] : baseHistory;
+    const messages1 = [system1, ...baseHistory];
     const label1 = debateToggle.checked ? bot1Name : null;
     const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData, temp1, length1);
     if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });

@@ -12,7 +12,11 @@
     <div id="chat-container" class="chat-container">
         <header class="chat-header">
             <h1><i class="fas fa-comments"></i> Into AI Chat</h1>
-            <button id="menu-toggle" class="menu-toggle" aria-label="Меню" aria-expanded="true"><i class="fas fa-bars"></i></button>
+            <div class="header-buttons">
+                <button id="menu-toggle" class="menu-toggle" aria-label="Меню" aria-expanded="true"><i class="fas fa-bars"></i></button>
+                <button type="button" id="clear-chat" class="clear-btn"><i class="fas fa-trash"></i></button>
+                <button type="button" id="pause-btn" class="pause-btn hidden">Пауза</button>
+            </div>
             <div class="controls">
                 <select id="model-select">
                     <option data-desc="Стандартен модел за разговор" value="@cf/meta/llama-3.1-8b-instruct">🧠 Разговор</option>
@@ -115,7 +119,6 @@
             <button type="button" id="voice-btn" class="voice-btn"><i class="fas fa-microphone"></i></button>
             <input type="text" id="user-input" placeholder="Напишете съобщение..." required autocomplete="off">
             <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
-            <button type="button" id="clear-chat" class="clear-btn"><i class="fas fa-trash"></i></button>
         </form>
     </div>
     <script src="chat.js"></script>
