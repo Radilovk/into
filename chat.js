@@ -262,15 +262,16 @@ fileInput.addEventListener('change', () => {
 
     const reader = new FileReader();
     reader.onload = async () => {
+        const dataUrl = reader.result;
         if (file.type.startsWith('image/')) {
-            appendImageMessage('user', reader.result);
+            appendImageMessage('user', dataUrl);
         } else {
             appendMessage('user', file.name);
         }
         chatHistory.push({ role: 'user', content: '[file]' });
         if (chatHistory.length > 10) chatHistory.shift();
         try {
-            await handleSend(reader.result);
+            await handleSend(dataUrl);
         } catch (err) {
             console.error('Грешка при handleSend:', err);
         }
@@ -364,13 +365,23 @@ voiceBtn.addEventListener('click', async () => {
     }
 });
 
+function speakText(text) {
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'bg-BG';
+    speechSynthesis.speak(utter);
+}
+
 async function handleSend(fileData) {
     const baseHistory = chatHistory.slice(-10);
     const model1 = getModel(modelSelect);
     const messages1 = [system1, ...baseHistory];
     const label1 = debateToggle.checked ? bot1Name : null;
     const reply1 = await sendRequest(model1, messages1, debateToggle.checked ? 'assistant-1' : 'assistant', label1, fileData, temp1, length1);
-    if (reply1) chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
+    if (reply1) {
+        chatHistory.push({ role: 'assistant', content: label1 ? `${label1}: ${reply1}` : reply1 });
+        if (modelSelect.value === 'voice-chat') speakText(reply1);
+    }
     if (chatHistory.length > 10) chatHistory.shift();
 
     if (debateToggle.checked) {
@@ -381,16 +392,37 @@ async function handleSend(fileData) {
         const model2 = getModel(modelSelect2);
         const messages2 = [system2, ...chatHistory.slice(-10)];
         const reply2 = await sendRequest(model2, messages2, 'assistant-2', bot2Name, null, temp2, length2);
-        if (reply2) chatHistory.push({ role: 'assistant', content: `${bot2Name}: ${reply2}` });
+        if (reply2) {
+            chatHistory.push({ role: 'assistant', content: `${bot2Name}: ${reply2}` });
+            if (modelSelect.value === 'voice-chat') speakText(reply2);
+        }
         if (chatHistory.length > 10) chatHistory.shift();
     }
 }
 
 async function sendRequest(model, messages, displayRole, speaker, fileData, temp, maxTokens) {
-    const payload = { messages, model };
-    if (temp !== undefined) payload.temperature = temp;
-    if (maxTokens !== undefined) payload.max_tokens = maxTokens;
-    if (fileData) payload.file = fileData;
+    const payload = { model };
+    if (model === '@cf/flux-1-schnell') {
+        payload.prompt = messages[messages.length - 1].content;
+        payload.num_images = 1;
+        payload.width = 512;
+        payload.height = 512;
+    } else if (model === '@cf/llama-3.2-11b-vision-instruct') {
+        payload.messages = [
+            { role: 'system', content: 'Опиши съдържанието на изображението.' },
+            { role: 'user', content: fileData }
+        ];
+        if (temp !== undefined) payload.temperature = temp;
+        if (maxTokens !== undefined) payload.max_tokens = maxTokens;
+    } else if (model === '@cf/openai/whisper-large-v3') {
+        payload.audio = fileData;
+        payload.language = 'bg';
+    } else {
+        payload.messages = messages;
+        if (temp !== undefined) payload.temperature = temp;
+        if (maxTokens !== undefined) payload.max_tokens = maxTokens;
+        if (fileData) payload.file = fileData;
+    }
 
     try {
         const response = await fetch(apiEndpoint, {
@@ -399,6 +431,16 @@ async function sendRequest(model, messages, displayRole, speaker, fileData, temp
             body: JSON.stringify(payload)
         });
         const data = await response.json();
+        if (model === '@cf/flux-1-schnell') {
+            const img = data.result.response;
+            appendImageMessage(displayRole, img);
+            return '[image]';
+        }
+        if (model === '@cf/openai/whisper-large-v3') {
+            const text = data.result.transcription;
+            appendMessage(displayRole, text, speaker);
+            return text;
+        }
         let aiText = data.result.response;
         const escaped = participantNames().map(escapeRegExp).join('|');
         const nameRegex = new RegExp(`^(${escaped}):?\\s*`, 'i');
