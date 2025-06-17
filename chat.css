@@ -250,8 +250,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  margin-left: auto;
-  align-self: flex-start;
+  margin-left: 0;
 }
 
 #restart-chat:hover {
