@@ -31,6 +31,10 @@ const humorInput = document.getElementById('humor-level');
 const sarcasmInput = document.getElementById('sarcasm-level');
 const aggressionInput = document.getElementById('aggression-level');
 const delayInput = document.getElementById('delay-level');
+const debateIcon = document.getElementById("debate-icon");
+const autoDebateIcon = document.getElementById("auto-debate-icon");
+const settingsIcon = document.getElementById("settings-icon");
+const pauseIcon = document.getElementById("pause-icon");
 
 const length1Value = length1Input.nextElementSibling;
 const temp1Value = temp1Input.nextElementSibling;
@@ -191,6 +195,8 @@ input.addEventListener('input', () => {
         pauseBtn.classList.add('hidden');
         pauseBtn.textContent = 'Пауза';
         autoDebateToggle.checked = false;
+        pauseIcon.classList.add("hidden");
+        pauseIcon.querySelector("i").className = "fas fa-pause";
         autoDebateLabel.classList.remove('running');
         console.log('Автодебатът е паузиран заради въвеждане от потребителя.');
     }
@@ -207,6 +213,8 @@ form.addEventListener('submit', async (e) => {
         pauseBtn.classList.add('hidden');
         pauseBtn.textContent = 'Пауза';
         autoDebateToggle.checked = false;
+        pauseIcon.classList.add("hidden");
+        pauseIcon.querySelector("i").className = "fas fa-pause";
         autoDebateLabel.classList.remove('running');
         appendMessage('assistant', 'Автодебатът е спрян.');
         input.value = '';
@@ -271,6 +279,8 @@ autoDebateToggle.addEventListener('change', () => {
     isPaused = false;
     pauseBtn.textContent = 'Пауза';
     pauseBtn.classList.toggle('hidden', !autoDebate);
+    pauseIcon.querySelector("i").className = "fas fa-pause";
+    pauseIcon.classList.toggle("hidden", !autoDebate);
     autoDebateLabel.classList.toggle('running', autoDebate);
     if (autoDebate) {
         runDebateLoop();
@@ -282,10 +292,12 @@ pauseBtn.addEventListener('click', () => {
         isPaused = true;
         pauseBtn.textContent = 'Продължи';
         autoDebateLabel.classList.remove('running');
+        pauseIcon.querySelector("i").className = "fas fa-play";
     } else {
         isPaused = false;
         pauseBtn.textContent = 'Пауза';
         autoDebateLabel.classList.add('running');
+        pauseIcon.querySelector("i").className = "fas fa-pause";
         runDebateLoop();
     }
 });
@@ -547,6 +559,10 @@ function applySettings() {
 }
 
 settingsBtn.addEventListener('click', openSettings);
+settingsIcon.addEventListener("click", openSettings);
+debateIcon.addEventListener("click", () => debateToggle.click());
+autoDebateIcon.addEventListener("click", () => autoDebateToggle.click());
+pauseIcon.addEventListener("click", () => pauseBtn.click());
 cancelSettingsBtn.addEventListener('click', closeSettings);
 saveSettingsBtn.addEventListener('click', () => {
     applySettings();
