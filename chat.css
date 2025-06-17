@@ -330,3 +330,18 @@ body {
   }
 }
 
+@media (max-width: 400px) {
+  .controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pause-btn {
+    padding: 8px 14px;
+  }
+
+  .settings-btn {
+    font-size: 1.3rem;
+  }
+}
+
