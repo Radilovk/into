@@ -189,21 +189,20 @@ function escapeRegExp(str) {
 const messagesEl = document.getElementById('messages');
 const form = document.getElementById('chat-form');
 const input = document.getElementById('user-input');
-const clearChatBtn = document.getElementById('clear-chat');
+const restartBtn = document.getElementById('restart-chat');
 
 const chatHistory = [];
 
+let pausedByInput = false;
 input.addEventListener('input', () => {
-    if (input.value.trim() && autoDebate) {
-        autoDebate = false;
-        isPaused = false;
-        pauseBtn.classList.add('hidden');
-        pauseBtn.textContent = 'Пауза';
-        autoDebateToggle.checked = false;
-        pauseIcon.classList.add("hidden");
-        pauseIcon.querySelector("i").className = "fas fa-pause";
+    if (input.value.trim() && autoDebate && !isPaused) {
+        isPaused = true;
+        pausedByInput = true;
+        pauseBtn.textContent = 'Продължи';
         autoDebateLabel.classList.remove('running');
-        console.log('Автодебатът е паузиран заради въвеждане от потребителя.');
+        pauseIcon.querySelector("i").className = "fas fa-play";
+        pauseIcon.classList.add('inactive');
+        pauseIcon.classList.remove('active');
     }
 });
 
@@ -235,6 +234,17 @@ form.addEventListener('submit', async (e) => {
         await handleSend();
     } catch (err) {
         console.error('Грешка при handleSend:', err);
+    }
+
+    if (pausedByInput && autoDebate) {
+        isPaused = false;
+        pausedByInput = false;
+        pauseBtn.textContent = 'Пауза';
+        autoDebateLabel.classList.add('running');
+        pauseIcon.querySelector("i").className = "fas fa-pause";
+        pauseIcon.classList.add('active');
+        pauseIcon.classList.remove('inactive');
+        runDebateLoop();
     }
 });
 
@@ -625,6 +635,18 @@ menuToggle.addEventListener('click', () => {
     showToast(`Меню: ${collapsed ? 'компактно' : 'разширено'}`);
 });
 
+document.addEventListener('click', (e) => {
+    if (!chatHeader.classList.contains('collapsed') &&
+        !chatHeader.contains(e.target) && e.target !== menuToggle) {
+        chatHeader.classList.add('collapsed');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuCollapsed = true;
+        localStorage.setItem('menuCollapsed', true);
+        menuToggle.classList.add('active');
+        showToast('Меню: компактно');
+    }
+});
+
 length1Input.addEventListener('input', () => {
     length1 = parseInt(length1Input.value);
     length1Value.textContent = length1Input.value;
@@ -672,11 +694,8 @@ delayInput.addEventListener('input', () => {
     delayValue.textContent = delayInput.value;
     updateSystemPrompts();
 });
-clearChatBtn.addEventListener('click', () => {
-    if (confirm('Да изчистя ли историята на чата?')) {
-        clearChat();
-        showToast('Чатът е изчистен');
-    }
+restartBtn.addEventListener('click', () => {
+    location.reload();
 });
 
 (async () => {
