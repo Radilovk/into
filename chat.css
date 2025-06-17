@@ -13,7 +13,7 @@ body {
 .chat-container {
   display: flex;
   flex-direction: column;
-  background: #1e1e1e;
+  background: #21242c;
   width: 100%;
   max-width: 700px;
   height: 90vh;
@@ -23,7 +23,7 @@ body {
 }
 
 .chat-header {
-  background: linear-gradient(135deg, #0044cc, #0058f5);
+  background: linear-gradient(135deg, #006eff, #00bfff);
   padding: 10px 15px;
   border-bottom: 1px solid #333;
   display: flex;
@@ -81,6 +81,24 @@ body {
   font-weight: bold;
 }
 
+.pause-btn {
+  background: #ff9800;
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.pause-btn:hover {
+  background: #ffad33;
+}
+
+.pause-btn.hidden {
+  display: none;
+}
+
 .hidden {
   display: none;
 }
@@ -103,7 +121,7 @@ body {
 
 .message.user {
   align-self: flex-end;
-  background: linear-gradient(135deg, #0058f5, #0b73ff);
+  background: linear-gradient(135deg, #006eff, #00bfff);
   color: #fff;
   border-bottom-right-radius: 0;
 }
@@ -135,7 +153,7 @@ body {
 }
 
 .chat-form {
-  background: #242424;
+  background: #262a33;
   padding: 10px;
   display: flex;
   gap: 8px;
@@ -152,7 +170,7 @@ body {
 }
 
 .chat-form button {
-  background: #0058f5;
+  background: #006eff;
   border: none;
   color: #fff;
   padding: 10px 15px;
@@ -164,7 +182,7 @@ body {
 }
 
 .chat-form button:hover {
-  background: #0b73ff;
+  background: #00bfff;
 }
 
 .voice-btn {
@@ -226,6 +244,7 @@ body {
   background: #1e1e1e;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
   width: 90%;
   max-width: 400px;
   max-height: 90vh;

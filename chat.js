@@ -9,6 +9,7 @@ const modelDesc2 = document.getElementById('model-desc-2');
 const debateToggle = document.getElementById('debate-mode');
 const autoDebateToggle = document.getElementById('auto-debate');
 const autoDebateLabel = document.querySelector('.auto-debate-toggle');
+const pauseBtn = document.getElementById('pause-btn');
 const fileInput = document.getElementById('file-input');
 const sendFileBtn = document.getElementById('send-file');
 const voiceBtn = document.getElementById('voice-btn');
@@ -134,6 +135,7 @@ let audioChunks = [];
 voiceBtn.style.display = modelSelect.value === 'voice-chat' ? 'block' : 'none';
 modelSelect2.classList.toggle('hidden', !debateToggle.checked);
 let autoDebate = false;
+let isPaused = false;
 let debateLoopRunning = false;
 
 function escapeRegExp(str) {
@@ -150,6 +152,9 @@ const chatHistory = [];
 input.addEventListener('input', () => {
     if (input.value.trim() && autoDebate) {
         autoDebate = false;
+        isPaused = false;
+        pauseBtn.classList.add('hidden');
+        pauseBtn.textContent = 'Пауза';
         autoDebateToggle.checked = false;
         autoDebateLabel.classList.remove('running');
         console.log('Автодебатът е паузиран заради въвеждане от потребителя.');
@@ -163,6 +168,9 @@ form.addEventListener('submit', async (e) => {
 
     if (userText.toLowerCase() === 'стоп' || userText.toLowerCase() === 'stop') {
         autoDebate = false;
+        isPaused = false;
+        pauseBtn.classList.add('hidden');
+        pauseBtn.textContent = 'Пауза';
         autoDebateToggle.checked = false;
         autoDebateLabel.classList.remove('running');
         appendMessage('assistant', 'Автодебатът е спрян.');
@@ -225,8 +233,24 @@ debateToggle.addEventListener('change', () => {
 
 autoDebateToggle.addEventListener('change', () => {
     autoDebate = autoDebateToggle.checked;
+    isPaused = false;
+    pauseBtn.textContent = 'Пауза';
+    pauseBtn.classList.toggle('hidden', !autoDebate);
     autoDebateLabel.classList.toggle('running', autoDebate);
     if (autoDebate) {
+        runDebateLoop();
+    }
+});
+
+pauseBtn.addEventListener('click', () => {
+    if (!isPaused) {
+        isPaused = true;
+        pauseBtn.textContent = 'Продължи';
+        autoDebateLabel.classList.remove('running');
+    } else {
+        isPaused = false;
+        pauseBtn.textContent = 'Пауза';
+        autoDebateLabel.classList.add('running');
         runDebateLoop();
     }
 });
@@ -394,7 +418,7 @@ async function transcribeAudio(blob) {
 async function runDebateLoop() {
     if (debateLoopRunning) return;
     debateLoopRunning = true;
-    while (autoDebate) {
+    while (autoDebate && !isPaused) {
         console.log('Започва итерация на дебат цикъла');
         try {
             await handleSend();
