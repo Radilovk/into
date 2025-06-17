@@ -27,8 +27,9 @@ body {
   padding: 10px 15px;
   border-bottom: 1px solid #333;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 10px;
 }
 
 .chat-header h1 {
@@ -241,7 +242,7 @@ body {
   background: #d32f2f;
 }
 
-#clear-chat {
+#restart-chat {
   background: #d32f2f;
   border: none;
   color: #fff;
@@ -249,9 +250,11 @@ body {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
+  margin-left: auto;
+  align-self: flex-start;
 }
 
-#clear-chat:hover {
+#restart-chat:hover {
   background: #e64a4a;
 }
 
