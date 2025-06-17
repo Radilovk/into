@@ -24,12 +24,12 @@ body {
 
 .chat-header {
   background: linear-gradient(135deg, #006eff, #00bfff);
-  padding: 10px 15px;
+  padding: 6px 10px;
   border-bottom: 1px solid #333;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .chat-header h1 {
@@ -43,7 +43,7 @@ body {
 .header-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 .icon-btn {
   background: none;
@@ -94,7 +94,7 @@ body {
 .controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .controls label {
@@ -250,7 +250,7 @@ body {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  margin-left: 0;
+  margin-left: auto;
 }
 
 #restart-chat:hover {
@@ -373,8 +373,8 @@ body {
   }
 
   .chat-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 6px;
   }
 
