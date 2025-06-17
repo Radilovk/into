@@ -70,6 +70,10 @@ body {
   display: none;
 }
 
+.chat-header.collapsed {
+  padding-bottom: 5px;
+}
+
 .debate-toggle {
   font-size: 0.9rem;
   user-select: none;
