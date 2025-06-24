@@ -116,6 +116,16 @@
             color: var(--text-dark);
         }
 
+        .effects-list {
+            background-color: var(--card-rgba);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin: 2rem 0;
+        }
+        .effects-list ul { list-style: none; max-width: 650px; margin: 0 auto; }
+        .effects-list li { margin-bottom: 0.5rem; color: var(--text-dark); font-weight: 500; }
+        .effects-list li::before { content: '✔'; color: var(--primary); font-weight: bold; margin-right: 8px; }
+
         .benefits-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -138,6 +148,23 @@
         .benefit-card ul { list-style: none; padding: 0; }
         .benefit-card li { margin-bottom: 0.5rem; color: var(--text-light); }
         .benefit-card li::before { content: '✓'; color: #28a745; font-weight: bold; margin-right: 10px; }
+
+        .benefit-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+            color: var(--primary);
+        }
+        .time-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            margin: 0 4px;
+        }
 
         .pricing-grid {
             display: flex;
@@ -198,11 +225,11 @@
         .trust-item h3 { font-size: 1.2rem; }
         
         .buttons-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 2rem 0; }
-        .btn { padding: 14px 28px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; text-align: center; transition: all 0.3s ease; border: 2px solid transparent; font-size: 1rem; }
-        .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(217, 38, 38, 0.2); }
+        .btn { padding: 16px 34px; border-radius: 10px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; text-align: center; transition: all 0.3s ease; border: 2px solid transparent; font-size: 1.1rem; }
+        .btn-primary { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); color: white; border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(217, 38, 38, 0.3); }
         .btn-outline { background: transparent; color: var(--primary); border-color: var(--primary); }
-        .btn-outline:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+        .btn-outline:hover { background: var(--primary); color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(217, 38, 38, 0.1); }
 
         .final-cta {
             background: var(--primary);
@@ -214,8 +241,8 @@
         }
         .final-cta h2 { font-size: 2rem; color: white; border: none; padding: 0; margin-top: 0; }
         .final-cta p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
-        .final-cta .btn { background: white; color: var(--primary); margin-top: 1.5rem; font-size: 1.1rem; padding: 16px 35px; }
-        .final-cta .btn:hover { background: #f0f0f0; }
+        .final-cta .btn { background: white; color: var(--primary); margin-top: 1.5rem; font-size: 1.2rem; padding: 18px 40px; border-radius: 10px; }
+        .final-cta .btn:hover { background: #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
         .footer {
             text-align: center;
@@ -248,6 +275,16 @@
             <h1>Влезте във форма за лятото!</h1>
             <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem auto;">В ръцете си държите специална покана! Направете първата стъпка към мечтаната фигура с нашата революционна EMS технология.</p>
 
+            <div class="effects-list">
+                <ul>
+                    <li>Изчистване на мазнините</li>
+                    <li>Оформяне и стягане</li>
+                    <li>Антицелулитно и дренажно действие</li>
+                    <li>Възстановяване след бременност</li>
+                    <li>Справяне с болки в гърба и кръста</li>
+                </ul>
+            </div>
+
             <div class="ems-intro">
                 <h3>Какво е EMS и защо работи?</h3>
                 <p>EMS е съкращение от <strong>Електро-мускулна стимулация</strong>. Системата използва безопасни електрически импулси, които предизвикват много по-интензивни съкращения на мускулите.</p>
@@ -274,7 +311,7 @@
             <h2>Какво включва всяка процедура?</h2>
             <div class="benefits-grid">
                 <div class="benefit-card">
-                    <h3>Активна част - 20 мин. (Упражнения)</h3>
+                    <h3><svg class="benefit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd"/></svg> Активна част <span class="time-tag">20 мин.</span> (Упражнения)</h3>
                     <ul>
                         <li>Стягане на кожата</li>
                         <li>Оформяне на мускулатурата</li>
@@ -282,7 +319,7 @@
                     </ul>
                 </div>
                 <div class="benefit-card">
-                    <h3>Пасивна част - 10 мин. (Терапия)</h3>
+                    <h3><svg class="benefit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z" clip-rule="evenodd"/></svg> Пасивна част <span class="time-tag">10 мин.</span> (Терапия)</h3>
                     <ul>
                         <li>Дренаж на тъканите</li>
                         <li>Антицелулитна терапия</li>
