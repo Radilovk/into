@@ -68,6 +68,7 @@
 <div id="filters">
   <input type="date" id="filterDate">
   <input type="text" id="filterName" placeholder="Филтър по име">
+  <input type="number" id="priceInput" placeholder="Цена (лв)" min="0" step="0.01">
 </div>
 <div style="overflow-x:auto;">
 <table>
@@ -88,22 +89,14 @@
 <script>
 const API_URL = 'https://acuityscheduling.com/api/v1/appointments?appointmentTypeID=80052001';
 const AUTH = 'Basic ' + btoa('13943721:270f72e36bf17ab3074bbcf849f4beb4');
-const PRICE = 40;
+let price = parseFloat(localStorage.getItem('emsPrice')) || 0;
 let appointments = [];
 
 function fetchAppointments(){
   fetch(API_URL,{headers:{'Authorization':AUTH}})
   .then(r=> r.ok ? r.json() : Promise.reject())
   .then(data=>{ appointments=data; render(); })
-  .catch(()=>{ appointments=dummyData(); render(); });
-}
-
-function dummyData(){
-  return [
-    {id:1, firstName:'Иван', lastName:'Иванов', phone:'+359888111111', date:'2025-06-24', time:'10:00', datetime:'2025-06-24T10:00:00+0300'},
-    {id:2, firstName:'Мария', lastName:'Петрова', phone:'+359888222222', date:'2025-06-24', time:'11:00', datetime:'2025-06-24T11:00:00+0300'},
-    {id:3, firstName:'Георги', lastName:'Димитров', phone:'+359888333333', date:'2025-06-23', time:'14:00', datetime:'2025-06-23T14:00:00+0300'}
-  ];
+  .catch(()=>{ appointments=[]; render(); });
 }
 
 function render(){
@@ -117,7 +110,7 @@ function render(){
   if(filterName) data=data.filter(a=> (`${a.firstName} ${a.lastName}`).toLowerCase().includes(filterName));
   data.forEach(a=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${a.date}</td><td>${a.time}</td><td>${a.firstName} ${a.lastName}</td><td>${a.phone}</td><td>${PRICE.toFixed(2)} лв</td><td><textarea id="note-${a.id}"></textarea></td><td><button class="save" data-id="${a.id}">💾</button></td>`;
+    tr.innerHTML=`<td>${a.date}</td><td>${a.time}</td><td>${a.firstName} ${a.lastName}</td><td>${a.phone}</td><td>${price.toFixed(2)} лв</td><td><textarea id="note-${a.id}"></textarea></td><td><button class="save" data-id="${a.id}">💾</button></td>`;
     body.appendChild(tr);
     const noteEl=tr.querySelector('textarea');
     noteEl.value=localStorage.getItem('note-'+a.id)||'';
@@ -142,14 +135,21 @@ function updateSummary(list){
     if(!map[d]) map[d]=0;
     map[d]++;
   });
-  const lines=Object.keys(map).sort((a,b)=> new Date(b)-new Date(a)).map(d=>`${d}: ${map[d]} резервации – ${(map[d]*PRICE).toFixed(2)} лв`);
+  const lines=Object.keys(map).sort((a,b)=> new Date(b)-new Date(a)).map(d=>`${d}: ${map[d]} резервации – ${(map[d]*price).toFixed(2)} лв`);
   const total=list.length;
-  lines.push(`Общо: ${total} резервации – ${(total*PRICE).toFixed(2)} лв`);
+  lines.push(`Общо: ${total} резервации – ${(total*price).toFixed(2)} лв`);
   summary.innerHTML=lines.join('<br>');
 }
 
 document.getElementById('filterDate').addEventListener('input',render);
 document.getElementById('filterName').addEventListener('input',render);
+const priceInput=document.getElementById('priceInput');
+priceInput.value = price || '';
+priceInput.addEventListener('input',e=>{
+  price=parseFloat(e.target.value)||0;
+  localStorage.setItem('emsPrice', price);
+  render();
+});
 
 document.addEventListener('DOMContentLoaded',fetchAppointments);
 </script>
