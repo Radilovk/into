@@ -904,3 +904,23 @@ body.dark-theme .nav-links {
         padding: var(--spacing-md);
     }
 }
+
+/* Calendar Page */
+.subpage-header {
+    background-color: var(--bg-secondary);
+    padding: var(--spacing-lg) 0;
+    text-align: center;
+}
+
+.events-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.events-list li {
+    margin-bottom: var(--spacing-md);
+    background: var(--card-bg);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px var(--shadow);
+}
