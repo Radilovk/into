@@ -106,7 +106,9 @@ function render(){
   body.innerHTML='';
   let data=[...appointments];
   data.sort((a,b)=> new Date(b.datetime)-new Date(a.datetime));
-  if(filterDate) data=data.filter(a=> a.date.startsWith(filterDate));
+  if(filterDate){
+    data=data.filter(a=> new Date(a.datetime).toISOString().slice(0,10) === filterDate);
+  }
   if(filterName) data=data.filter(a=> (`${a.firstName} ${a.lastName}`).toLowerCase().includes(filterName));
   data.forEach(a=>{
     const tr=document.createElement('tr');
