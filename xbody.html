@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bg">
+<html id="html" lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +61,7 @@
         }
 
         .header {
+            position: relative;
             background: linear-gradient(135deg, rgba(50,50,50,0.8), rgba(30,30,30,0.9));
             color: white;
             padding: 40px;
@@ -89,6 +90,10 @@
             padding: 40px;
         }
         
+        .lang-en { display: none; }
+        body.en .lang-en { display: inline; }
+        body.en .lang-bg { display: none; }
+        .lang-toggle { position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
         h1, h2, h3 {
             font-weight: 600;
             margin-bottom: 1rem;
@@ -275,6 +280,7 @@
             .page-wrapper { margin: 0; border-radius: 0; border: none; }
             .content { padding: 25px; }
             .header { padding: 30px 20px; }
+            position: relative;
             h1 { font-size: 1.8rem; }
             h2 { font-size: 1.5rem; }
         }
@@ -286,43 +292,42 @@
     <div class="page-wrapper">
         <header class="header">
             <div class="logo">X<span>BODY</span></div>
-            <div class="subtitle">OASIS RESORT & SPA, ЛОЗЕНЕЦ | Тел: 0886 920 828</div>
+            <div class="subtitle"><span class="lang-bg">OASIS RESORT & SPA, ЛОЗЕНЕЦ | Тел: 0886 920 828</span><span class="lang-en">OASIS RESORT & SPA, LOZENETS | Phone: 0886 920 828</span></div>
+            <button id="lang-toggle" class="lang-toggle" title="English">🇬🇧</button>
         </header>
 
         <main class="content">
-            <h1>Влезте във форма за лятото!</h1>
-            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem auto;">В ръцете си държите специална покана! Направете първата стъпка към мечтаната фигура с нашата революционна EMS технология.</p>
+            <h1><span class="lang-bg">Влезте във форма за лятото!</span><span class="lang-en">Get in shape for the summer!</span></h1>
+            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem auto;"><span class="lang-bg">В ръцете си държите специална покана! Направете първата стъпка към мечтаната фигура с нашата революционна EMS технология.</span><span class="lang-en">You are holding a special invitation! Take the first step toward your dream body with our revolutionary EMS technology.</span></p>
 
             <div class="effects-list">
                 <ul>
-                    <li>Изчистване на мазнините</li>
-                    <li>Оформяне и стягане</li>
-                    <li>Антицелулитно и дренажно действие</li>
-                    <li>Възстановяване след бременност</li>
-                    <li>Справяне с болки в гърба и кръста</li>
+                    <li><span class="lang-bg">Изчистване на мазнините</span><span class="lang-en">Fat reduction</span></li>
+                    <li><span class="lang-bg">Оформяне и стягане</span><span class="lang-en">Toning and shaping</span></li>
+                    <li><span class="lang-bg">Антицелулитно и дренажно действие</span><span class="lang-en">Anti-cellulite and drainage effect</span></li>
+                    <li><span class="lang-bg">Възстановяване след бременност</span><span class="lang-en">Post-pregnancy recovery</span></li>
+                    <li><span class="lang-bg">Справяне с болки в гърба и кръста</span><span class="lang-en">Relief from back and lower back pain</span></li>
                 </ul>
             </div>
 
             <div class="ems-intro">
-                <h3>Какво е EMS и защо работи?</h3>
-                <p>EMS е съкращение от <strong>Електро-мускулна стимулация</strong>. Системата използва безопасни електрически импулси, които предизвикват много по-интензивни съкращения на мускулите.</p>
-                <p>По време на всяка тренировка специален костюм насочва импулсите към основните мускулни групи. Така само за 20 минути активирате над 90% от мускулатурата си и изгаряте мазнини значително по-бързо.</p>
-                <p>Резултатът е стегнато тяло, по-гладка кожа и осезаем антицелулитен ефект още след първите няколко процедури.</p>
+                <h3><span class="lang-bg">Какво е EMS и защо работи?</span><span class="lang-en">What is EMS and why does it work?</span></h3>
+                <p><span class="lang-bg">EMS е съкращение от <strong>Електро-мускулна стимулация</strong>. Системата използва безопасни електрически импулси, които предизвикват много по-интензивни съкращения на мускулите.</span><span class="lang-en">EMS stands for <strong>Electrical Muscle Stimulation</strong>. The system uses safe electrical impulses that trigger much more intense muscle contractions.</span></p>
+                <p><span class="lang-bg">По време на всяка тренировка специален костюм насочва импулсите към основните мускулни групи. Така само за 20 минути активирате над 90% от мускулатурата си и изгаряте мазнини значително по-бързо.</span><span class="lang-en">During each workout, a special suit targets the impulses to your major muscle groups. In just 20 minutes you activate over 90% of your muscles and burn fat much faster.</span></p>
+                <p><span class="lang-bg">Резултатът е стегнато тяло, по-гладка кожа и осезаем антицелулитен ефект още след първите няколко процедури.</span><span class="lang-en">The result is a toned body, smoother skin, and a noticeable anti-cellulite effect after just a few sessions.</span></p>
             </div>
 
-            <h2>Вашата оферта: 5 + 1 ПОДАРЪК</h2>
+            <h2><span class="lang-bg">Вашата оферта: 5 + 1 ПОДАРЪК</span><span class="lang-en">Your offer: 5 + 1 FREE</span></h2>
             <div class="pricing-grid">
                 <div class="price-card">
-                    <h3>Еднократна процедура</h3>
+                    <h3><span class="lang-bg">Еднократна процедура</span><span class="lang-en">Single session</span></h3>
                     <div class="price">65 лв</div>
-                    <p>Индивидуална EMS сесия с активна и пасивна част.</p>
+                    <p><span class="lang-bg">Индивидуална EMS сесия с активна и пасивна част.</span><span class="lang-en">Individual EMS session with active and passive segments.</span></p>
                 </div>
-                <div class="price-card recommended">
-                    <h3>Пакет "Beach Body"</h3>
-                    <div class="price">325 лв</div>
-                    <p>Плащате 5, получавате <strong>6 процедури</strong> </p>
-                    <p class="saving">Спестявате 65 лв!</p>
-                    <p class="value-note">(Реална стойност: 6 x 65 лв = 390 лв)</p>
+                    <h3><span class="lang-bg">Пакет "Beach Body"</span><span class="lang-en">Beach Body Package</span></h3>
+                    <p><span class="lang-bg">Плащате 5, получавате <strong>6 процедури</strong> </span><span class="lang-en">Pay for 5, get <strong>6 sessions</strong></span></p>
+                    <p class="saving"><span class="lang-bg">Спестявате 65 лв!</span><span class="lang-en">Save 65 BGN!</span></p>
+                    <p class="value-note"><span class="lang-bg">(Реална стойност: 6 x 65 лв = 390 лв)</span><span class="lang-en">(Actual value: 6 x 65 BGN = 390 BGN)</span></p>
                 </div>
             </div>
 
@@ -378,18 +383,22 @@
             </div>
 
             <div class="final-cta">
-                <h2>Готови ли сте за промяна?</h2>
-                <p>Местата са ограничени - запазете своя час за EMS сега!</p>
+                <h2><span class="lang-bg">Готови ли сте за промяна?</span><span class="lang-en">Ready for a change?</span></h2>
+                <p><span class="lang-bg">Местата са ограничени - запазете своя час за EMS сега!</span><span class="lang-en">Spots are limited - book your EMS session now!</span></p>
                 <a href="https://xbody.as.me/oasis" class="btn">
-                    Резервирайте онлайн
+                    <span class="lang-bg">Резервирайте онлайн</span><span class="lang-en">Book online</span>
                 </a>
             </div>
         </main>
         
         <footer class="footer">
-            <p>© 2024 Alpha Kinetics. Всички права запазени.</p>
-            <p><strong>Местоположение:</strong> Oasis Resort & Spa, Лозенец</p>
+            <p><span class="lang-bg">© 2024 Alpha Kinetics. Всички права запазени.</span><span class="lang-en">© 2024 Alpha Kinetics. All rights reserved.</span></p>
+            <p><strong><span class="lang-bg">Местоположение:</span><span class="lang-en">Location:</span></strong> Oasis Resort & Spa, Лозенец</p>
         </footer>
+<script>
+const btn=document.getElementById("lang-toggle");
+btn.addEventListener("click",()=>{const html=document.getElementById("html");if(document.body.classList.toggle("en")){btn.textContent="🇧🇬";btn.title="Български";html.lang="en";}else{btn.textContent="🇬🇧";btn.title="English";html.lang="bg";}});
+</script>
     </div>
 </body>
 </html>
