@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EMS тренировки в Oasis Resort &amp; Spa, Лозенец. Научете как 20-минутните сесии оформят тялото и намаляват целулита.">
-    <title>XBODY EMS Тренировки - "Оазис" Лозенец</title>
+    <meta name="description" content="EMS тренировки в Oasis Resort &amp; Spa, Лозенец. Научете как 20-минутните сесии оформят тялото и намаляват целулита." data-en="EMS training at Oasis Resort &amp; Spa, Lozenets. Learn how 20-minute sessions shape the body and reduce cellulite.">
+    <title data-en="XBODY EMS Training - Oasis Lozenets">XBODY EMS Тренировки - &quot;Оазис&quot; Лозенец</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -83,6 +83,19 @@
             font-weight: 400;
             opacity: 0.9;
             margin-top: 5px;
+        }
+
+        .lang-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .content {
@@ -213,9 +226,10 @@
         .price-card.recommended {
             border: 2px solid var(--primary);
             position: relative;
+            --label-text: 'НАЙ-ДОБРА ОФЕРТА';
         }
         .price-card.recommended::before {
-            content: 'НАЙ-ДОБРА ОФЕРТА';
+            content: var(--label-text);
             position: absolute;
             top: -15px;
             left: 50%;
@@ -286,110 +300,143 @@
     <div class="page-wrapper">
         <header class="header">
             <div class="logo">X<span>BODY</span></div>
-            <div class="subtitle">OASIS RESORT & SPA, ЛОЗЕНЕЦ | Тел: 0886 920 828</div>
+            <div class="subtitle" data-en="OASIS RESORT &amp; SPA, LOZENETS | Tel: 0886 920 828">OASIS RESORT &amp; SPA, ЛОЗЕНЕЦ | Тел: 0886 920 828</div>
+            <button id="lang-toggle" class="lang-btn" title="English version">🇬🇧 EN</button>
         </header>
 
         <main class="content">
-            <h1>Влезте във форма за лятото!</h1>
-            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem auto;">В ръцете си държите специална покана! Направете първата стъпка към мечтаната фигура с нашата революционна EMS технология.</p>
+            <h1 data-en="Get in shape for summer!">Влезте във форма за лятото!</h1>
+            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem auto;" data-en="You hold a special invitation! Take the first step toward your dream figure with our revolutionary EMS technology.">В ръцете си държите специална покана! Направете първата стъпка към мечтаната фигура с нашата революционна EMS технология.</p>
 
             <div class="effects-list">
                 <ul>
-                    <li>Изчистване на мазнините</li>
-                    <li>Оформяне и стягане</li>
-                    <li>Антицелулитно и дренажно действие</li>
-                    <li>Възстановяване след бременност</li>
-                    <li>Справяне с болки в гърба и кръста</li>
+                    <li data-en="Fat reduction">Изчистване на мазнините</li>
+                    <li data-en="Toning and shaping">Оформяне и стягане</li>
+                    <li data-en="Anti-cellulite and drainage action">Антицелулитно и дренажно действие</li>
+                    <li data-en="Post-pregnancy recovery">Възстановяване след бременност</li>
+                    <li data-en="Relief of back and lower back pain">Справяне с болки в гърба и кръста</li>
                 </ul>
             </div>
 
             <div class="ems-intro">
-                <h3>Какво е EMS и защо работи?</h3>
-                <p>EMS е съкращение от <strong>Електро-мускулна стимулация</strong>. Системата използва безопасни електрически импулси, които предизвикват много по-интензивни съкращения на мускулите.</p>
-                <p>По време на всяка тренировка специален костюм насочва импулсите към основните мускулни групи. Така само за 20 минути активирате над 90% от мускулатурата си и изгаряте мазнини значително по-бързо.</p>
-                <p>Резултатът е стегнато тяло, по-гладка кожа и осезаем антицелулитен ефект още след първите няколко процедури.</p>
+                <h3 data-en="What is EMS and why does it work?">Какво е EMS и защо работи?</h3>
+                <p data-en="EMS stands for Electrical Muscle Stimulation. The system uses safe electrical impulses that trigger much more intensive muscle contractions.">EMS е съкращение от <strong>Електро-мускулна стимулация</strong>. Системата използва безопасни електрически импулси, които предизвикват много по-интензивни съкращения на мускулите.</p>
+                <p data-en="During each session a special suit directs the impulses to the main muscle groups. This way in just 20 minutes you activate over 90% of your muscles and burn fat much faster.">По време на всяка тренировка специален костюм насочва импулсите към основните мускулни групи. Така само за 20 минути активирате над 90% от мускулатурата си и изгаряте мазнини значително по-бързо.</p>
+                <p data-en="The result is a toned body, smoother skin and a noticeable anti-cellulite effect after just a few procedures.">Резултатът е стегнато тяло, по-гладка кожа и осезаем антицелулитен ефект още след първите няколко процедури.</p>
             </div>
 
-            <h2>Вашата оферта: 5 + 1 ПОДАРЪК</h2>
+            <h2 data-en="Your offer: 5 + 1 FREE">Вашата оферта: 5 + 1 ПОДАРЪК</h2>
             <div class="pricing-grid">
                 <div class="price-card">
-                    <h3>Еднократна процедура</h3>
-                    <div class="price">65 лв</div>
-                    <p>Индивидуална EMS сесия с активна и пасивна част.</p>
+                    <h3 data-en="Single session">Еднократна процедура</h3>
+                    <div class="price" data-en="65 BGN">65 лв</div>
+                    <p data-en="Individual EMS session with active and passive part.">Индивидуална EMS сесия с активна и пасивна част.</p>
                 </div>
-                <div class="price-card recommended">
-                    <h3>Пакет "Beach Body"</h3>
-                    <div class="price">325 лв</div>
-                    <p>Плащате 5, получавате <strong>6 процедури</strong> </p>
-                    <p class="saving">Спестявате 65 лв!</p>
-                    <p class="value-note">(Реална стойност: 6 x 65 лв = 390 лв)</p>
+                <div class="price-card recommended" data-label-en="BEST DEAL">
+                    <h3 data-en="\"Beach Body\" package">Пакет "Beach Body"</h3>
+                    <div class="price" data-en="325 BGN">325 лв</div>
+                    <p data-en="Pay for 5, get <strong>6 sessions</strong>">Плащате 5, получавате <strong>6 процедури</strong> </p>
+                    <p class="saving" data-en="Save 65 BGN!">Спестявате 65 лв!</p>
+                    <p class="value-note" data-en="(Actual value: 6 x 65 BGN = 390 BGN)">(Реална стойност: 6 x 65 лв = 390 лв)</p>
                 </div>
             </div>
 
-            <h2>Какво включва всяка процедура?</h2>
+            <h2 data-en="What does each session include?">Какво включва всяка процедура?</h2>
             <div class="benefits-grid">
                 <div class="benefit-card">
-                    <h3><svg class="benefit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd"/></svg> Активна част <span class="time-tag">20 мин.</span> (Упражнения)</h3>
+                    <h3 data-en="Active part <span class='time-tag'>20 min</span> (Exercises)"><svg class="benefit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clip-rule="evenodd"/></svg> Активна част <span class="time-tag">20 мин.</span> (Упражнения)</h3>
                     <ul>
-                        <li>Оформяне на тялото</li>
-                        <li>Изчистване на мазнините</li>
-                        <li>Стягане на мускулите</li>
+                        <li data-en="Body shaping">Оформяне на тялото</li>
+                        <li data-en="Fat burning">Изчистване на мазнините</li>
+                        <li data-en="Muscle toning">Стягане на мускулите</li>
                     </ul>
                 </div>
                 <div class="benefit-card">
-                    <h3><svg class="benefit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z" clip-rule="evenodd"/></svg> Пасивна част <span class="time-tag">10 мин.</span> (Терапия)</h3>
+                    <h3 data-en="Passive part <span class='time-tag'>10 min</span> (Therapy)"><svg class="benefit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z" clip-rule="evenodd"/></svg> Пасивна част <span class="time-tag">10 мин.</span> (Терапия)</h3>
                     <ul>
-                        <li>Антицелулитна терапия</li>
-                        <li>Дренаж на тъканите</li>
-                        <li>Стягане на кожата</li>
+                        <li data-en="Anti-cellulite therapy">Антицелулитна терапия</li>
+                        <li data-en="Tissue drainage">Дренаж на тъканите</li>
+                        <li data-en="Skin tightening">Стягане на кожата</li>
                     </ul>
                 </div>
             </div>
 
-            <h2>Защо да изберете нас?</h2>
+            <h2 data-en="Why choose us?">Защо да изберете нас?</h2>
             <div class="trust-section">
                 <div class="trust-item">
                     <svg class="trust-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h2.25c1.035 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-2.25a1.875 1.875 0 01-1.875-1.875V8.625zM16.5 4.125c0-1.036.84-1.875 1.875-1.875h2.25C21.496 2.25 22 2.754 22 3.375v16.5c0 1.035-.84 1.875-1.875 1.875h-2.25a1.875 1.875 0 01-1.875-1.875V4.125z" /></svg>
-                    <h3>Гарантирани резултати</h3>
-                    <p>Видима промяна след 5 процедури при 92% от клиентите.</p>
+                    <h3 data-en="Guaranteed results">Гарантирани резултати</h3>
+                    <p data-en="Visible change after 5 sessions for 92% of clients.">Видима промяна след 5 процедури при 92% от клиентите.</p>
                 </div>
                 <div class="trust-item">
                     <svg class="trust-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
-                    <h3>Професионализъм</h3>
-                    <p>Сертифицирани треньори и терапевти с над 10 години опит.</p>
+                    <h3 data-en="Professionalism">Професионализъм</h3>
+                    <p data-en="Certified trainers and therapists with over 10 years of experience.">Сертифицирани треньори и терапевти с над 10 години опит.</p>
                 </div>
                 <div class="trust-item">
                     <svg class="trust-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
-                    <h3>Индивидуален подход</h3>
-                    <p>Програма, персонализирана според вашите цели и нужди.</p>
+                    <h3 data-en="Individual approach">Индивидуален подход</h3>
+                    <p data-en="Program tailored to your goals and needs.">Програма, персонализирана според вашите цели и нужди.</p>
                 </div>
             </div>
 
             <div class="buttons-container">
-                <a href="https://mybody.best/wp-content/uploads/effects.html" class="btn btn-outline">Вижте реални резултати</a>
-                <a href="https://mybody.best/wp-content/uploads/faq.html" class="btn btn-outline">Често задавани въпроси</a>
+                <a href="https://mybody.best/wp-content/uploads/effects.html" class="btn btn-outline" data-en="See real results">Вижте реални резултати</a>
+                <a href="https://mybody.best/wp-content/uploads/faq.html" class="btn btn-outline" data-en="Frequently asked questions">Често задавани въпроси</a>
                 <!-- НОВ БУТОН ЗА ЛОКАЦИЯ -->
                 <a href="https://www.google.com/maps/place//data=!4m2!3m1!1s0x40a12dad1ed57d07:0xd709069b723b1ba8?sa=X&ved=1t:8290&hl=bg&ictx=111" class="btn btn-outline" target="_blank" rel="noopener">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: text-bottom; margin-right: 8px;">
                         <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
                     </svg>
-                    Намерете ни
+                    <span data-en="Find us">Намерете ни</span>
                 </a>
             </div>
 
             <div class="final-cta">
-                <h2>Готови ли сте за промяна?</h2>
-                <p>Местата са ограничени - запазете своя час за EMS сега!</p>
-                <a href="https://xbody.as.me/oasis" class="btn">
+                <h2 data-en="Ready for a change?">Готови ли сте за промяна?</h2>
+                <p data-en="Slots are limited - book your EMS session now!">Местата са ограничени - запазете своя час за EMS сега!</p>
+                <a href="https://xbody.as.me/oasis" class="btn" data-en="Book online">
                     Резервирайте онлайн
                 </a>
             </div>
         </main>
         
         <footer class="footer">
-            <p>© 2024 Alpha Kinetics. Всички права запазени.</p>
-            <p><strong>Местоположение:</strong> Oasis Resort & Spa, Лозенец</p>
+            <p data-en="© 2024 Alpha Kinetics. All rights reserved.">© 2024 Alpha Kinetics. Всички права запазени.</p>
+            <p><strong data-en="Location:">Местоположение:</strong> <span data-en="Oasis Resort &amp; Spa, Lozenets">Oasis Resort &amp; Spa, Лозенец</span></p>
         </footer>
-    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('lang-toggle');
+    const root = document.documentElement;
+    document.querySelectorAll('[data-en]').forEach(el => {
+        const value = el.tagName.toLowerCase() === 'meta' ? el.getAttribute('content') : el.innerHTML;
+        el.dataset.bg = value;
+    });
+    const recommended = document.querySelector('.price-card.recommended');
+    if (recommended) {
+        recommended.dataset.labelBg = recommended.style.getPropertyValue('--label-text');
+    }
+    function switchLang(toEn) {
+        root.lang = toEn ? 'en' : 'bg';
+        btn.textContent = toEn ? '🇧🇬 BG' : '🇬🇧 EN';
+        btn.title = toEn ? 'Български' : 'English version';
+        document.querySelectorAll('[data-en]').forEach(el => {
+            const text = toEn ? el.dataset.en : el.dataset.bg;
+            if (el.tagName.toLowerCase() === 'meta') {
+                el.setAttribute('content', text);
+            } else {
+                el.innerHTML = text;
+            }
+        });
+        if (recommended) {
+            const label = toEn ? recommended.dataset.labelEn : recommended.dataset.labelBg;
+            recommended.style.setProperty('--label-text', '"' + label + '"');
+        }
+    }
+    btn.addEventListener('click', () => switchLang(root.lang === 'bg'));
+});
+</script>
 </body>
 </html>
