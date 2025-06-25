@@ -167,9 +167,17 @@ wrangler secret put ACUITY_KEY
 
 Тези стойности не бива да се записват във front-end файла. Worker-ът използва секретите, за да извика Acuity API и връща резултата към клиента.
 
+В `acuity-report.html` задайте променливата `window.ACUITY_URL` с действителния URL на вашия Worker, например:
+
+```html
+<script>
+  window.ACUITY_URL = 'https://workerai.radilov-k.workers.dev/acuity';
+</script>
+```
+
 Примерен достъп:
 
 ```bash
-curl "https://your-worker.workers.dev/acuity?calendarID=80052001"
+curl "https://workerai.radilov-k.workers.dev/acuity?calendarID=80052001"
 ```
 
