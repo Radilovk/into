@@ -67,7 +67,7 @@
 <h1>Отчет за EMS тренировки</h1>
 <div id="summary"></div>
 <div id="filters">
-  <input type="date" id="filterDate">
+  <input type="date" id="startDate"> <input type="date" id="endDate">
   <input type="text" id="filterName" placeholder="Филтър по име">
   <input type="number" id="priceInput" placeholder="Цена (лв)" min="0" step="0.01">
 </div>
@@ -101,16 +101,21 @@ function fetchAppointments(){
 }
 
 function render(){
-  const filterDate=document.getElementById('filterDate').value;
+  const startDate=document.getElementById('startDate').value;
   const filterName=document.getElementById('filterName').value.toLowerCase();
+  const endDate=document.getElementById('endDate').value;
   const body=document.getElementById('appointments');
   body.innerHTML='';
   let data=[...appointments];
   data.sort((a,b)=> new Date(b.datetime)-new Date(a.datetime));
-  if(filterDate){
-    data=data.filter(a=> new Date(a.datetime).toISOString().slice(0,10) === filterDate);
+  if(startDate){
+    data=data.filter(a=> new Date(a.datetime)>=new Date(startDate));
   }
-  if(filterName) data=data.filter(a=> (`${a.firstName} ${a.lastName}`).toLowerCase().includes(filterName));
+  if(endDate){
+    const end=new Date(endDate);
+    end.setDate(end.getDate()+1);
+    data=data.filter(a=> new Date(a.datetime)<end);
+  }
   data.forEach(a=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${a.date}</td><td>${a.time}</td><td>${a.firstName} ${a.lastName}</td><td>${a.phone}</td><td>${price.toFixed(2)} лв</td><td><textarea id="note-${a.id}"></textarea></td><td><button class="save" data-id="${a.id}">💾</button></td>`;
@@ -132,19 +137,24 @@ function saveNote(e){
 
 function updateSummary(list){
   const summary=document.getElementById('summary');
+  const start=document.getElementById('startDate').value;
+  const end=document.getElementById('endDate').value;
   const map={};
   list.forEach(a=>{
     const d=a.date;
     if(!map[d]) map[d]=0;
     map[d]++;
   });
-  const lines=Object.keys(map).sort((a,b)=> new Date(b)-new Date(a)).map(d=>`${d}: ${map[d]} резервации – ${(map[d]*price).toFixed(2)} лв`);
+  const lines=Object.keys(map)
+    .sort((a,b)=> new Date(b)-new Date(a))
+    .map(d=>`${d}: ${map[d]} резервации – ${(map[d]*price).toFixed(2)} лв`);
   const total=list.length;
-  lines.push(`Общо: ${total} резервации – ${(total*price).toFixed(2)} лв`);
+  lines.unshift(`Общо за периода ${start||'начало'} – ${end||'край'}: ${total} резервации – ${(total*price).toFixed(2)} лв`);
   summary.innerHTML=lines.join('<br>');
 }
 
-document.getElementById('filterDate').addEventListener('input',render);
+document.getElementById('startDate').addEventListener('input',render);
+document.getElementById("endDate").addEventListener("input",render);
 document.getElementById('filterName').addEventListener('input',render);
 const priceInput=document.getElementById('priceInput');
 priceInput.value = price || '';
