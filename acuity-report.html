@@ -88,13 +88,12 @@
 </table>
 </div>
 <script>
-const API_URL = 'https://acuityscheduling.com/api/v1/appointments?appointmentTypeID=80052001';
-const AUTH = 'Basic ' + btoa('13943721:270f72e36bf17ab3074bbcf849f4beb4');
+const API_ENDPOINT = '/acuity';
 let price = parseFloat(localStorage.getItem('emsPrice')) || 0;
 let appointments = [];
 
 function fetchAppointments(){
-  fetch(API_URL,{headers:{'Authorization':AUTH}})
+  fetch(API_ENDPOINT)
   .then(r=> r.ok ? r.json() : Promise.reject())
   .then(data=>{ appointments=data; render(); })
   .catch(()=>{ appointments=[]; render(); });
