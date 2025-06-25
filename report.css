@@ -1,3 +1,38 @@
 body {
     font-family: 'Montserrat', sans-serif;
 }
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    #filters {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    input[type="text"],
+    input[type="date"] {
+        width: 100%;
+        padding: 4px 6px;
+    }
+
+    th,
+    td {
+        padding: 4px;
+        font-size: 0.9rem;
+    }
+
+    table th:nth-child(4),
+    table td:nth-child(4),
+    table th:nth-child(5),
+    table td:nth-child(5) {
+        display: none;
+    }
+}
