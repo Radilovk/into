@@ -92,12 +92,27 @@ const API_URL = 'https://acuityscheduling.com/api/v1/appointments?appointmentTyp
 const AUTH = 'Basic ' + btoa('13943721:270f72e36bf17ab3074bbcf849f4beb4');
 let price = parseFloat(localStorage.getItem('emsPrice')) || 0;
 let appointments = [];
+let fetchFailed = false;
 
 function fetchAppointments(){
-  fetch(API_URL,{headers:{'Authorization':AUTH}})
-  .then(r=> r.ok ? r.json() : Promise.reject())
-  .then(data=>{ appointments=data; render(); })
-  .catch(()=>{ appointments=[]; render(); });
+  fetch(API_URL, {headers: {'Authorization': AUTH}})
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      appointments = data;
+      fetchFailed = false;
+      render();
+      const summary = document.getElementById('summary');
+      summary.textContent = '';
+      summary.style.color = '';
+    })
+    .catch(() => {
+      appointments = [];
+      fetchFailed = true;
+      render();
+      const summary = document.getElementById('summary');
+      summary.textContent = 'Не може да се заредят резервациите';
+      summary.style.color = 'red';
+    });
 }
 
 function render(){
@@ -139,6 +154,12 @@ function updateSummary(list){
   const summary=document.getElementById('summary');
   const start=document.getElementById('startDate').value;
   const end=document.getElementById('endDate').value;
+  if(fetchFailed){
+    summary.textContent = 'Не може да се заредят резервациите';
+    summary.style.color = 'red';
+    return;
+  }
+  summary.style.color = '';
   const map={};
   list.forEach(a=>{
     const d=a.date;
