@@ -156,11 +156,19 @@ KV. `GET /settings` връща текущите стойности, а `POST /se
 
 ### Acuity отчет
 
-Страницата `acuity-report.html` визуализира записвания от Acuity Scheduling. Данните се зареждат от Worker endpoint `/acuity`, който изисква `calendarID` за търсения календар. API потребителят и ключът трябва да се пазят като Worker secrets, например `ACUITY_USER` и `ACUITY_KEY`.
+`acuity-report.html` вече извиква Acuity API директно от браузъра. Потребителското име и ключът се съхраняват в JavaScript кода и се използват при зареждане на календара.
 
-Примерен достъп:
+Примерен код:
 
-```bash
-curl "https://your-worker.workers.dev/acuity?calendarID=80052001"
+```html
+<script>
+  const ACUITY_USER = '13943721';
+  const ACUITY_KEY = '270f72e36bf17ab3074bbcf849f4beb4';
+  const BASE_URL = 'https://acuityscheduling.com/api/v1';
+  const API_URL = `${BASE_URL}/appointments?appointmentTypeID=80052001&calendarID=12342518`;
+  // извличане на данните ...
+</script>
 ```
+
+Отворете страницата и браузърът ще зареди информацията директно от Acuity.
 
