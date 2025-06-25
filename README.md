@@ -153,3 +153,14 @@ Worker-ът поддържа и маршрут `/settings` за четене и 
 KV. `GET /settings` връща текущите стойности, а `POST /settings` ги обновява.
 
 Допълнителни примери за заявки към различни AI модели ще откриете във файла `WORKERS_AI_EXAMPLES.md`.
+
+### Acuity отчет
+
+Страницата `acuity-report.html` визуализира записвания от Acuity Scheduling. Данните се зареждат от Worker endpoint `/acuity`, който изисква `calendarID` за търсения календар. API потребителят и ключът трябва да се пазят като Worker secrets, например `ACUITY_USER` и `ACUITY_KEY`.
+
+Примерен достъп:
+
+```bash
+curl "https://your-worker.workers.dev/acuity?calendarID=80052001"
+```
+
