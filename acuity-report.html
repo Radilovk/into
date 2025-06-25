@@ -88,8 +88,12 @@
 </table>
 </div>
 <script>
+// Ако отваряте файла локално или от различен домейн,
+// задайте window.ACUITY_URL = 'https://your-worker.workers.dev/acuity'
+// преди да заредите скрипта.
 const API_URL =
-  '/acuity?appointmentTypeID=80052001&calendarID=12342518';
+  (window.ACUITY_URL || '/acuity') +
+  '?appointmentTypeID=80052001&calendarID=12342518';
 let price = parseFloat(localStorage.getItem('emsPrice')) || 0;
 let appointments = [];
 let fetchFailed = false;

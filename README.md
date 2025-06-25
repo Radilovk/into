@@ -158,6 +158,15 @@ KV. `GET /settings` връща текущите стойности, а `POST /se
 
 Страницата `acuity-report.html` визуализира записвания от Acuity Scheduling. Данните се зареждат от Worker endpoint `/acuity`, който изисква `calendarID` за търсения календар. API потребителят и ключът трябва да се пазят като Worker secrets, например `ACUITY_USER` и `ACUITY_KEY`.
 
+Добавяне на секретите става с `wrangler`:
+
+```bash
+wrangler secret put ACUITY_USER
+wrangler secret put ACUITY_KEY
+```
+
+Тези стойности не бива да се записват във front-end файла. Worker-ът използва секретите, за да извика Acuity API и връща резултата към клиента.
+
 Примерен достъп:
 
 ```bash
