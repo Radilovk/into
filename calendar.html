@@ -9,12 +9,23 @@
 <body>
   <header class="subpage-header">
     <div class="container">
-      <h1>Предстоящи събития</h1>
+      <h1>Събития</h1>
       <nav><a href="main.html">&larr; Начало</a></nav>
     </div>
   </header>
-  <main class="container" id="events-container">
-    <!-- Списъкът с бъдещите събития ще се зареди тук -->
+  <main class="container">
+    <form id="date-filter" class="events-filter">
+      <div class="form-group">
+        <label for="start-date">От:</label>
+        <input type="date" id="start-date">
+      </div>
+      <div class="form-group">
+        <label for="end-date">До:</label>
+        <input type="date" id="end-date">
+      </div>
+      <button id="filter-btn" class="form-submit-btn">Покажи</button>
+    </form>
+    <div id="events-container"><!-- Събитията ще се заредят тук --></div>
   </main>
 
   <script src="calendar.js"></script>

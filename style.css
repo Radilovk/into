@@ -912,6 +912,19 @@ body.dark-theme .nav-links {
     text-align: center;
 }
 
+.events-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    align-items: flex-end;
+}
+
+.events-filter .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
 .events-list {
     list-style: none;
     padding-left: 0;
