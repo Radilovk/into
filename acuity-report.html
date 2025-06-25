@@ -88,7 +88,8 @@
 </table>
 </div>
 <script>
-const API_URL = 'https://acuityscheduling.com/api/v1/appointments?appointmentTypeID=80052001';
+const API_URL =
+  'https://acuityscheduling.com/api/v1/appointments?appointmentTypeID=80052001&calendarID=12342518';
 const AUTH = 'Basic ' + btoa('13943721:270f72e36bf17ab3074bbcf849f4beb4');
 let price = parseFloat(localStorage.getItem('emsPrice')) || 0;
 let appointments = [];
