@@ -141,8 +141,13 @@
                 document.querySelectorAll("[data-en]").forEach(el => {
                     el.innerHTML = toEn ? el.dataset.en : el.dataset.bg;
                 });
+                localStorage.setItem('lang', toEn ? 'en' : 'bg');
             }
             btn.addEventListener("click", () => switchLang(root.lang === "bg"));
+            const savedLang = localStorage.getItem('lang');
+            if (savedLang === 'en') {
+                switchLang(true);
+            }
         });
     </script>
 </body>
