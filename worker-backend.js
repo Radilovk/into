@@ -2,6 +2,36 @@ export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
 
+    if (pathname === '/acuity') {
+      if (request.method !== 'GET') {
+        return new Response('Method Not Allowed', { status: 405 });
+      }
+      const acuityUrl = 'https://acuityscheduling.com/api/v1/appointments?appointmentTypeID=80052001';
+      const auth = 'Basic MTM5NDM3MjE6MjcwZjcyZTM2YmYxN2FiMzA3NGJiY2Y4NDlmNGJlYjQ=';
+      let acuityRes;
+      try {
+        acuityRes = await fetch(acuityUrl, {
+          headers: { 'Authorization': auth }
+        });
+      } catch {
+        return new Response(JSON.stringify({ error: 'Request failed' }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+      const result = await acuityRes.text();
+      return new Response(result, {
+        status: acuityRes.status,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     if (pathname === '/settings') {
       if (request.method === 'GET') {
         const data = await env.SETTINGS.get('chat', 'json');
