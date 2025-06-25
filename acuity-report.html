@@ -89,14 +89,13 @@
 </div>
 <script>
 const API_URL =
-  'https://acuityscheduling.com/api/v1/appointments?appointmentTypeID=80052001&calendarID=12342518';
-const AUTH = 'Basic ' + btoa('13943721:270f72e36bf17ab3074bbcf849f4beb4');
+  '/acuity?appointmentTypeID=80052001&calendarID=12342518';
 let price = parseFloat(localStorage.getItem('emsPrice')) || 0;
 let appointments = [];
 let fetchFailed = false;
 
 function fetchAppointments(){
-  fetch(API_URL, {headers: {'Authorization': AUTH}})
+  fetch(API_URL)
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(data => {
       appointments = data;
