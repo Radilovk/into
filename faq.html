@@ -30,27 +30,33 @@
         .faq {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch;
         }
-        .question {
-            display: flex;
-            align-items: center;
+        .faq-item {
             width: 100%;
-            padding: 15px;
-            border-left: 5px solid #ff0000;
-            background-color: #222;
-            font-size: 18px;
-            line-height: 1.5;
             margin-bottom: 10px;
-            text-align: left;
-            font-weight: bold;
+            background-color: #222;
+            border-left: 5px solid #ff0000;
+            border-radius: 5px;
+            overflow: hidden;
         }
-        .answer {
+        .faq-item summary {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            text-align: left;
+        }
+        .faq-item[open] summary {
+            background-color: #333;
+        }
+        .faq-item .answer {
             padding: 10px 15px;
             background-color: #333;
             font-size: 16px;
             text-align: left;
-            margin-bottom: 15px;
+            border-top: 1px solid #444;
         }
         .back-button {
             display: inline-block;
@@ -86,47 +92,65 @@
     <div class="container">
         <h1 data-en="Frequently asked questions">Често задавани въпроси</h1>
         <div class="faq">
-            <div class="question" data-en="How long does an EMS workout last?">Колко време трае една EMS тренировка?</div>
-            <div class="answer" data-en="👉 Only 20 minutes of activity equals 90 minutes of regular workout.">👉 Само <strong>20 минути активна част</strong>, но ефектът се равнява на <strong>90 минути стандартна фитнес тренировка</strong>.</div>
-            
-            <div class="question" data-en="How often should I do EMS workouts?">Колко често трябва да правя EMS тренировки?</div>
-            <div class="answer" data-en="👉 Optimally twice per week. Muscles need recovery between sessions.">👉 Оптималният вариант е <strong>2 пъти седмично</strong>. Мускулите се нуждаят от време за възстановяване между тренировките.</div>
-            
-            <div class="question" data-en="Is EMS training suitable for everyone?">EMS тренировките подходящи ли са за всеки?</div>
-            <div class="answer" data-en="👉 Suitable for most people but not recommended if you:" >👉 Подходящи са за почти всички, но <strong>не се препоръчват</strong> при:
-                <ul>
-                    <li data-en="Pregnancy">✔ Бременност</li>
-                    <li data-en="Pacemaker or other implanted electronic devices">✔ Пейсмейкър или други имплантирани електронни устройства</li>
-                    <li data-en="Epilepsy">✔ Епилепсия</li>
-                    <li data-en="Severe cardiovascular diseases">✔ Тежки сърдечно-съдови заболявания</li>
-                    <li data-en="Advanced neurological disorders">✔ Напреднали неврологични заболявания</li>
-                    <li data-en="Severe skin problems or wounds in electrode areas">✔ Тежки кожни проблеми или рани в зоните на електродите</li>
-                </ul>
-            </div>
-            
-            <div class="question" data-en="What does an EMS workout feel like?">Какво е усещането по време на EMS тренировка?</div>
-            <div class="answer" data-en="👉 Gentle pulsing muscle contractions that don't hurt. Intensity adjusts to comfort.">👉 Леко <strong>пулсиращо и ритмично стягане на мускулите</strong>, което <strong>не причинява болка</strong>. Интензитетът се регулира според усещането на клиента.</div>
-            
-            <div class="question" data-en="Do I need to be fit to start?">Трябва ли да съм в добра физическа форма, за да започна?</div>
-            <div class="answer" data-en="👉 No, sessions are personalized to your level and goals.">👉 Не, тренировките са <strong>персонализирани</strong> според индивидуалното ниво и целите на клиента.</div>
-            
-            <div class="question" data-en="What outfit should I wear?">Какъв екип трябва да нося?</div>
-            <div class="answer" data-en="👉 The best choice is thin cotton clothing worn under the electrodes:">👉 Най-добрият вариант е <strong>тънък памучен екип</strong>, който се носи под електродите:
-                <ul>
-                    <li data-en="T-shirt with sleeves">✔ Тениска с ръкав</li>
-                    <li data-en="Leggings or short sports pants">✔ Клин или къси спортни панталони</li>
-                    <li data-en="Sports shoes">✔ Спортни обувки</li>
-                </ul>
-            </div>
-            
-            <div class="question" data-en="Does EMS training reduce cellulite?">EMS тренировките влияят ли на целулита?</div>
-            <div class="answer" data-en="👉 Yes, it improves circulation and lymph flow which smooths the skin.">👉 Да, подобряват <strong>кръвообращението и лимфния дренаж</strong>, което намалява <strong>целулита и изглажда кожата</strong>.</div>
-            
-            <div class="question" data-en="Should I follow a diet?">Трябва ли да спазвам хранителен режим?</div>
-            <div class="answer" data-en="👉 It's advisable to combine with balanced nutrition for lasting results.">👉 Препоръчително е да се комбинира с <strong>балансирано хранене</strong>, за да се постигнат <strong>по-бързи и по-дълготрайни резултати</strong>.</div>
-            
-            <div class="question" data-en="What should I do after an EMS session?">Какво да правя след EMS тренировка?</div>
-            <div class="answer" data-en="👉 Drink enough water and consume protein to aid recovery.">👉 <strong>Пийте достатъчно вода</strong> и осигурете <strong>достатъчно протеини</strong>, за да подпомогнете възстановяването.</div>
+            <details class="faq-item">
+                <summary class="question" data-en="How long does an EMS workout last?">Колко време трае една EMS тренировка?</summary>
+                <div class="answer" data-en="👉 Only 20 minutes of activity equals 90 minutes of regular workout.">👉 Само <strong>20 минути активна част</strong>, но ефектът се равнява на <strong>90 минути стандартна фитнес тренировка</strong>.</div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="How often should I do EMS workouts?">Колко често трябва да правя EMS тренировки?</summary>
+                <div class="answer" data-en="👉 Optimally twice per week. Muscles need recovery between sessions.">👉 Оптималният вариант е <strong>2 пъти седмично</strong>. Мускулите се нуждаят от време за възстановяване между тренировките.</div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="Is EMS training suitable for everyone?">EMS тренировките подходящи ли са за всеки?</summary>
+                <div class="answer" data-en="👉 Suitable for most people but not recommended if you:">👉 Подходящи са за почти всички, но <strong>не се препоръчват</strong> при:
+                    <ul>
+                        <li data-en="Pregnancy">✔ Бременност</li>
+                        <li data-en="Pacemaker or other implanted electronic devices">✔ Пейсмейкър или други имплантирани електронни устройства</li>
+                        <li data-en="Epilepsy">✔ Епилепсия</li>
+                        <li data-en="Severe cardiovascular diseases">✔ Тежки сърдечно-съдови заболявания</li>
+                        <li data-en="Advanced neurological disorders">✔ Напреднали неврологични заболявания</li>
+                        <li data-en="Severe skin problems or wounds in electrode areas">✔ Тежки кожни проблеми или рани в зоните на електродите</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="What does an EMS workout feel like?">Какво е усещането по време на EMS тренировка?</summary>
+                <div class="answer" data-en="👉 Gentle pulsing muscle contractions that don't hurt. Intensity adjusts to comfort.">👉 Леко <strong>пулсиращо и ритмично стягане на мускулите</strong>, което <strong>не причинява болка</strong>. Интензитетът се регулира според усещането на клиента.</div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="Do I need to be fit to start?">Трябва ли да съм в добра физическа форма, за да започна?</summary>
+                <div class="answer" data-en="👉 No, sessions are personalized to your level and goals.">👉 Не, тренировките са <strong>персонализирани</strong> според индивидуалното ниво и целите на клиента.</div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="What outfit should I wear?">Какъв екип трябва да нося?</summary>
+                <div class="answer" data-en="👉 The best choice is thin cotton clothing worn under the electrodes:">👉 Най-добрият вариант е <strong>тънък памучен екип</strong>, който се носи под електродите:
+                    <ul>
+                        <li data-en="T-shirt with sleeves">✔ Тениска с ръкав</li>
+                        <li data-en="Leggings or short sports pants">✔ Клин или къси спортни панталони</li>
+                        <li data-en="Sports shoes">✔ Спортни обувки</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="Does EMS training reduce cellulite?">EMS тренировките влияят ли на целулита?</summary>
+                <div class="answer" data-en="👉 Yes, it improves circulation and lymph flow which smooths the skin.">👉 Да, подобряват <strong>кръвообращението и лимфния дренаж</strong>, което намалява <strong>целулита и изглажда кожата</strong>.</div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="Should I follow a diet?">Трябва ли да спазвам хранителен режим?</summary>
+                <div class="answer" data-en="👉 It's advisable to combine with balanced nutrition for lasting results.">👉 Препоръчително е да се комбинира с <strong>балансирано хранене</strong>, за да се постигнат <strong>по-бързи и по-дълготрайни резултати</strong>.</div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="question" data-en="What should I do after an EMS session?">Какво да правя след EMS тренировка?</summary>
+                <div class="answer" data-en="👉 Drink enough water and consume protein to aid recovery.">👉 <strong>Пийте достатъчно вода</strong> и осигурете <strong>достатъчно протеини</strong>, за да подпомогнете възстановяването.</div>
+            </details>
         </div>
         
        <button data-en="⬅ Back" class="back-button" onclick="goBack()">⬅ Назад</button>
@@ -152,8 +176,13 @@
                 document.querySelectorAll("[data-en]").forEach(el => {
                     el.innerHTML = toEn ? el.dataset.en : el.dataset.bg;
                 });
+                localStorage.setItem('lang', toEn ? 'en' : 'bg');
             }
             btn.addEventListener("click", () => switchLang(root.lang === "bg"));
+            const savedLang = localStorage.getItem('lang');
+            if (savedLang === 'en') {
+                switchLang(true);
+            }
         });
     </script>
 </body>

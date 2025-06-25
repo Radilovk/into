@@ -434,8 +434,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const label = toEn ? recommended.dataset.labelEn : recommended.dataset.labelBg;
             recommended.style.setProperty('--label-text', '"' + label + '"');
         }
+        localStorage.setItem('lang', toEn ? 'en' : 'bg');
     }
     btn.addEventListener('click', () => switchLang(root.lang === 'bg'));
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang === 'en') {
+        switchLang(true);
+    }
 });
 </script>
 </body>
