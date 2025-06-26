@@ -57,14 +57,6 @@
     border-radius:4px;
     cursor:pointer;
   }
-  button.download{
-    background:#4caf50;
-    color:#fff;
-    border:none;
-    padding:6px 10px;
-    border-radius:4px;
-    cursor:pointer;
-  }
   #summary{
     margin-bottom:20px;
     font-weight:bold;
@@ -78,7 +70,6 @@
   <input type="date" id="startDate"> <input type="date" id="endDate">
   <input type="text" id="filterName" placeholder="Филтър по име">
   <input type="number" id="priceInput" placeholder="Цена (лв)" min="0" step="0.01">
-  <button id="exportXls" class="download">XLS</button>
 </div>
 <div style="overflow-x:auto;">
 <table>
@@ -192,18 +183,6 @@ function updateSummary(list){
   summary.innerHTML=lines.join('<br>');
 }
 
-function exportXls(){
-  const table=document.querySelector('table').outerHTML;
-  const html=`<html><head><meta charset="UTF-8"></head><body>${table}</body></html>`;
-  const blob=new Blob([html],{type:'application/vnd.ms-excel'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='acuity-report.xls';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 document.getElementById('startDate').addEventListener('input',render);
 document.getElementById("endDate").addEventListener("input",render);
 document.getElementById('filterName').addEventListener('input',render);
@@ -214,8 +193,6 @@ priceInput.addEventListener('input',e=>{
   localStorage.setItem('emsPrice', price);
   render();
 });
-
-document.getElementById('exportXls').addEventListener('click', exportXls);
 
 document.addEventListener('DOMContentLoaded',fetchAppointments);
 </script>

@@ -181,5 +181,3 @@ wrangler secret put ACUITY_KEY
 curl "https://workerai.radilov-k.workers.dev/acuity?calendarID=80052001"
 ```
 
-От страницата може да изтеглите таблицата с резултатите като `.xls` файл чрез бутона **XLS** в горната част на филтрите.
-
