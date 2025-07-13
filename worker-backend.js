@@ -28,6 +28,7 @@ export default {
       }
       return new Response('Method Not Allowed', { status: 405 });
     }
+
     if (pathname === '/acuity') {
       if (request.method !== 'GET') {
         return new Response('Method Not Allowed', { status: 405 });
@@ -75,6 +76,7 @@ export default {
         }
       });
     }
+
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         status: 204,
@@ -97,31 +99,11 @@ export default {
       return new Response('Invalid JSON', { status: 400 });
     }
 
-    const messages = data.messages || [];
+    // ПРОМЕНЕН САМО ТОЗИ ФРАГМЕНТ:
     const model = data.model || env.MODEL;
-
-    if (!env.ACCOUNT_ID || !env.AI_TOKEN || !model) {
-      return new Response(JSON.stringify({ error: 'Missing Worker secrets' }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
     const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/ai/run/${model}`;
-
-    const payload = { messages };
-    if (data.file) {
-      payload.file = data.file;
-    }
-    if (data.temperature !== undefined) {
-      payload.temperature = data.temperature;
-    }
-    if (data.max_tokens !== undefined) {
-      payload.max_tokens = data.max_tokens;
-    }
+    // payload е вече копие на целия data обект, т.е. всичко подадено от клиента:
+    const payload = { ...data };
 
     let response;
     try {
