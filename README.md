@@ -155,6 +155,18 @@ KV. `GET /settings` връща текущите стойности, а `POST /se
 
 Допълнителни примери за заявки към различни AI модели ще откриете във файла `WORKERS_AI_EXAMPLES.md`.
 
+#### Примерна Node.js заявка към LLaMA 3.3 70B
+
+```javascript
+const model = '@cf/meta/llama-3.3-70b-instruct-fp8-fast'; // FTN = free
+const response = await ai.run(model, {
+  messages: [
+    { role: 'user', content: 'Обясни на български какво е фотосинтеза.' }
+  ],
+  max_tokens: 16000
+});
+```
+
 ### Acuity отчет
 
 Страницата `acuity-report.html` визуализира записвания от Acuity Scheduling. Данните се зареждат от Worker endpoint `/acuity`, който изисква `calendarID` за търсения календар. API потребителят и ключът трябва да се пазят като Worker secrets, например `ACUITY_USER` и `ACUITY_KEY`.
