@@ -74,3 +74,17 @@ Respond like a person who doesn't just talk — destabilizes. Let people feel th
   "model": "@cf/meta/llama-3.1-8b-instruct"
 }
 ```
+
+## 6. Задълбочен анализ с LLaMA 3.3 70B
+
+```json
+{
+  "messages": [
+    { "role": "system", "content": "Отговаряй подробно на български." },
+    { "role": "user", "content": "Разкажи за историята на кирилицата." }
+  ],
+  "max_tokens": 800,
+  "temperature": 0.5,
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+}
+```
