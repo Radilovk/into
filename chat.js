@@ -432,16 +432,16 @@ async function sendRequest(model, messages, displayRole, speaker, fileData, temp
         });
         const data = await response.json();
         if (model === '@cf/flux-1-schnell') {
-            const img = data.response || data.result?.response;
+            const img = data.result.response;
             appendImageMessage(displayRole, img);
             return '[image]';
         }
         if (model === '@cf/openai/whisper-large-v3') {
-            const text = data.text || data.transcription || data.result?.transcription;
+            const text = data.result.transcription;
             appendMessage(displayRole, text, speaker);
             return text;
         }
-        let aiText = data.response || (data.result && data.result.response);
+        let aiText = data.result.response;
         const escaped = participantNames().map(escapeRegExp).join('|');
         const nameRegex = new RegExp(`^(${escaped}):?\\s*`, 'i');
         aiText = aiText.replace(nameRegex, '');
@@ -529,7 +529,7 @@ async function transcribeAudio(blob) {
             body: JSON.stringify(payload)
         });
         const data = await response.json();
-        return data.text || data.transcription || data.result?.transcription;
+        return data.result.transcription;
     } catch {
         appendMessage('assistant', 'Грешка при транскрипция.');
         return null;
