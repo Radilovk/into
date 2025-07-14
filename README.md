@@ -126,6 +126,19 @@ wrangler secret put MODEL
 wrangler secret put AI_TOKEN
 ```
 
+Освен секретите трябва да добавите AI binding във `wrangler.toml`:
+
+```toml
+name = "worker-backend"
+main = "worker-backend.js"
+compatibility_date = "2024-07-01"
+
+[[ai]]
+binding = "AI"
+```
+
+Така `import { Ai } from '@cloudflare/ai'` ще работи коректно при деплой.
+
 Ако някоя от тези стойности липсва, worker-ът ще върне грешка `Missing Worker secrets`.
 
 Ако отваряте `chat.html` от различен домейн или локално като файл, Worker-ът трябва да връща CORS заглавки, за да позволи заявките. Примерните стойности са:
@@ -158,14 +171,20 @@ KV. `GET /settings` връща текущите стойности, а `POST /se
 #### Примерна Node.js заявка към LLaMA 3.3 70B
 
 ```javascript
-const model = '@cf/meta/llama-3.3-70b-instruct-fp8-fast'; // FTN = free
-const response = await ai.run(model, {
+const ai = new Ai(env.AI);
+const model = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+const result = await ai.runModel(model, {
   messages: [
     { role: 'user', content: 'Обясни на български какво е фотосинтеза.' }
   ],
-  max_tokens: 16000
+  max_tokens: 300
 });
+
+console.log(result.response); // "Фотосинтезата е процес при който..."
 ```
+
+Методът `runModel()` връща обект с ключ `response`. Използвайте масив `messages`,
+тъй като моделът очаква диалогов формат.
 
 ### Acuity отчет
 
