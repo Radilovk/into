@@ -126,6 +126,19 @@ wrangler secret put MODEL
 wrangler secret put AI_TOKEN
 ```
 
+Освен секретите трябва да добавите AI binding във `wrangler.toml`:
+
+```toml
+name = "worker-backend"
+main = "worker-backend.js"
+compatibility_date = "2024-07-01"
+
+[[ai]]
+binding = "AI"
+```
+
+Така `import { Ai } from '@cloudflare/ai'` ще работи коректно при деплой.
+
 Ако някоя от тези стойности липсва, worker-ът ще върне грешка `Missing Worker secrets`.
 
 Ако отваряте `chat.html` от различен домейн или локално като файл, Worker-ът трябва да връща CORS заглавки, за да позволи заявките. Примерните стойности са:
