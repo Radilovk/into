@@ -1,3 +1,5 @@
+import { Ai } from '@cloudflare/ai';
+
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
@@ -99,22 +101,14 @@ export default {
       return new Response('Invalid JSON', { status: 400 });
     }
 
-    // ПРОМЕНЕН САМО ТОЗИ ФРАГМЕНТ:
     const model = data.model || env.MODEL;
-    const cfEndpoint = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/ai/run/${model}`;
-    // payload е вече копие на целия data обект, т.е. всичко подадено от клиента:
-    const payload = { ...data };
+    const options = { ...data };
+    delete options.model;
 
-    let response;
+    const ai = new Ai(env.AI);
+    let result;
     try {
-      response = await fetch(cfEndpoint, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.AI_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      result = await ai.runModel(model, options);
     } catch (err) {
       return new Response(JSON.stringify({ error: 'Request failed' }), {
         status: 500,
@@ -125,9 +119,8 @@ export default {
       });
     }
 
-    const result = await response.text();
-    return new Response(result, {
-      status: response.status,
+    return new Response(JSON.stringify(result), {
+      status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
