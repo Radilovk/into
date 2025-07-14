@@ -158,14 +158,20 @@ KV. `GET /settings` връща текущите стойности, а `POST /se
 #### Примерна Node.js заявка към LLaMA 3.3 70B
 
 ```javascript
-const model = '@cf/meta/llama-3.3-70b-instruct-fp8-fast'; // FTN = free
-const response = await ai.run(model, {
+const ai = new Ai(env.AI);
+const model = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+const result = await ai.runModel(model, {
   messages: [
     { role: 'user', content: 'Обясни на български какво е фотосинтеза.' }
   ],
-  max_tokens: 16000
+  max_tokens: 300
 });
+
+console.log(result.response); // "Фотосинтезата е процес при който..."
 ```
+
+Методът `runModel()` връща обект с ключ `response`. Използвайте масив `messages`,
+тъй като моделът очаква диалогов формат.
 
 ### Acuity отчет
 
