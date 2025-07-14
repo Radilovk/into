@@ -105,6 +105,16 @@ export default {
     const options = { ...data };
     delete options.model;
 
+    if (!env.AI) {
+      return new Response(JSON.stringify({ error: 'Missing AI binding' }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
+    }
+
     const ai = new Ai(env.AI);
     let result;
     try {

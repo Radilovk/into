@@ -1,0 +1,6 @@
+name = "worker-backend"
+main = "worker-backend.js"
+compatibility_date = "2024-07-01"
+
+[[ai]]
+binding = "AI"
