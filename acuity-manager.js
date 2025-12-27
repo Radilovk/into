@@ -532,8 +532,379 @@ async function handleAIActions(response) {
     }
 }
 
+// Calendar Management Functions
+async function loadCalendarsManagement() {
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/calendars`);
+        if (response.ok) {
+            calendars = await response.json();
+            displayCalendarsManagement();
+            // Also update the calendar select in block form
+            updateBlockCalendarSelect();
+            // Update export calendar select
+            updateExportCalendarSelect();
+        } else {
+            showError('calendars-management-list', 'Не може да се заредят календарите');
+        }
+    } catch (error) {
+        console.error('Error loading calendars:', error);
+        showError('calendars-management-list', 'Грешка при зареждане на календарите');
+    }
+}
+
+function displayCalendarsManagement() {
+    const container = document.getElementById('calendars-management-list');
+    
+    if (!calendars || calendars.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>Няма намерени календари</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = calendars.map(cal => `
+        <div class="calendar-item">
+            <h4>
+                <i class="fas fa-calendar"></i> ${cal.name || cal.email}
+                <span class="calendar-status calendar-active">Активен</span>
+            </h4>
+            <p><strong>Email:</strong> ${cal.email || 'N/A'}</p>
+            <p><strong>ID:</strong> ${cal.id}</p>
+            <p><strong>Описание:</strong> ${cal.description || 'Няма описание'}</p>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="viewCalendarSchedule(${cal.id})">
+                    <i class="fas fa-clock"></i> Виж работно време
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+function updateBlockCalendarSelect() {
+    const select = document.getElementById('block-calendarID');
+    if (calendars.length === 0) {
+        select.innerHTML = '<option value="">Няма налични календари</option>';
+        return;
+    }
+    
+    select.innerHTML = '<option value="">Избери календар...</option>' + 
+        calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+}
+
+function updateExportCalendarSelect() {
+    const select = document.getElementById('export-calendarID');
+    if (calendars.length === 0) {
+        select.innerHTML = '<option value="">Няма налични календари</option>';
+        return;
+    }
+    
+    select.innerHTML = '<option value="">Всички календари</option>' + 
+        calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+}
+
+async function viewCalendarSchedule(calendarId) {
+    const calendar = calendars.find(c => c.id === calendarId);
+    alert(`График за ${calendar.name || calendar.email}:\n\nЗа детайлен преглед и редакция на работните часове, използвайте функцията за блокиране на часове или се свържете с Acuity support за промяна на основния график.`);
+}
+
+// Blocks Management Functions
+async function loadBlocks() {
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/blocks`);
+        if (response.ok) {
+            const blocks = await response.json();
+            displayBlocks(blocks);
+        } else {
+            showError('blocks-list', 'Не може да се заредят блокираните часове');
+        }
+    } catch (error) {
+        console.error('Error loading blocks:', error);
+        showError('blocks-list', 'Грешка при зареждане на блокираните часове');
+    }
+}
+
+function displayBlocks(blocks) {
+    const container = document.getElementById('blocks-list');
+    
+    if (!blocks || blocks.length === 0) {
+        container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Няма блокирани часове</p>';
+        return;
+    }
+    
+    const html = blocks.map(block => `
+        <div class="block-item">
+            <button class="btn btn-danger btn-sm delete-btn" onclick="deleteBlock(${block.id})">
+                <i class="fas fa-trash"></i>
+            </button>
+            <p><strong>Календар:</strong> ${block.calendarID}</p>
+            <p><strong>От:</strong> ${new Date(block.start).toLocaleString('bg-BG')}</p>
+            <p><strong>До:</strong> ${new Date(block.end).toLocaleString('bg-BG')}</p>
+            ${block.notes ? `<p><strong>Причина:</strong> ${block.notes}</p>` : ''}
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+async function createBlock(event) {
+    event.preventDefault();
+    
+    const blockData = {
+        calendarID: document.getElementById('block-calendarID').value,
+        start: document.getElementById('block-start').value,
+        end: document.getElementById('block-end').value,
+        notes: document.getElementById('block-notes').value
+    };
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/blocks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(blockData)
+        });
+        
+        if (response.ok) {
+            alert('Блокираният период е създаден успешно!');
+            document.getElementById('block-form').reset();
+            await loadBlocks();
+        } else {
+            const error = await response.text();
+            alert('Грешка при създаване на блокиран период: ' + error);
+        }
+    } catch (error) {
+        console.error('Error creating block:', error);
+        alert('Грешка при създаване на блокиран период');
+    }
+}
+
+async function deleteBlock(blockId) {
+    if (!confirm('Сигурни ли сте, че искате да изтриете този блокиран период?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/blocks/${blockId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Блокираният период е изтрит успешно!');
+            await loadBlocks();
+        } else {
+            alert('Грешка при изтриване на блокиран период');
+        }
+    } catch (error) {
+        console.error('Error deleting block:', error);
+        alert('Грешка при изтриване на блокиран период');
+    }
+}
+
+// Export Functions
+async function exportClients(format) {
+    if (clients.length === 0) {
+        await loadClients();
+    }
+    
+    if (clients.length === 0) {
+        alert('Няма данни за експорт');
+        return;
+    }
+    
+    if (format === 'csv') {
+        exportClientsAsCSV();
+    } else {
+        exportClientsAsJSON();
+    }
+}
+
+function exportClientsAsCSV() {
+    // Create CSV header
+    const headers = ['ID', 'Име', 'Фамилия', 'Email', 'Телефон'];
+    const csvRows = [headers.join(',')];
+    
+    // Add data rows
+    clients.forEach(client => {
+        const row = [
+            client.id || '',
+            `"${client.firstName || ''}"`,
+            `"${client.lastName || ''}"`,
+            `"${client.email || ''}"`,
+            `"${client.phone || ''}"`
+        ];
+        csvRows.push(row.join(','));
+    });
+    
+    // Create and download file
+    const csvContent = '\uFEFF' + csvRows.join('\n'); // UTF-8 BOM for Excel
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `clients_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+function exportClientsAsJSON() {
+    const jsonContent = JSON.stringify(clients, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `clients_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+}
+
+async function exportAppointments(format) {
+    if (appointments.length === 0) {
+        await loadAppointments();
+    }
+    
+    if (appointments.length === 0) {
+        alert('Няма данни за експорт');
+        return;
+    }
+    
+    if (format === 'csv') {
+        exportAppointmentsAsCSV();
+    } else {
+        exportAppointmentsAsJSON();
+    }
+}
+
+function exportAppointmentsAsCSV() {
+    const headers = ['ID', 'Дата', 'Час', 'Име', 'Фамилия', 'Телефон', 'Email', 'Тип', 'Статус'];
+    const csvRows = [headers.join(',')];
+    
+    appointments.forEach(apt => {
+        const row = [
+            apt.id || '',
+            `"${apt.date || new Date(apt.datetime).toLocaleDateString('bg-BG')}"`,
+            `"${apt.time || new Date(apt.datetime).toLocaleTimeString('bg-BG')}"`,
+            `"${apt.firstName || ''}"`,
+            `"${apt.lastName || ''}"`,
+            `"${apt.phone || ''}"`,
+            `"${apt.email || ''}"`,
+            `"${apt.type || ''}"`,
+            `"${apt.status || 'Confirmed'}"`
+        ];
+        csvRows.push(row.join(','));
+    });
+    
+    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `appointments_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+function exportAppointmentsAsJSON() {
+    const jsonContent = JSON.stringify(appointments, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `appointments_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+}
+
+async function exportAppointmentTypes(format) {
+    if (appointmentTypes.length === 0) {
+        await loadAppointmentTypes();
+    }
+    
+    if (appointmentTypes.length === 0) {
+        alert('Няма данни за експорт');
+        return;
+    }
+    
+    if (format === 'csv') {
+        exportAppointmentTypesAsCSV();
+    } else {
+        exportAppointmentTypesAsJSON();
+    }
+}
+
+function exportAppointmentTypesAsCSV() {
+    const headers = ['ID', 'Име', 'Описание', 'Продължителност', 'Цена'];
+    const csvRows = [headers.join(',')];
+    
+    appointmentTypes.forEach(type => {
+        const row = [
+            type.id || '',
+            `"${type.name || type.type || ''}"`,
+            `"${type.description || ''}"`,
+            type.duration || '',
+            type.price || ''
+        ];
+        csvRows.push(row.join(','));
+    });
+    
+    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `appointment_types_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+function exportAppointmentTypesAsJSON() {
+    const jsonContent = JSON.stringify(appointmentTypes, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `appointment_types_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+}
+
+// Business Info Functions
+async function loadBusinessInfo() {
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/business-info`);
+        if (response.ok) {
+            const businessInfo = await response.json();
+            displayBusinessInfo(businessInfo);
+        } else {
+            showError('business-info', 'Не може да се зареди информацията за бизнеса');
+        }
+    } catch (error) {
+        console.error('Error loading business info:', error);
+        showError('business-info', 'Грешка при зареждане на информацията за бизнеса');
+    }
+}
+
+function displayBusinessInfo(info) {
+    const container = document.getElementById('business-info');
+    
+    const html = `
+        <div style="line-height: 1.8;">
+            <p><strong><i class="fas fa-building"></i> Име на бизнес:</strong> ${info.name || 'N/A'}</p>
+            <p><strong><i class="fas fa-envelope"></i> Email:</strong> ${info.email || 'N/A'}</p>
+            <p><strong><i class="fas fa-phone"></i> Телефон:</strong> ${info.phone || 'N/A'}</p>
+            <p><strong><i class="fas fa-globe"></i> Уебсайт:</strong> ${info.website ? `<a href="${info.website}" target="_blank">${info.website}</a>` : 'N/A'}</p>
+            <p><strong><i class="fas fa-map-marker-alt"></i> Адрес:</strong> ${info.address || 'N/A'}</p>
+            <p><strong><i class="fas fa-clock"></i> Часова зона:</strong> ${info.timezone || 'N/A'}</p>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
 // Export functions for HTML onclick handlers
 window.loadAppointments = loadAppointments;
 window.loadClients = loadClients;
 window.sendMessage = sendMessage;
 window.handleBookingSubmit = handleBookingSubmit;
+window.loadCalendarsManagement = loadCalendarsManagement;
+window.viewCalendarSchedule = viewCalendarSchedule;
+window.loadBlocks = loadBlocks;
+window.createBlock = createBlock;
+window.deleteBlock = deleteBlock;
+window.exportClients = exportClients;
+window.exportAppointments = exportAppointments;
+window.exportAppointmentTypes = exportAppointmentTypes;
+window.loadBusinessInfo = loadBusinessInfo;
