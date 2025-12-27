@@ -1283,7 +1283,8 @@ async function editCalendar(calendarId) {
         } else {
             const error = await response.json().catch(() => ({}));
             
-            // Check for plan limitation error
+            // Check for Acuity plan limitation error (403 with specific error format)
+            // Both checks are needed: HTTP 403 + Acuity error format confirmation
             if (response.status === 403 && error.status_code === 403) {
                 alert('❌ Грешка при актуализация на календар\n\n' +
                       'Вашият Acuity план не поддържа редактиране на календари чрез API.\n\n' +
@@ -2062,7 +2063,8 @@ async function updateService() {
         } else {
             const error = await response.json().catch(() => ({}));
             
-            // Check for plan limitation error
+            // Check for Acuity plan limitation error (403 with specific error format)
+            // Both checks are needed: HTTP 403 + Acuity error format confirmation
             if (response.status === 403 && error.status_code === 403) {
                 alert('❌ Грешка при актуализация\n\n' +
                       'Вашият Acuity план не поддържа редактиране на услуги чрез API.\n\n' +
