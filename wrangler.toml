@@ -5,3 +5,6 @@ compatibility_date = "2024-07-01"
 [[kv_namespaces]]
 binding = "SETTINGS"
 id = "<your_kv_id>"
+
+[[ai]]
+binding = "AI"
