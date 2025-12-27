@@ -388,7 +388,7 @@ GET /acuity?calendarID=12342518&appointmentTypeID=80052001
 ```
 
 ### PUT /acuity/appointments/:id (НОВ)
-Актуализира резервация.
+Актуализира резервация. Вътрешно използва PATCH метод към Acuity API.
 
 **URL параметри:**
 - `id`: ID на резервацията
@@ -417,7 +417,7 @@ GET /acuity?calendarID=12342518&appointmentTypeID=80052001
 Връща списък с всички клиенти.
 
 ### PUT /acuity/clients/:id (НОВ)
-Актуализира информация за клиент.
+Актуализира информация за клиент. Вътрешно използва PATCH метод към Acuity API.
 
 **URL параметри:**
 - `id`: ID на клиента
@@ -436,7 +436,7 @@ GET /acuity?calendarID=12342518&appointmentTypeID=80052001
 Връща налични видове резервации/тренировки.
 
 ### PUT /acuity/appointment-types/:id (НОВ)
-Актуализира вид резервация/услуга.
+Актуализира вид резервация/услуга. Вътрешно използва PATCH метод към Acuity API.
 
 **URL параметри:**
 - `id`: ID на типа резервация
@@ -458,7 +458,7 @@ GET /acuity?calendarID=12342518&appointmentTypeID=80052001
 Връща налични календари.
 
 ### PUT /acuity/calendars/:id (НОВ)
-Актуализира календар.
+Актуализира календар. Вътрешно използва PATCH метод към Acuity API.
 
 **URL параметри:**
 - `id`: ID на календара
