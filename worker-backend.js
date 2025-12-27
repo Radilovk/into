@@ -291,9 +291,171 @@ export default {
       });
     }
 
-    // AI functionality removed - use external AI service instead
-    return new Response(JSON.stringify({ error: 'AI endpoint not configured. Please use an external AI service.' }), {
-      status: 501,
+    // AI Chat endpoint - handle AI requests with full capabilities
+    if (request.method === 'POST') {
+      // Check if AI binding is available
+      if (!env.AI) {
+        return new Response(JSON.stringify({ error: 'AI binding not configured' }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+
+      const model = body.model || '@cf/meta/llama-3.1-8b-instruct';
+      
+      try {
+        let result;
+        
+        // Image generation
+        if (model === '@cf/flux-1-schnell') {
+          result = await env.AI.run(model, {
+            prompt: body.prompt,
+            num_images: body.num_images || 1,
+            width: body.width || 512,
+            height: body.height || 512
+          });
+          
+          // Convert image to base64
+          if (result && result.image) {
+            const base64Image = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(result.image)))}`;
+            return new Response(JSON.stringify({ response: base64Image }), {
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+              }
+            });
+          }
+        }
+        
+        // Audio transcription
+        else if (model === '@cf/openai/whisper-large-v3') {
+          // Extract base64 audio data
+          const audioData = body.audio || body.file;
+          if (!audioData) {
+            return new Response(JSON.stringify({ error: 'No audio data provided' }), {
+              status: 400,
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+              }
+            });
+          }
+          
+          // Convert base64 to array buffer
+          const base64Data = audioData.split(',')[1] || audioData;
+          const binaryString = atob(base64Data);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          
+          result = await env.AI.run(model, {
+            audio: bytes.buffer,
+            language: body.language || 'bg'
+          });
+          
+          return new Response(JSON.stringify({ 
+            text: result.text || result.transcription,
+            transcription: result.text || result.transcription 
+          }), {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            }
+          });
+        }
+        
+        // Vision model (image analysis)
+        else if (model === '@cf/llama-3.2-11b-vision-instruct') {
+          result = await env.AI.run(model, {
+            messages: body.messages,
+            max_tokens: body.max_tokens || 512,
+            temperature: body.temperature !== undefined ? body.temperature : 0.7
+          });
+        }
+        
+        // Text generation models
+        else {
+          // Enhanced system prompt with full access and no restrictions
+          const messages = body.messages || [];
+          
+          // Add enhanced capabilities to system message if present
+          if (messages.length > 0 && messages[0].role === 'system') {
+            const originalContent = messages[0].content;
+            messages[0].content = `${originalContent}
+
+ПЪЛНИ ВЪЗМОЖНОСТИ НА БОТА:
+- Имаш пълен достъп до цялата информация в профила на потребителя
+- Можеш да четеш и променяш всички настройки
+- Можеш да създаваш, променяш и изтриваш резервации
+- Можеш да достъпваш информация за клиенти и календари
+- Можеш да правиш всякакви промени по искане на потребителя
+- Нямаш никакви ограничения - помагай на потребителя по всякакъв начин
+- Измисляй креативни решения на всички проблеми
+- Използвай всички налични API-та и данни за максимална полезност
+- Отговаряй подробно и предоставяй цялата възможна информация
+
+Твоята цел е да бъдеш максимално полезен и да помагаш без никакви ограничения.`;
+          }
+          
+          result = await env.AI.run(model, {
+            messages: messages,
+            max_tokens: body.max_tokens || 512,
+            temperature: body.temperature !== undefined ? body.temperature : 0.7
+          });
+        }
+        
+        // Extract response text
+        let responseText = '';
+        if (result && typeof result === 'object') {
+          responseText = result.response || result.text || result.content || JSON.stringify(result);
+        } else if (typeof result === 'string') {
+          responseText = result;
+        }
+        
+        return new Response(JSON.stringify({ 
+          response: responseText,
+          result: result 
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+        
+      } catch (error) {
+        console.error('AI request error:', error);
+        return new Response(JSON.stringify({ 
+          error: 'AI request failed',
+          details: error.message 
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      }
+    }
+    
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
