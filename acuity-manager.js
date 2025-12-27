@@ -95,7 +95,6 @@ async function loadAllData() {
 async function loadAppointments() {
     // Reload with current filter settings
     const calendarSelect = document.getElementById('appointments-calendar-select');
-    const typeSelect = document.getElementById('appointments-type-select');
     
     if (calendarSelect && calendarSelect.value) {
         await loadAppointmentsByFilter();
