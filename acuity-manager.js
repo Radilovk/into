@@ -3,6 +3,31 @@ const WORKER_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:8787'
     : 'https://workerai.radilov-k.workers.dev';
 
+// Default Acuity parameters (can be configured)
+const DEFAULT_CONFIG = {
+    calendarID: '12342518',
+    appointmentTypeID: '80052001'
+};
+
+// AI System Prompt
+const AI_SYSTEM_PROMPT = `Вие сте AI асистент за управление на Acuity Scheduling резервации. Имате достъп до следните данни:
+
+Резервации: {appointments_count} броя
+Клиенти: {clients_count} броя
+Видове тренировки: {appointment_types}
+Календари: {calendars}
+
+Вашата задача е да помагате на потребителя с:
+1. Преглед на резервации и клиенти
+2. Създаване на нови резервации
+3. Проверка на наличност
+4. Търсене на информация
+
+Когато потребителят иска да създаде резервация, отговорете с JSON обект в следния формат:
+{"action": "create_booking", "data": {"firstName": "Иван", "lastName": "Петров", "phone": "+359...", "email": "...", "datetime": "2024-01-15T10:00", "appointmentTypeID": "...", "calendarID": "..."}}
+
+Отговаряйте на български език. Бъдете полезни, учтиви и точни.`;
+
 // State
 let appointments = [];
 let clients = [];
@@ -60,8 +85,8 @@ async function loadAllData() {
 
 async function loadAppointments() {
     try {
-        // Try to load with default parameters from acuity-report
-        const response = await fetch(`${WORKER_URL}/acuity?calendarID=12342518&appointmentTypeID=80052001`);
+        // Try to load with default parameters from config
+        const response = await fetch(`${WORKER_URL}/acuity?calendarID=${DEFAULT_CONFIG.calendarID}&appointmentTypeID=${DEFAULT_CONFIG.appointmentTypeID}`);
         if (response.ok) {
             appointments = await response.json();
             displayAppointments();
@@ -408,23 +433,11 @@ function prepareAIContext() {
 }
 
 async function callAI(provider, apiKey, message, context) {
-    const systemPrompt = `Вие сте AI асистент за управление на Acuity Scheduling резервации. Имате достъп до следните данни:
-
-Резервации: ${context.appointments.length} броя
-Клиенти: ${context.clients.length} броя
-Видове тренировки: ${context.appointmentTypes.map(t => t.name).join(', ')}
-Календари: ${context.calendars.map(c => c.name).join(', ')}
-
-Вашата задача е да помагате на потребителя с:
-1. Преглед на резервации и клиенти
-2. Създаване на нови резервации
-3. Проверка на наличност
-4. Търсене на информация
-
-Когато потребителят иска да създаде резервация, отговорете с JSON обект в следния формат:
-{"action": "create_booking", "data": {"firstName": "Иван", "lastName": "Петров", "phone": "+359...", "email": "...", "datetime": "2024-01-15T10:00", "appointmentTypeID": "...", "calendarID": "..."}}
-
-Отговаряйте на български език. Бъдете полезни, учтиви и точни.`;
+    const systemPrompt = AI_SYSTEM_PROMPT
+        .replace('{appointments_count}', context.appointments.length)
+        .replace('{clients_count}', context.clients.length)
+        .replace('{appointment_types}', context.appointmentTypes.map(t => t.name).join(', '))
+        .replace('{calendars}', context.calendars.map(c => c.name).join(', '));
 
     if (provider === 'openai') {
         return await callOpenAI(apiKey, message, systemPrompt);
