@@ -450,6 +450,104 @@
             color: #2196F3;
             margin-right: 10px;
         }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .calendar-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #fff;
+        }
+
+        .calendar-item h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .calendar-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .calendar-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .calendar-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .block-item {
+            border-left: 4px solid #ffc107;
+            background: #fff3cd;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .block-item .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 0.85rem;
+        }
+
+        .checklist label {
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .checklist label:hover {
+            background: #f8f9fa;
+        }
+
+        .emergency-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .emergency-notice h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -470,6 +568,15 @@
                     </button>
                     <button class="tab" data-tab="clients">
                         <i class="fas fa-users"></i> Клиенти
+                    </button>
+                    <button class="tab" data-tab="calendars">
+                        <i class="fas fa-calendar-alt"></i> Календари
+                    </button>
+                    <button class="tab" data-tab="export">
+                        <i class="fas fa-download"></i> Експорт
+                    </button>
+                    <button class="tab" data-tab="profile">
+                        <i class="fas fa-user-shield"></i> Профил
                     </button>
                     <button class="tab" data-tab="booking">
                         <i class="fas fa-plus-circle"></i> Нова резервация
@@ -513,17 +620,480 @@
                         </button>
                         <div id="appointments-list"></div>
                     </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i> Управление на резервации
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Отмяна и модификация на резервации</p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Намери резервация по ID</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="appointment-id-search" class="form-control" placeholder="Въведи ID на резервация">
+                                <button class="btn btn-primary" onclick="searchAppointmentById()">
+                                    <i class="fas fa-search"></i> Търси
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="appointment-details"></div>
+                    </div>
+
+                    <div class="card" style="background: #fff3cd; border: 2px solid #ffc107;">
+                        <div class="card-header" style="color: #856404;">
+                            <i class="fas fa-exclamation-triangle"></i> Масови операции (ВНИМАНИЕ!)
+                        </div>
+                        <p style="color: #856404; margin-bottom: 15px;">
+                            Използвайте тези функции само в спешни случаи!
+                        </p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Избери календар за масови операции</label>
+                            <select id="bulk-calendarID" class="form-control">
+                                <option value="">Избери календар...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-day"></i> Избери период</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="date" id="bulk-start-date" class="form-control" placeholder="От дата">
+                                <input type="date" id="bulk-end-date" class="form-control" placeholder="До дата">
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-warning" onclick="previewBulkCancel()">
+                                <i class="fas fa-eye"></i> Покажи резервации за отмяна
+                            </button>
+                            <button class="btn btn-danger" onclick="executeBulkCancel()">
+                                <i class="fas fa-ban"></i> ОТМЕНИ ВСИЧКИ (ОПАСНО!)
+                            </button>
+                        </div>
+                        
+                        <div id="bulk-preview" style="margin-top: 20px;"></div>
+                    </div>
                 </div>
 
                 <div id="clients" class="tab-content">
                     <h2 class="section-title">
                         <i class="fas fa-users"></i> Клиенти
                     </h2>
+                    
                     <div class="card">
-                        <button class="btn btn-primary" onclick="loadClients()">
-                            <i class="fas fa-sync"></i> Презареди
-                        </button>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="loadClients()">
+                                <i class="fas fa-sync"></i> Презареди
+                            </button>
+                            <input type="text" id="client-search" class="form-control" placeholder="Търси по име, email или телефон..." style="flex: 1; min-width: 250px;" oninput="filterClients()">
+                        </div>
                         <div id="clients-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i> Управление на клиенти
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Търсене, редактиране и блокиране на клиенти</p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Намери клиент по ID</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="client-id-search" class="form-control" placeholder="Въведи ID на клиент">
+                                <button class="btn btn-primary" onclick="searchClientById()">
+                                    <i class="fas fa-search"></i> Търси
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="client-details"></div>
+                    </div>
+
+                    <div class="card" style="background: #fff3cd; border: 2px solid #ffc107;">
+                        <div class="card-header" style="color: #856404;">
+                            <i class="fas fa-ban"></i> Черен списък (Блокирани клиенти)
+                        </div>
+                        <p style="color: #856404; margin-bottom: 15px;">
+                            Управление на блокирани клиенти. Блокираните клиенти се съхраняват локално в браузъра.
+                        </p>
+                        
+                        <button class="btn btn-primary" onclick="showBlockedClients()" style="margin-bottom: 15px;">
+                            <i class="fas fa-list"></i> Покажи блокирани клиенти (<span id="blocked-count">0</span>)
+                        </button>
+                        
+                        <div id="blocked-clients-list"></div>
+                    </div>
+                </div>
+
+                <div id="calendars" class="tab-content">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt"></i> Управление на Календари
+                    </h2>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-shield-alt"></i>
+                        <strong>Защита:</strong> Тук можете да управлявате работните часове и наличността за всички календари без достъп до основния профил.
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-calendar"></i> Активни календари
+                        </div>
+                        <button class="btn btn-primary" onclick="loadCalendarsManagement()" style="margin-bottom: 15px;">
+                            <i class="fas fa-sync"></i> Презареди календари
+                        </button>
+                        <div id="calendars-management-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-ban"></i> Блокиране на часове
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Блокирайте конкретни дати/часове когато не сте налични</p>
+                        <button class="btn btn-primary" onclick="loadBlocks()" style="margin-bottom: 15px;">
+                            <i class="fas fa-sync"></i> Покажи блокирани часове
+                        </button>
+                        <div id="blocks-list"></div>
+                        
+                        <hr style="margin: 20px 0; border: 1px solid #e0e0e0;">
+                        
+                        <h4 style="margin-bottom: 15px;"><i class="fas fa-plus"></i> Добави блокиран период</h4>
+                        <form id="block-form" onsubmit="createBlock(event)">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Календар</label>
+                                <select id="block-calendarID" class="form-control" required>
+                                    <option value="">Избери календар...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-day"></i> Начална дата и час</label>
+                                <input type="datetime-local" id="block-start" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-day"></i> Крайна дата и час</label>
+                                <input type="datetime-local" id="block-end" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-comment"></i> Причина (опционално)</label>
+                                <input type="text" id="block-notes" class="form-control" placeholder="напр. Личен отпуск">
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-ban"></i> Създай блокиран период
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-clock"></i> Работно време на календарите
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">
+                            Промяната на стандартното работно време се прави директно в Acuity. 
+                            Използвайте блокирането на часове за временни промени.
+                        </p>
+                        <div style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Как да промените работното време:</h4>
+                            <ol style="line-height: 1.8;">
+                                <li>Влезте в Acuity (или рестартирайте паролата)</li>
+                                <li>Отидете на Calendar → Business Hours</li>
+                                <li>Променете работните часове за всеки ден</li>
+                                <li>Запазете промените</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> Алтернативен метод чрез блокове:</h4>
+                            <p style="margin-bottom: 10px;">Ако нямате достъп до Acuity, можете да използвате блокове за да симулирате промяна на работното време:</p>
+                            <ol style="line-height: 1.8;">
+                                <li>За да затворите сутрините: Блокирайте 00:00-09:00 за всеки ден</li>
+                                <li>За да затворите вечерите: Блокирайте 18:00-23:59 за всеки ден</li>
+                                <li>За почивни дни: Блокирайте целия ден 00:00-23:59</li>
+                            </ol>
+                            <button class="btn btn-warning" onclick="showQuickScheduleHelper()" style="margin-top: 10px;">
+                                <i class="fas fa-magic"></i> Бърз помощник за график
+                            </button>
+                        </div>
+                        
+                        <div id="quick-schedule-helper" style="display: none; margin-top: 20px; padding: 20px; background: white; border: 2px solid #667eea; border-radius: 10px;">
+                            <h4 style="color: #667eea; margin-bottom: 15px;"><i class="fas fa-magic"></i> Бърз помощник за график</h4>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Избери календар</label>
+                                <select id="schedule-helper-calendar" class="form-control">
+                                    <option value="">Избери календар...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-alt"></i> Период</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <input type="date" id="schedule-start-date" class="form-control" placeholder="От дата">
+                                    <input type="date" id="schedule-end-date" class="form-control" placeholder="До дата">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Затвори часове</label>
+                                <select id="schedule-preset" class="form-control">
+                                    <option value="morning">Сутрините (00:00-09:00)</option>
+                                    <option value="evening">Вечерите (18:00-23:59)</option>
+                                    <option value="fullday">Целия ден (00:00-23:59)</option>
+                                    <option value="custom">Персонализиран период</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-hours" style="display: none;">
+                                <div class="form-group">
+                                    <label><i class="fas fa-clock"></i> От час</label>
+                                    <input type="time" id="schedule-from-time" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-clock"></i> До час</label>
+                                    <input type="time" id="schedule-to-time" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="schedule-recurring" style="margin-right: 10px;">
+                                    <span>Повтаряй за всеки ден в периода</span>
+                                </label>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-success" onclick="applyQuickSchedule()">
+                                    <i class="fas fa-check"></i> Приложи график
+                                </button>
+                                <button class="btn btn-secondary" onclick="hideQuickScheduleHelper()">
+                                    <i class="fas fa-times"></i> Отказ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="export" class="tab-content">
+                    <h2 class="section-title">
+                        <i class="fas fa-download"></i> Експорт на данни
+                    </h2>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Защита:</strong> Изтеглете резервни копия на вашите данни в различни формати.
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-users"></i> Експорт на клиенти
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Изтеглете пълна база данни с всички клиенти</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="exportClients('csv')">
+                                <i class="fas fa-file-csv"></i> Изтегли като CSV
+                            </button>
+                            <button class="btn btn-success" onclick="exportClients('json')">
+                                <i class="fas fa-file-code"></i> Изтегли като JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-calendar-check"></i> Експорт на резервации
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Изтеглете всички резервации за избран период</p>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Избери календар</label>
+                            <select id="export-calendarID" class="form-control">
+                                <option value="">Всички календари</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button class="btn btn-success" onclick="exportAppointments('csv')">
+                                <i class="fas fa-file-csv"></i> Изтегли като CSV
+                            </button>
+                            <button class="btn btn-success" onclick="exportAppointments('json')">
+                                <i class="fas fa-file-code"></i> Изтегли като JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-dumbbell"></i> Експорт на типове тренировки
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Изтеглете информация за всички видове услуги</p>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="exportAppointmentTypes('csv')">
+                                <i class="fas fa-file-csv"></i> Изтегли като CSV
+                            </button>
+                            <button class="btn btn-success" onclick="exportAppointmentTypes('json')">
+                                <i class="fas fa-file-code"></i> Изтегли като JSON
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="profile" class="tab-content">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-shield"></i> Управление на профил
+                    </h2>
+                    
+                    <div class="info-box" style="background: #fff3cd; border-left-color: #ffc107;">
+                        <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                        <strong>Важно:</strong> Тази секция ви позволява да управлявате критични настройки на профила без директен достъп до Acuity.
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-building"></i> Информация за бизнеса
+                        </div>
+                        <button class="btn btn-primary" onclick="loadBusinessInfo()" style="margin-bottom: 15px;">
+                            <i class="fas fa-sync"></i> Зареди информация
+                        </button>
+                        <div id="business-info"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-credit-card"></i> Информация за плащане
+                        </div>
+                        <p style="color: #666; margin-bottom: 15px;">
+                            Забележка: Промяната на платежна информация изисква директен достъп до Acuity billing portal. 
+                            Ето стъпките за достъп:
+                        </p>
+                        <ol style="color: #666; line-height: 1.8;">
+                            <li>Отидете на <a href="https://secure.acuityscheduling.com/login.php" target="_blank" style="color: #667eea;">Acuity Login</a></li>
+                            <li>Изберете "Forgot password" ако нямате достъп</li>
+                            <li>След влизане: Settings → Billing</li>
+                            <li>Обновете вашата платежна информация</li>
+                        </ol>
+                        <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin-top: 15px; border-radius: 5px;">
+                            <strong><i class="fas fa-shield-alt"></i> Алтернатива за компрометиран акаунт:</strong><br>
+                            <p style="margin-top: 10px;">Ако акаунтът ви е хакнат и нямате email достъп:</p>
+                            <ul style="margin-top: 10px;">
+                                <li>Свържете се с Acuity Support: <a href="mailto:support@acuityscheduling.com" style="color: #dc3545;">support@acuityscheduling.com</a></li>
+                                <li>Обяснете ситуацията и поискайте помощ за възстановяване на акаунта</li>
+                                <li>Предоставете доказателство за собственост (предишни плащания, бизнес информация)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-key"></i> API Ключове
+                        </div>
+                        <p style="color: #666; margin-bottom: 15px;">
+                            За регенериране на API ключове за по-голяма сигурност:
+                        </p>
+                        <ol style="color: #666; line-height: 1.8;">
+                            <li>Влезте в Acuity (използвайте password reset ако е нужно)</li>
+                            <li>Отидете на Settings → Integrations → API</li>
+                            <li>Натиснете "Regenerate API Key"</li>
+                            <li>Обновете Worker secrets с новите стойности</li>
+                        </ol>
+                        <div style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; margin-top: 15px; border-radius: 5px;">
+                            <strong><i class="fas fa-terminal"></i> Команди за обновяване на Worker secrets:</strong>
+                            <pre style="background: #333; color: #0f0; padding: 15px; border-radius: 5px; margin-top: 10px; overflow-x: auto;">wrangler secret put ACUITY_USER
+wrangler secret put ACUITY_KEY
+wrangler deploy</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-lock"></i> Защитни мерки
+                        </div>
+                        <p style="color: #666; margin-bottom: 15px;">Препоръчителни действия за защита на компрометиран акаунт:</p>
+                        <div class="checklist">
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Смяна на парола на Acuity акаунт
+                            </label>
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Активиране на 2FA (two-factor authentication)
+                            </label>
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Регенериране на API ключове
+                            </label>
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Преглед на всички резервации за подозрителна активност
+                            </label>
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Смяна на email адреса на акаунта (ако е възможно)
+                            </label>
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Проверка на свързани интеграции и отстраняване на неразпознати
+                            </label>
+                            <label style="display: block; margin: 10px 0;">
+                                <input type="checkbox" style="margin-right: 10px;">
+                                Експорт на всички данни за бекъп
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: #f8d7da; border: 2px solid #dc3545;">
+                        <div class="card-header" style="color: #721c24;">
+                            <i class="fas fa-exclamation-circle"></i> Спешни контакти
+                        </div>
+                        <div style="color: #721c24; line-height: 1.8;">
+                            <p><strong>Acuity Support:</strong></p>
+                            <ul>
+                                <li>Email: <a href="mailto:support@acuityscheduling.com" style="color: #721c24; text-decoration: underline;">support@acuityscheduling.com</a></li>
+                                <li>Телефон: +1 (888) 729-8645 (US)</li>
+                                <li>Live Chat: <a href="https://help.acuityscheduling.com" target="_blank" style="color: #721c24; text-decoration: underline;">help.acuityscheduling.com</a></li>
+                            </ul>
+                            <p style="margin-top: 15px;"><strong>За съмнение за хакване:</strong></p>
+                            <ul>
+                                <li>Незабавно се свържете с Acuity support</li>
+                                <li>Изпратете детайли за подозрителната активност</li>
+                                <li>Поискайте временно замразяване на акаунта</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: #dc3545; border: 3px solid #a71d2a; color: white;">
+                        <div class="card-header" style="color: white; font-size: 1.3rem;">
+                            <i class="fas fa-shield-alt"></i> СПЕШЕН РЕЖИМ "LOCKDOWN"
+                        </div>
+                        <p style="margin-bottom: 15px; line-height: 1.6;">
+                            Този режим блокира ВСЕ календари за нови резервации, като запазва съществуващите. 
+                            Използвайте САМО ако подозирате активно хакване на акаунта.
+                        </p>
+                        
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Какво прави Lockdown:</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>✓ Създава блокове за всички календари за следващите 30 дни</li>
+                                <li>✓ Запазва съществуващите резервации</li>
+                                <li>✓ Предотвратява нови резервации от клиенти</li>
+                                <li>✓ Може да бъде обратим (премахване на блоковете)</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.9); color: #333; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="lockdown-confirm" style="margin-right: 10px; width: 20px; height: 20px;">
+                                <span style="font-weight: 600;">Разбирам последствията и искам да активирам LOCKDOWN режим</span>
+                            </label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn" style="background: #fff; color: #dc3545; font-weight: 700;" onclick="activateLockdown()">
+                                <i class="fas fa-lock"></i> АКТИВИРАЙ LOCKDOWN
+                            </button>
+                            <button class="btn" style="background: rgba(255,255,255,0.3); color: white;" onclick="deactivateLockdown()">
+                                <i class="fas fa-unlock"></i> Деактивирай Lockdown
+                            </button>
+                        </div>
+                        
+                        <div id="lockdown-status" style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 5px; display: none;"></div>
                     </div>
                 </div>
 

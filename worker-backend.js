@@ -134,6 +134,120 @@ export default {
         return callAcuityAPI(acuityUrl);
       }
 
+      // PUT /acuity/appointments/:id - update appointment
+      if (pathname.match(/^\/acuity\/appointments\/\d+$/) && request.method === 'PUT') {
+        const appointmentId = pathname.split('/').pop();
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointments/${appointmentId}`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // PUT /acuity/appointments/:id/cancel - cancel appointment
+      if (pathname.match(/^\/acuity\/appointments\/\d+\/cancel$/) && request.method === 'PUT') {
+        const pathParts = pathname.split('/');
+        const appointmentId = pathParts[pathParts.length - 2]; // Get ID before 'cancel'
+        let body = {};
+        try {
+          body = await request.json();
+        } catch {
+          // Optional body for cancel reason
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointments/${appointmentId}/cancel`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // PUT /acuity/calendars/:id - update calendar
+      if (pathname.match(/^\/acuity\/calendars\/\d+$/) && request.method === 'PUT') {
+        const calendarId = pathname.split('/').pop();
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/calendars/${calendarId}`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // GET /acuity/blocks - get availability blocks
+      if (pathname === '/acuity/blocks' && request.method === 'GET') {
+        const url = new URL(request.url);
+        const calendarID = url.searchParams.get('calendarID');
+        const params = new URLSearchParams();
+        if (calendarID) params.append('calendarID', calendarID);
+        const acuityUrl = `https://acuityscheduling.com/api/v1/blocks${params.toString() ? '?' + params.toString() : ''}`;
+        return callAcuityAPI(acuityUrl);
+      }
+
+      // POST /acuity/blocks - create availability block
+      if (pathname === '/acuity/blocks' && request.method === 'POST') {
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/blocks`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // DELETE /acuity/blocks/:id - delete availability block
+      if (pathname.match(/^\/acuity\/blocks\/\d+$/) && request.method === 'DELETE') {
+        const blockId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/blocks/${blockId}`;
+        return callAcuityAPI(acuityUrl, { method: 'DELETE' });
+      }
+
+      // PUT /acuity/clients/:id - update client
+      if (pathname.match(/^\/acuity\/clients\/\d+$/) && request.method === 'PUT') {
+        const clientId = pathname.split('/').pop();
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/clients/${clientId}`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // DELETE /acuity/clients/:id - delete client
+      if (pathname.match(/^\/acuity\/clients\/\d+$/) && request.method === 'DELETE') {
+        const clientId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/clients/${clientId}`;
+        return callAcuityAPI(acuityUrl, { method: 'DELETE' });
+      }
+
+      // GET /acuity/business-info - get business information
+      if (pathname === '/acuity/business-info' && request.method === 'GET') {
+        return callAcuityAPI('https://acuityscheduling.com/api/v1/business-info');
+      }
+
       return new Response('Not Found', { status: 404 });
     }
 
