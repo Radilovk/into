@@ -475,6 +475,15 @@
             background: #e0a800;
         }
 
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
         .calendar-item {
             border: 1px solid #e0e0e0;
             border-radius: 8px;
@@ -944,8 +953,16 @@
                         </div>
                         <p style="margin-bottom: 15px; color: #666;">
                             <strong>За потребители без достъп до Acuity профил:</strong> Ако нямате възможност да влезете в Acuity, 
-                            можете ефективно да "спрете" услуга, като блокирате всички календари за тази услуга на дълъг период.
+                            можете ефективно да "спрете" услуга, като блокирате всички календари на дълъг период.
                         </p>
+                        
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <p style="margin: 0; color: #856404;">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>Важно:</strong> 
+                                Този метод блокира <strong>ЦЕЛИЯ календар</strong> (всички услуги), не само избраната услуга. 
+                                Използвайте го само ако искате да спрете приемането на всякакви резервации за този период.
+                            </p>
+                        </div>
                         
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
                             <h4 style="margin-top: 0; color: #17a2b8;">
@@ -953,17 +970,20 @@
                             </h4>
                             <ul style="margin: 10px 0; padding-left: 25px;">
                                 <li>Създава блок (unavailable period) за всички календари</li>
-                                <li>Блокът е специфичен за избраната услуга</li>
-                                <li>Клиентите няма да виждат свободни часове за тази услуга</li>
-                                <li>Можете да изтриете блока, за да възстановите услугата</li>
+                                <li>Блокът предотвратява ВСИЧКИ резервации в календара</li>
+                                <li>Ефективно "спира" приемането на нови резервации</li>
+                                <li>Можете да изтриете блока, за да възстановите достъпността</li>
                             </ul>
                         </div>
                         
                         <div class="form-group">
-                            <label><i class="fas fa-tools"></i> Изберете услуга за спиране</label>
+                            <label><i class="fas fa-tools"></i> Изберете услуга (за проследяване)</label>
                             <select id="disable-service-select" class="form-control">
                                 <option value="">Изберете услуга...</option>
                             </select>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                Забележка: Избраната услуга се използва само за проследяване. Блоковете ще засегнат всички услуги в календара.
+                            </small>
                         </div>
                         
                         <div class="form-group">
@@ -985,7 +1005,7 @@
                         
                         <div class="action-buttons">
                             <button class="btn btn-warning" onclick="disableServiceViaBlocks()" style="background: #ff9800; border-color: #ff9800;">
-                                <i class="fas fa-ban"></i> Спри услуга чрез блокове
+                                <i class="fas fa-ban"></i> Блокирай всички календари
                             </button>
                             <button class="btn btn-info" onclick="viewServiceBlocks()">
                                 <i class="fas fa-list"></i> Виж активни блокове
