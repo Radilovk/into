@@ -2,6 +2,28 @@
 
 ## Дата: 2025-12-27
 
+### Update 2: Enhanced Scheduling Control (27 Dec 2025, Evening)
+Added specific emphasis on editing `alignment` and `schedulingIncrement` properties for appointment types and calendars.
+
+**New Capabilities:**
+- ⭐ **schedulingIncrement**: Control booking intervals (15, 30, 60 minutes, etc.)
+- ⭐ **alignment**: Control appointment alignment to the hour (0, 15, 30, 45 minutes)
+- These can be edited for ANY appointment type (service) and ANY calendar
+- Full API support via PATCH endpoints already in place
+
+**Why This Matters:**
+- `schedulingIncrement` controls how often appointments can be booked (e.g., every 15 mins vs every hour)
+- `alignment` controls when appointments start (e.g., only on the hour vs also at :15, :30, :45)
+- Critical for managing business hours and appointment availability
+- Allows fine-tuned control of scheduling system
+
+**Implementation:**
+- Updated AI system prompt with specific instructions for these properties
+- Added example JSON responses for editing these fields
+- Documented the PATCH endpoints that support these operations
+
+### Update 1: Initial Implementation (27 Dec 2025)
+
 ## Обобщение
 Възстановена и подобрена AI функционалността на бота с премахване на всички ограничения и добавяне на пълен достъп до информация и възможност за правене на промени.
 
