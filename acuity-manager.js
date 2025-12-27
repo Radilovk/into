@@ -965,18 +965,20 @@ async function callGoogleAI(apiKey, model, message, systemPrompt) {
     
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        // Google AI API returns errors in format: { error: { message: "...", status: "..." } }
         const errorMessage = errorData.error?.message || errorData.error?.status || response.statusText;
         throw new Error('Google AI API error: ' + errorMessage);
     }
     
     const data = await response.json();
     
-    // Check if we have a valid response
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+    // Validate response structure using optional chaining
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
         throw new Error('Google AI API returned an unexpected response format');
     }
     
-    return data.candidates[0].content.parts[0].text;
+    return text;
 }
 
 async function handleAIActions(response) {
