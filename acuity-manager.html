@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acuity Мениджър с AI Асистент</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            padding: 30px;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .right-panel {
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 200px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chat-header h3 {
+            margin-bottom: 10px;
+        }
+
+        .chat-config {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .chat-config select {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .chat-config input {
+            flex: 2;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            max-width: 90%;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.assistant {
+            background: white;
+            border: 1px solid #e0e0e0;
+            margin-right: auto;
+        }
+
+        .message.system {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            text-align: center;
+            margin: 0 auto;
+            font-style: italic;
+        }
+
+        .message .label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .chat-send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                max-height: 500px;
+            }
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box i {
+            color: #2196F3;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Acuity Мениджър с AI Асистент</h1>
+            <p>Управление на резервации и клиенти с помощта на изкуствен интелект</p>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="tabs">
+                    <button class="tab active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Табло
+                    </button>
+                    <button class="tab" data-tab="appointments">
+                        <i class="fas fa-calendar-check"></i> Резервации
+                    </button>
+                    <button class="tab" data-tab="clients">
+                        <i class="fas fa-users"></i> Клиенти
+                    </button>
+                    <button class="tab" data-tab="booking">
+                        <i class="fas fa-plus-circle"></i> Нова резервация
+                    </button>
+                </div>
+
+                <div id="dashboard" class="tab-content active">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i> Статистика
+                    </h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="number" id="stat-appointments">0</div>
+                            <div class="label">Резервации</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number" id="stat-clients">0</div>
+                            <div class="label">Клиенти</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="number" id="stat-types">0</div>
+                            <div class="label">Видове тренировки</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-calendar-alt"></i> Предстоящи резервации
+                        </div>
+                        <div id="upcoming-appointments"></div>
+                    </div>
+                </div>
+
+                <div id="appointments" class="tab-content">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i> Резервации
+                    </h2>
+                    <div class="card">
+                        <button class="btn btn-primary" onclick="loadAppointments()">
+                            <i class="fas fa-sync"></i> Презареди
+                        </button>
+                        <div id="appointments-list"></div>
+                    </div>
+                </div>
+
+                <div id="clients" class="tab-content">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i> Клиенти
+                    </h2>
+                    <div class="card">
+                        <button class="btn btn-primary" onclick="loadClients()">
+                            <i class="fas fa-sync"></i> Презареди
+                        </button>
+                        <div id="clients-list"></div>
+                    </div>
+                </div>
+
+                <div id="booking" class="tab-content">
+                    <h2 class="section-title">
+                        <i class="fas fa-plus-circle"></i> Нова резервация
+                    </h2>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Съвет:</strong> Използвайте AI асистента отдясно за да създадете резервация с естествен език!
+                    </div>
+
+                    <div class="card">
+                        <form id="booking-form">
+                            <div class="form-group">
+                                <label><i class="fas fa-dumbbell"></i> Вид тренировка</label>
+                                <select id="appointmentTypeID" class="form-control" required>
+                                    <option value="">Зареждане...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Календар</label>
+                                <select id="calendarID" class="form-control" required>
+                                    <option value="">Зареждане...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-day"></i> Дата и час</label>
+                                <input type="datetime-local" id="datetime" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Име</label>
+                                <input type="text" id="firstName" class="form-control" placeholder="Име" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Фамилия</label>
+                                <input type="text" id="lastName" class="form-control" placeholder="Фамилия" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Телефон</label>
+                                <input type="tel" id="phone" class="form-control" placeholder="+359..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Имейл</label>
+                                <input type="email" id="email" class="form-control" placeholder="email@example.com" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Създай резервация
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h3><i class="fas fa-robot"></i> AI Асистент</h3>
+                        <p style="font-size: 0.9rem; opacity: 0.9;">Попитайте за резервации, клиенти или създайте нова резервация</p>
+                        <div class="chat-config">
+                            <select id="ai-provider" class="form-control">
+                                <option value="openai">OpenAI</option>
+                                <option value="google">Google AI</option>
+                            </select>
+                            <input type="password" id="ai-api-key" placeholder="API ключ..." class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message system">
+                            <div class="label">Системно съобщение</div>
+                            Здравейте! Аз съм вашият AI асистент за управление на Acuity резервации. Мога да ви помогна да:
+                            <ul style="text-align: left; margin-top: 10px;">
+                                <li>Преглеждате резервации и клиенти</li>
+                                <li>Създавате нови резервации</li>
+                                <li>Проверявате наличност</li>
+                                <li>Търсите информация</li>
+                            </ul>
+                            Как мога да ви помогна днес?
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <input type="text" id="chat-input" class="chat-input" 
+                                   placeholder="Напишете съобщение до AI асистента..." 
+                                   onkeypress="if(event.key === 'Enter') sendMessage()">
+                            <button class="chat-send-btn" onclick="sendMessage()" id="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="acuity-manager.js"></script>
+</body>
+</html>
