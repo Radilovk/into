@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup booking form
     document.getElementById('booking-form').addEventListener('submit', handleBookingSubmit);
+    
+    // Initialize AI model options
+    updateModelOptions();
 });
 
 // Tab Management
@@ -839,6 +842,43 @@ function addMessage(type, content) {
     chatHistory.push({ role: type === 'user' ? 'user' : 'assistant', content });
 }
 
+function updateModelOptions() {
+    const provider = document.getElementById('ai-provider').value;
+    const modelSelect = document.getElementById('ai-model');
+    
+    // Clear existing options
+    modelSelect.innerHTML = '';
+    
+    if (provider === 'openai') {
+        const openaiModels = [
+            { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
+            { value: 'gpt-4', label: 'GPT-4' },
+            { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
+            { value: 'gpt-4o', label: 'GPT-4o' },
+            { value: 'gpt-4o-mini', label: 'GPT-4o Mini' }
+        ];
+        openaiModels.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            modelSelect.appendChild(option);
+        });
+    } else {
+        const googleModels = [
+            { value: 'gemini-pro', label: 'Gemini Pro' },
+            { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+            { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
+            { value: 'gemini-1.5-flash-8b', label: 'Gemini 1.5 Flash 8B' }
+        ];
+        googleModels.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            modelSelect.appendChild(option);
+        });
+    }
+}
+
 function prepareAIContext() {
     return {
         appointments: appointments.map(apt => ({
@@ -871,14 +911,21 @@ async function callAI(provider, apiKey, message, context) {
         .replace('{appointment_types}', context.appointmentTypes.map(t => t.name).join(', '))
         .replace('{calendars}', context.calendars.map(c => c.name).join(', '));
 
+    const modelElement = document.getElementById('ai-model');
+    const model = modelElement?.value;
+    
+    if (!model) {
+        throw new Error('Моля, изберете AI модел');
+    }
+
     if (provider === 'openai') {
-        return await callOpenAI(apiKey, message, systemPrompt);
+        return await callOpenAI(apiKey, model, message, systemPrompt);
     } else {
-        return await callGoogleAI(apiKey, message, systemPrompt);
+        return await callGoogleAI(apiKey, model, message, systemPrompt);
     }
 }
 
-async function callOpenAI(apiKey, message, systemPrompt) {
+async function callOpenAI(apiKey, model, message, systemPrompt) {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -886,7 +933,7 @@ async function callOpenAI(apiKey, message, systemPrompt) {
             'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
+            model: model,
             messages: [
                 { role: 'system', content: systemPrompt },
                 ...chatHistory.slice(-10),
@@ -897,15 +944,17 @@ async function callOpenAI(apiKey, message, systemPrompt) {
     });
     
     if (!response.ok) {
-        throw new Error('OpenAI API error: ' + response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || response.statusText;
+        throw new Error('OpenAI API error: ' + errorMessage);
     }
     
     const data = await response.json();
     return data.choices[0].message.content;
 }
 
-async function callGoogleAI(apiKey, message, systemPrompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+async function callGoogleAI(apiKey, model, message, systemPrompt) {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -920,11 +969,21 @@ async function callGoogleAI(apiKey, message, systemPrompt) {
     });
     
     if (!response.ok) {
-        throw new Error('Google AI API error: ' + response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        // Google AI API returns errors in format: { error: { message: "...", status: "..." } }
+        const errorMessage = errorData.error?.message || errorData.error?.status || response.statusText;
+        throw new Error('Google AI API error: ' + errorMessage);
     }
     
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    
+    // Validate response structure using optional chaining
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) {
+        throw new Error('Google AI API returned an unexpected response format');
+    }
+    
+    return text;
 }
 
 async function handleAIActions(response) {
@@ -1005,11 +1064,16 @@ function displayCalendarsManagement() {
             <p><strong>Email:</strong> ${cal.email || 'N/A'}</p>
             <p><strong>ID:</strong> ${cal.id}</p>
             <p><strong>Описание:</strong> ${cal.description || 'Няма описание'}</p>
+            <p><strong>Часова зона:</strong> ${cal.timezone || 'N/A'}</p>
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="viewCalendarSchedule(${cal.id})">
-                    <i class="fas fa-clock"></i> Виж работно време
+                <button class="btn btn-primary" onclick="viewCalendarBlocks(${cal.id})">
+                    <i class="fas fa-clock"></i> Виж блокирани часове
+                </button>
+                <button class="btn btn-success" onclick="editCalendar(${cal.id})">
+                    <i class="fas fa-edit"></i> Редактирай
                 </button>
             </div>
+            <div id="calendar-blocks-${cal.id}" class="calendar-blocks-container" style="display: none; margin-top: 15px;"></div>
         </div>
     `).join('');
     
@@ -1038,9 +1102,101 @@ function updateExportCalendarSelect() {
         calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
 }
 
-async function viewCalendarSchedule(calendarId) {
+async function viewCalendarBlocks(calendarId) {
+    const container = document.getElementById(`calendar-blocks-${calendarId}`);
     const calendar = calendars.find(c => c.id === calendarId);
-    alert(`График за ${calendar.name || calendar.email}:\n\nЗа детайлен преглед и редакция на работните часове, използвайте функцията за блокиране на часове или се свържете с Acuity support за промяна на основния график.`);
+    
+    // Toggle visibility
+    if (container.style.display === 'block') {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.innerHTML = '<p style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> Зареждане...</p>';
+    container.style.display = 'block';
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/blocks?calendarID=${calendarId}`);
+        if (response.ok) {
+            const blocks = await response.json();
+            const calendarBlocks = blocks.filter(b => b.calendarID == calendarId);
+            
+            if (calendarBlocks.length === 0) {
+                container.innerHTML = '<p style="color: #999; padding: 10px;">Няма блокирани часове за този календар</p>';
+            } else {
+                const html = calendarBlocks.map(block => `
+                    <div class="block-item" style="margin: 10px 0; padding: 10px; background: #f9f9f9; border-left: 3px solid #dc3545;">
+                        <p><strong>От:</strong> ${new Date(block.start).toLocaleString('bg-BG')}</p>
+                        <p><strong>До:</strong> ${new Date(block.end).toLocaleString('bg-BG')}</p>
+                        ${block.notes ? `<p><strong>Причина:</strong> ${block.notes}</p>` : ''}
+                        <button class="btn btn-danger btn-sm" onclick="deleteBlock(${block.id})">
+                            <i class="fas fa-trash"></i> Изтрий
+                        </button>
+                    </div>
+                `).join('');
+                container.innerHTML = html;
+            }
+        } else {
+            container.innerHTML = '<p style="color: #dc3545;">Грешка при зареждане на блокираните часове</p>';
+        }
+    } catch (error) {
+        console.error('Error loading calendar blocks:', error);
+        container.innerHTML = '<p style="color: #dc3545;">Грешка при зареждане на блокираните часове</p>';
+    }
+}
+
+async function editCalendar(calendarId) {
+    const calendar = calendars.find(c => c.id === calendarId);
+    if (!calendar) {
+        alert('Календарът не е намерен');
+        return;
+    }
+    
+    // Create modal/prompt for editing
+    const newName = prompt(`Редактирай име на календар:\n\nТекущо име: ${calendar.name || 'N/A'}`, calendar.name || '');
+    if (newName === null) return; // User cancelled
+    
+    const newEmail = prompt(`Редактирай email на календар:\n\nТекущ email: ${calendar.email || 'N/A'}`, calendar.email || '');
+    if (newEmail === null) return; // User cancelled
+    
+    const newDescription = prompt(`Редактирай описание на календар:\n\nТекущо описание: ${calendar.description || 'N/A'}`, calendar.description || '');
+    if (newDescription === null) return; // User cancelled
+    
+    const newTimezone = prompt(`Редактирай часова зона на календар:\n\nТекуща часова зона: ${calendar.timezone || 'N/A'}`, calendar.timezone || '');
+    if (newTimezone === null) return; // User cancelled
+    
+    // Prepare update data
+    const updateData = {};
+    if (newName && newName !== calendar.name) updateData.name = newName;
+    if (newEmail && newEmail !== calendar.email) updateData.email = newEmail;
+    if (newDescription && newDescription !== calendar.description) updateData.description = newDescription;
+    if (newTimezone && newTimezone !== calendar.timezone) updateData.timezone = newTimezone;
+    
+    if (Object.keys(updateData).length === 0) {
+        alert('Няма промени за запазване');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        if (response.ok) {
+            alert('Календарът е актуализиран успешно!');
+            await loadCalendarsManagement();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при актуализиране на календара: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error updating calendar:', error);
+        alert('Грешка при актуализиране на календара: ' + error.message);
+    }
 }
 
 // Blocks Management Functions
@@ -1667,9 +1823,11 @@ function updateBulkCalendarSelect() {
 window.loadAppointments = loadAppointments;
 window.loadClients = loadClients;
 window.sendMessage = sendMessage;
+window.updateModelOptions = updateModelOptions;
 window.handleBookingSubmit = handleBookingSubmit;
 window.loadCalendarsManagement = loadCalendarsManagement;
-window.viewCalendarSchedule = viewCalendarSchedule;
+window.viewCalendarBlocks = viewCalendarBlocks;
+window.editCalendar = editCalendar;
 window.loadBlocks = loadBlocks;
 window.createBlock = createBlock;
 window.deleteBlock = deleteBlock;
