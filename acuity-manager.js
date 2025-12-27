@@ -911,7 +911,12 @@ async function callAI(provider, apiKey, message, context) {
         .replace('{appointment_types}', context.appointmentTypes.map(t => t.name).join(', '))
         .replace('{calendars}', context.calendars.map(c => c.name).join(', '));
 
-    const model = document.getElementById('ai-model').value;
+    const modelElement = document.getElementById('ai-model');
+    const model = modelElement?.value;
+    
+    if (!model) {
+        throw new Error('Моля, изберете AI модел');
+    }
 
     if (provider === 'openai') {
         return await callOpenAI(apiKey, model, message, systemPrompt);
@@ -1164,7 +1169,7 @@ async function editCalendar(calendarId) {
     const updateData = {};
     if (newName && newName !== calendar.name) updateData.name = newName;
     if (newEmail && newEmail !== calendar.email) updateData.email = newEmail;
-    if (newDescription !== calendar.description) updateData.description = newDescription;
+    if (newDescription && newDescription !== calendar.description) updateData.description = newDescription;
     if (newTimezone && newTimezone !== calendar.timezone) updateData.timezone = newTimezone;
     
     if (Object.keys(updateData).length === 0) {
