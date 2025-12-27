@@ -81,18 +81,61 @@ function switchTab(tabName) {
 
 // Data Loading Functions
 async function loadAllData() {
+    // Note: We don't load appointments here because users need to select a calendar first
+    // This is intentional to allow calendar-specific appointment viewing
     await Promise.all([
-        loadAppointments(),
         loadClients(),
-        loadAppointmentTypes()
+        loadAppointmentTypes(),
+        loadCalendars()
     ]);
     updateDashboard();
+    updateAppointmentsFilterSelects();
 }
 
 async function loadAppointments() {
+    // Reload with current filter settings
+    const calendarSelect = document.getElementById('appointments-calendar-select');
+    
+    if (calendarSelect && calendarSelect.value) {
+        await loadAppointmentsByFilter();
+    } else {
+        // Show message to select calendar
+        const container = document.getElementById('appointments-list');
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>Изберете календар и натиснете "Зареди резервации"</p>
+            </div>
+        `;
+    }
+}
+
+async function loadAppointmentsByFilter() {
+    const calendarSelectElement = document.getElementById('appointments-calendar-select');
+    const typeSelectElement = document.getElementById('appointments-type-select');
+    
+    if (!calendarSelectElement || !typeSelectElement) {
+        console.error('Calendar or type select elements not found');
+        showError('appointments-list', 'Грешка при зареждане на филтрите');
+        return;
+    }
+    
+    const calendarID = calendarSelectElement.value;
+    const appointmentTypeID = typeSelectElement.value;
+    
+    if (!calendarID) {
+        showError('appointments-list', 'Моля, изберете календар');
+        return;
+    }
+    
     try {
-        // Try to load with default parameters from config
-        const response = await fetch(`${WORKER_URL}/acuity?calendarID=${DEFAULT_CONFIG.calendarID}&appointmentTypeID=${DEFAULT_CONFIG.appointmentTypeID}`);
+        // Build URL with parameters
+        let url = `${WORKER_URL}/acuity?calendarID=${calendarID}`;
+        if (appointmentTypeID) {
+            url += `&appointmentTypeID=${appointmentTypeID}`;
+        }
+        
+        const response = await fetch(url);
         if (response.ok) {
             appointments = await response.json();
             displayAppointments();
@@ -130,6 +173,7 @@ async function loadAppointmentTypes() {
         if (response.ok) {
             appointmentTypes = await response.json();
             updateAppointmentTypeSelect();
+            updateAppointmentsFilterSelects();
             updateDashboard();
         } else {
             console.error('Failed to load appointment types');
@@ -148,6 +192,7 @@ async function loadCalendars() {
             updateBlockCalendarSelect();
             updateExportCalendarSelect();
             updateBulkCalendarSelect();
+            updateAppointmentsFilterSelects();
         } else {
             console.error('Failed to load calendars');
         }
@@ -710,6 +755,30 @@ function updateAppointmentTypeSelect() {
     select.innerHTML = appointmentTypes.map(type => 
         `<option value="${type.id}">${type.name || type.type}</option>`
     ).join('');
+}
+
+function updateAppointmentsFilterSelects() {
+    // Update calendar select for appointments filter
+    const calendarSelect = document.getElementById('appointments-calendar-select');
+    if (calendarSelect) {
+        if (calendars.length === 0) {
+            calendarSelect.innerHTML = '<option value="">Няма налични календари</option>';
+        } else {
+            calendarSelect.innerHTML = '<option value="">Избери календар...</option>' + 
+                calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+        }
+    }
+    
+    // Update appointment type select for appointments filter
+    const typeSelect = document.getElementById('appointments-type-select');
+    if (typeSelect) {
+        if (appointmentTypes.length === 0) {
+            typeSelect.innerHTML = '<option value="">Няма налични типове</option>';
+        } else {
+            typeSelect.innerHTML = '<option value="">Всички типове</option>' + 
+                appointmentTypes.map(type => `<option value="${type.id}">${type.name || type.type}</option>`).join('');
+        }
+    }
 }
 
 function updateCalendarSelect() {
@@ -1821,6 +1890,7 @@ function updateBulkCalendarSelect() {
 
 // Export functions for HTML onclick handlers
 window.loadAppointments = loadAppointments;
+window.loadAppointmentsByFilter = loadAppointmentsByFilter;
 window.loadClients = loadClients;
 window.sendMessage = sendMessage;
 window.updateModelOptions = updateModelOptions;

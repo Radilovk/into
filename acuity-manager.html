@@ -614,11 +614,48 @@
                     <h2 class="section-title">
                         <i class="fas fa-calendar-check"></i> Резервации
                     </h2>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Избор на календар:</strong> Изберете календар и тип тренировка за да заредите резервациите.
+                    </div>
+                    
                     <div class="card">
-                        <button class="btn btn-primary" onclick="loadAppointments()">
-                            <i class="fas fa-sync"></i> Презареди
-                        </button>
-                        <div id="appointments-list"></div>
+                        <div class="card-header">
+                            <i class="fas fa-filter"></i> Филтриране на резервации
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Избери календар</label>
+                            <select id="appointments-calendar-select" class="form-control">
+                                <option value="">Избери календар...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-dumbbell"></i> Избери тип тренировка</label>
+                            <select id="appointments-type-select" class="form-control">
+                                <option value="">Избери тип...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="loadAppointmentsByFilter()">
+                                <i class="fas fa-search"></i> Зареди резервации
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAppointments()">
+                                <i class="fas fa-sync"></i> Презареди
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div id="appointments-list">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>Изберете календар и натиснете "Зареди резервации"</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card">
