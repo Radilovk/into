@@ -71,6 +71,18 @@ export default {
         }
       };
 
+      // Handle OPTIONS preflight requests for CORS
+      if (request.method === 'OPTIONS') {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Authorization, Content-Type'
+          }
+        });
+      }
+
       // GET /acuity - list appointments
       if (pathname === '/acuity' && request.method === 'GET') {
         const url = new URL(request.url);
