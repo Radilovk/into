@@ -111,6 +111,23 @@ export default {
         return callAcuityAPI('https://acuityscheduling.com/api/v1/appointment-types');
       }
 
+      // PUT /acuity/appointment-types/:id - update appointment type
+      if (pathname.match(/^\/acuity\/appointment-types\/\d+$/) && request.method === 'PUT') {
+        const typeId = pathname.split('/').pop();
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointment-types/${typeId}`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
       // GET /acuity/calendars - list calendars
       if (pathname === '/acuity/calendars' && request.method === 'GET') {
         return callAcuityAPI('https://acuityscheduling.com/api/v1/calendars');
@@ -256,7 +273,7 @@ export default {
         status: 204,
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Authorization, Content-Type'
         }
       });
