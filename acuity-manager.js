@@ -81,6 +81,8 @@ function switchTab(tabName) {
 
 // Data Loading Functions
 async function loadAllData() {
+    // Note: We don't load appointments here because users need to select a calendar first
+    // This is intentional to allow calendar-specific appointment viewing
     await Promise.all([
         loadClients(),
         loadAppointmentTypes(),
@@ -110,11 +112,20 @@ async function loadAppointments() {
 }
 
 async function loadAppointmentsByFilter() {
-    const calendarID = document.getElementById('appointments-calendar-select').value;
-    const appointmentTypeID = document.getElementById('appointments-type-select').value;
+    const calendarSelectElement = document.getElementById('appointments-calendar-select');
+    const typeSelectElement = document.getElementById('appointments-type-select');
+    
+    if (!calendarSelectElement || !typeSelectElement) {
+        console.error('Calendar or type select elements not found');
+        showError('appointments-list', 'Грешка при зареждане на филтрите');
+        return;
+    }
+    
+    const calendarID = calendarSelectElement.value;
+    const appointmentTypeID = typeSelectElement.value;
     
     if (!calendarID) {
-        alert('Моля, изберете календар');
+        showError('appointments-list', 'Моля, изберете календар');
         return;
     }
     
