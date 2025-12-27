@@ -1282,7 +1282,21 @@ async function editCalendar(calendarId) {
             await loadCalendarsManagement();
         } else {
             const error = await response.json().catch(() => ({}));
-            alert('Грешка при актуализиране на календара: ' + (error.message || response.statusText));
+            
+            // Check for Acuity plan limitation error (403 with specific error format)
+            // Both checks are needed: HTTP 403 + Acuity error format confirmation
+            if (response.status === 403 && error.status_code === 403) {
+                alert('❌ Грешка при актуализация на календар\n\n' +
+                      'Вашият Acuity план не поддържа редактиране на календари чрез API.\n\n' +
+                      '📋 За да промените настройките на календара:\n' +
+                      '1. Влезте директно в Acuity Scheduling\n' +
+                      '2. Отидете в Calendar → My Calendar\n' +
+                      '3. Редактирайте календара оттам\n\n' +
+                      'Или надградете вашия Acuity план за пълен API достъп.\n\n' +
+                      'Техническа информация: ' + (error.message || error.error || response.statusText));
+            } else {
+                alert('Грешка при актуализиране на календара: ' + (error.message || response.statusText));
+            }
         }
     } catch (error) {
         console.error('Error updating calendar:', error);
@@ -1918,6 +1932,7 @@ async function loadServices() {
         if (response.ok) {
             appointmentTypes = await response.json();
             displayServices();
+            updateDisableServiceSelect(); // Update the workaround dropdown
         } else {
             console.error('Failed to load services:', response.statusText);
             showError('services-list', 'Не може да се заредят услугите');
@@ -2048,7 +2063,21 @@ async function updateService() {
             loadServices();
         } else {
             const error = await response.json().catch(() => ({}));
-            alert('Грешка при актуализация: ' + (error.message || response.statusText));
+            
+            // Check for Acuity plan limitation error (403 with specific error format)
+            // Both checks are needed: HTTP 403 + Acuity error format confirmation
+            if (response.status === 403 && error.status_code === 403) {
+                alert('❌ Грешка при актуализация\n\n' +
+                      'Вашият Acuity план не поддържа редактиране на услуги чрез API.\n\n' +
+                      '📋 За да промените настройките на услугата:\n' +
+                      '1. Влезте директно в Acuity Scheduling\n' +
+                      '2. Отидете в Calendar → Appointment Types\n' +
+                      '3. Редактирайте услугата оттам\n\n' +
+                      'Или надградете вашия Acuity план за пълен API достъп.\n\n' +
+                      'Техническа информация: ' + (error.message || error.error || response.statusText));
+            } else {
+                alert('Грешка при актуализация: ' + (error.message || response.statusText));
+            }
         }
     } catch (error) {
         console.error('Error updating service:', error);
@@ -2059,6 +2088,189 @@ async function updateService() {
 function cancelServiceEdit() {
     document.getElementById('service-edit-form').style.display = 'none';
     document.getElementById('service-id-search').value = '';
+}
+
+// ==================== SERVICE WORKAROUND: DISABLE VIA BLOCKS ====================
+
+// Update service select dropdown when services are loaded
+function updateDisableServiceSelect() {
+    const select = document.getElementById('disable-service-select');
+    if (!select) return;
+    
+    if (!appointmentTypes || appointmentTypes.length === 0) {
+        select.innerHTML = '<option value="">Няма налични услуги</option>';
+        return;
+    }
+    
+    select.innerHTML = '<option value="">Изберете услуга...</option>' + 
+        appointmentTypes.map(service => 
+            `<option value="${service.id}" data-name="${service.name || 'Услуга'}">${service.name || 'N/A'} (ID: ${service.id})</option>`
+        ).join('');
+}
+
+async function disableServiceViaBlocks() {
+    const serviceSelect = document.getElementById('disable-service-select');
+    const durationSelect = document.getElementById('disable-service-duration');
+    const noteInput = document.getElementById('disable-service-note');
+    const statusContainer = document.getElementById('service-blocks-status');
+    
+    const serviceId = serviceSelect.value;
+    const serviceName = serviceSelect.options[serviceSelect.selectedIndex]?.dataset.name || 'услугата';
+    const days = parseInt(durationSelect.value);
+    const note = noteInput.value || `Услуга спряна чрез блокове (ID: ${serviceId})`;
+    
+    if (!serviceId) {
+        alert('Моля, изберете услуга');
+        return;
+    }
+    
+    // Load calendars if not loaded
+    if (calendars.length === 0) {
+        await loadCalendars();
+    }
+    
+    if (calendars.length === 0) {
+        alert('Не могат да се заредят календарите');
+        return;
+    }
+    
+    const confirmMsg = `⚠️ ПОТВЪРЖДЕНИЕ\n\n` +
+        `Ще блокирате ВСИЧКИ календари за ${days} дни (${Math.round(days/30)} месеца).\n\n` +
+        `⚠️ ВАЖНО: Това ще спре ВСИЧКИ услуги в календарите, не само "${serviceName}".\n\n` +
+        `Клиентите няма да могат да резервират нищо през този период.\n\n` +
+        `Искате ли да продължите?`;
+    
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+    
+    statusContainer.style.display = 'block';
+    statusContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Създаване на блокове...</p>';
+    
+    const now = new Date();
+    const endDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+    
+    let success = 0;
+    let failed = 0;
+    const createdBlocks = [];
+    
+    for (const calendar of calendars) {
+        try {
+            const blockData = {
+                calendarID: calendar.id,
+                start: now.toISOString(),
+                end: endDate.toISOString(),
+                notes: `${note} | Calendar: ${calendar.name || calendar.email}`
+            };
+            
+            // Note: Acuity API blocks don't natively filter by appointmentTypeID
+            // So we block the entire calendar for the period
+            // Users will need to manually note which service is being blocked
+            
+            const response = await fetch(`${WORKER_URL}/acuity/blocks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(blockData)
+            });
+            
+            if (response.ok) {
+                const block = await response.json();
+                createdBlocks.push({ calendar: calendar.name || calendar.email, blockId: block.id });
+                success++;
+            } else {
+                failed++;
+            }
+        } catch (error) {
+            failed++;
+        }
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    // Save created blocks to localStorage for tracking
+    const existingDisabledServices = JSON.parse(localStorage.getItem('disabledServices') || '{}');
+    existingDisabledServices[serviceId] = {
+        serviceName: serviceName,
+        blocks: createdBlocks,
+        createdAt: now.toISOString(),
+        endDate: endDate.toISOString(),
+        note: note
+    };
+    localStorage.setItem('disabledServices', JSON.stringify(existingDisabledServices));
+    
+    statusContainer.innerHTML = `
+        <div style="background: ${success > 0 ? '#d4edda' : '#f8d7da'}; padding: 15px; border-radius: 8px; border-left: 4px solid ${success > 0 ? '#28a745' : '#dc3545'};">
+            <h4 style="color: ${success > 0 ? '#155724' : '#721c24'}; margin: 0 0 10px 0;">
+                ${success > 0 ? '✓ Календарите са блокирани!' : '✗ Грешка при блокиране'}
+            </h4>
+            <p style="margin: 5px 0;">Успешни блокове: ${success}</p>
+            <p style="margin: 5px 0;">Неуспешни: ${failed}</p>
+            <p style="margin: 10px 0 0 0;"><strong>Период:</strong> ${now.toLocaleDateString('bg-BG')} - ${endDate.toLocaleDateString('bg-BG')}</p>
+            ${success > 0 ? `<p style="margin: 10px 0 0 0; font-size: 0.9rem; color: #666;">
+                💡 За да възстановите резервациите, изтрийте създадените блокове от секция "Календари" → "Блокирани часове"
+            </p>` : ''}
+        </div>
+    `;
+}
+
+async function viewServiceBlocks() {
+    const statusContainer = document.getElementById('service-blocks-status');
+    const disabledServices = JSON.parse(localStorage.getItem('disabledServices') || '{}');
+    
+    if (Object.keys(disabledServices).length === 0) {
+        statusContainer.style.display = 'block';
+        statusContainer.innerHTML = `
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="color: #666; margin: 0;">Няма спрени услуги чрез блокове</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">';
+    html += '<h4 style="margin-top: 0; color: #667eea;"><i class="fas fa-ban"></i> Спрени услуги:</h4>';
+    
+    for (const [serviceId, data] of Object.entries(disabledServices)) {
+        const endDate = new Date(data.endDate);
+        const isExpired = endDate < new Date();
+        
+        html += `
+            <div style="background: white; padding: 12px; margin: 10px 0; border-radius: 6px; border-left: 3px solid ${isExpired ? '#6c757d' : '#ffc107'};">
+                <p style="margin: 5px 0;"><strong>${data.serviceName}</strong> (ID: ${serviceId})</p>
+                <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">
+                    Период: ${new Date(data.createdAt).toLocaleDateString('bg-BG')} - ${endDate.toLocaleDateString('bg-BG')}
+                    ${isExpired ? '<span style="color: #dc3545;"> (Изтекъл)</span>' : '<span style="color: #28a745;"> (Активен)</span>'}
+                </p>
+                <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">Блокове: ${data.blocks.length}</p>
+                <button class="btn btn-danger btn-sm" onclick="removeServiceDisable('${serviceId}')" style="margin-top: 10px;">
+                    <i class="fas fa-trash"></i> Премахни проследяването
+                </button>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    
+    statusContainer.style.display = 'block';
+    statusContainer.innerHTML = html;
+}
+
+function removeServiceDisable(serviceId) {
+    const disabledServices = JSON.parse(localStorage.getItem('disabledServices') || '{}');
+    
+    if (!disabledServices[serviceId]) {
+        alert('Услугата не е намерена в проследяването');
+        return;
+    }
+    
+    const data = disabledServices[serviceId];
+    
+    if (confirm(`Премахване на проследяването за "${data.serviceName}"?\n\nЗабележка: Това НЕ изтрива блоковете от Acuity. За да възстановите напълно услугата, трябва ръчно да изтриете блоковете от секция "Календари".`)) {
+        delete disabledServices[serviceId];
+        localStorage.setItem('disabledServices', JSON.stringify(disabledServices));
+        viewServiceBlocks(); // Refresh the view
+    }
 }
 
 // Default schedule management
@@ -2179,3 +2391,6 @@ window.editService = editService;
 window.updateService = updateService;
 window.cancelServiceEdit = cancelServiceEdit;
 window.saveDefaultSchedule = saveDefaultSchedule;
+window.disableServiceViaBlocks = disableServiceViaBlocks;
+window.viewServiceBlocks = viewServiceBlocks;
+window.removeServiceDisable = removeServiceDisable;
