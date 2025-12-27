@@ -1162,9 +1162,14 @@ wrangler deploy</pre>
                         <h3><i class="fas fa-robot"></i> AI Асистент</h3>
                         <p style="font-size: 0.9rem; opacity: 0.9;">Попитайте за резервации, клиенти или създайте нова резервация</p>
                         <div class="chat-config">
-                            <select id="ai-provider" class="form-control">
+                            <select id="ai-provider" class="form-control" onchange="updateModelOptions()">
                                 <option value="openai">OpenAI</option>
                                 <option value="google">Google AI</option>
+                            </select>
+                            <select id="ai-model" class="form-control">
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-4-turbo">GPT-4 Turbo</option>
                             </select>
                             <input type="password" id="ai-api-key" placeholder="API ключ..." class="form-control">
                         </div>

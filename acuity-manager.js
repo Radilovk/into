@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup booking form
     document.getElementById('booking-form').addEventListener('submit', handleBookingSubmit);
+    
+    // Initialize AI model options
+    updateModelOptions();
 });
 
 // Tab Management
@@ -839,6 +842,43 @@ function addMessage(type, content) {
     chatHistory.push({ role: type === 'user' ? 'user' : 'assistant', content });
 }
 
+function updateModelOptions() {
+    const provider = document.getElementById('ai-provider').value;
+    const modelSelect = document.getElementById('ai-model');
+    
+    // Clear existing options
+    modelSelect.innerHTML = '';
+    
+    if (provider === 'openai') {
+        const openaiModels = [
+            { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
+            { value: 'gpt-4', label: 'GPT-4' },
+            { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
+            { value: 'gpt-4o', label: 'GPT-4o' },
+            { value: 'gpt-4o-mini', label: 'GPT-4o Mini' }
+        ];
+        openaiModels.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            modelSelect.appendChild(option);
+        });
+    } else {
+        const googleModels = [
+            { value: 'gemini-pro', label: 'Gemini Pro' },
+            { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
+            { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
+            { value: 'gemini-1.5-flash-8b', label: 'Gemini 1.5 Flash 8B' }
+        ];
+        googleModels.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            modelSelect.appendChild(option);
+        });
+    }
+}
+
 function prepareAIContext() {
     return {
         appointments: appointments.map(apt => ({
@@ -871,14 +911,16 @@ async function callAI(provider, apiKey, message, context) {
         .replace('{appointment_types}', context.appointmentTypes.map(t => t.name).join(', '))
         .replace('{calendars}', context.calendars.map(c => c.name).join(', '));
 
+    const model = document.getElementById('ai-model').value;
+
     if (provider === 'openai') {
-        return await callOpenAI(apiKey, message, systemPrompt);
+        return await callOpenAI(apiKey, model, message, systemPrompt);
     } else {
-        return await callGoogleAI(apiKey, message, systemPrompt);
+        return await callGoogleAI(apiKey, model, message, systemPrompt);
     }
 }
 
-async function callOpenAI(apiKey, message, systemPrompt) {
+async function callOpenAI(apiKey, model, message, systemPrompt) {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -886,7 +928,7 @@ async function callOpenAI(apiKey, message, systemPrompt) {
             'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
+            model: model,
             messages: [
                 { role: 'system', content: systemPrompt },
                 ...chatHistory.slice(-10),
@@ -897,15 +939,17 @@ async function callOpenAI(apiKey, message, systemPrompt) {
     });
     
     if (!response.ok) {
-        throw new Error('OpenAI API error: ' + response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || response.statusText;
+        throw new Error('OpenAI API error: ' + errorMessage);
     }
     
     const data = await response.json();
     return data.choices[0].message.content;
 }
 
-async function callGoogleAI(apiKey, message, systemPrompt) {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+async function callGoogleAI(apiKey, model, message, systemPrompt) {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -920,10 +964,18 @@ async function callGoogleAI(apiKey, message, systemPrompt) {
     });
     
     if (!response.ok) {
-        throw new Error('Google AI API error: ' + response.statusText);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || errorData.error?.status || response.statusText;
+        throw new Error('Google AI API error: ' + errorMessage);
     }
     
     const data = await response.json();
+    
+    // Check if we have a valid response
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+        throw new Error('Google AI API returned an unexpected response format');
+    }
+    
     return data.candidates[0].content.parts[0].text;
 }
 
