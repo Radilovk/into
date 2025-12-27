@@ -578,8 +578,8 @@ async function deleteClient(clientId) {
             document.getElementById('client-details').innerHTML = '';
             await loadClients();
         } else {
-            const error = await response.text();
-            alert('Грешка при изтриване на клиента: ' + error);
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при изтриване на клиента: ' + (error.message || response.statusText));
         }
     } catch (error) {
         console.error('Error deleting client:', error);
@@ -855,8 +855,8 @@ async function handleBookingSubmit(e) {
             await loadAppointments();
             switchTab('appointments');
         } else {
-            const error = await response.text();
-            alert('Грешка при създаване на резервация: ' + error);
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при създаване на резервация: ' + (error.message || response.statusText));
         }
     } catch (error) {
         console.error('Error creating booking:', error);
@@ -1353,8 +1353,8 @@ async function createBlock(event) {
             document.getElementById('block-form').reset();
             await loadBlocks();
         } else {
-            const error = await response.text();
-            alert('Грешка при създаване на блокиран период: ' + error);
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при създаване на блокиран период: ' + (error.message || response.statusText));
         }
     } catch (error) {
         console.error('Error creating block:', error);
@@ -1643,8 +1643,8 @@ async function cancelAppointment(appointmentId) {
             document.getElementById('appointment-details').innerHTML = '';
             await loadAppointments();
         } else {
-            const error = await response.text();
-            alert('Грешка при отмяна на резервацията: ' + error);
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при отмяна на резервацията: ' + (error.message || response.statusText));
         }
     } catch (error) {
         console.error('Error cancelling appointment:', error);
@@ -1673,8 +1673,8 @@ async function rescheduleAppointment(appointmentId) {
             document.getElementById('appointment-details').innerHTML = '';
             await loadAppointments();
         } else {
-            const error = await response.text();
-            alert('Грешка при пренасрочване на резервацията: ' + error);
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при пренасрочване на резервацията: ' + (error.message || response.statusText));
         }
     } catch (error) {
         console.error('Error rescheduling appointment:', error);
@@ -2047,8 +2047,8 @@ async function updateService() {
             cancelServiceEdit();
             loadServices();
         } else {
-            const error = await response.text();
-            alert('Грешка при актуализация: ' + error);
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при актуализация: ' + (error.message || response.statusText));
         }
     } catch (error) {
         console.error('Error updating service:', error);

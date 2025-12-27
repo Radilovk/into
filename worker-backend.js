@@ -123,7 +123,7 @@ export default {
         return callAcuityAPI('https://acuityscheduling.com/api/v1/appointment-types');
       }
 
-      // PUT /acuity/appointment-types/:id - update appointment type
+      // PUT/PATCH /acuity/appointment-types/:id - update appointment type
       if (pathname.match(/^\/acuity\/appointment-types\/\d+$/) && (request.method === 'PUT' || request.method === 'PATCH')) {
         const typeId = pathname.split('/').pop();
         let body;
