@@ -894,6 +894,351 @@ function displayBusinessInfo(info) {
     container.innerHTML = html;
 }
 
+// Appointment Management Functions
+async function searchAppointmentById() {
+    const appointmentId = document.getElementById('appointment-id-search').value;
+    
+    if (!appointmentId) {
+        alert('Моля, въведете ID на резервация');
+        return;
+    }
+    
+    // Find appointment in loaded data first
+    const appointment = appointments.find(apt => apt.id == appointmentId);
+    
+    if (appointment) {
+        displayAppointmentDetails(appointment);
+    } else {
+        alert('Резервация с този ID не е намерена в заредените данни. Моля, презаредете списъка с резервации.');
+    }
+}
+
+function displayAppointmentDetails(appointment) {
+    const container = document.getElementById('appointment-details');
+    
+    const html = `
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
+            <h4 style="color: #667eea; margin-bottom: 15px;">
+                <i class="fas fa-info-circle"></i> Детайли за резервация #${appointment.id}
+            </h4>
+            <div style="line-height: 2;">
+                <p><strong>Клиент:</strong> ${appointment.firstName} ${appointment.lastName}</p>
+                <p><strong>Телефон:</strong> ${appointment.phone || 'N/A'}</p>
+                <p><strong>Email:</strong> ${appointment.email || 'N/A'}</p>
+                <p><strong>Дата:</strong> ${appointment.date || new Date(appointment.datetime).toLocaleDateString('bg-BG')}</p>
+                <p><strong>Час:</strong> ${appointment.time || new Date(appointment.datetime).toLocaleTimeString('bg-BG')}</p>
+                <p><strong>Тип:</strong> ${appointment.type || 'N/A'}</p>
+                <p><strong>Статус:</strong> <span class="status-badge status-${(appointment.status || 'confirmed').toLowerCase()}">${appointment.status || 'Confirmed'}</span></p>
+            </div>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-warning" onclick="rescheduleAppointment(${appointment.id})">
+                    <i class="fas fa-calendar-alt"></i> Пренасрочи
+                </button>
+                <button class="btn btn-danger" onclick="cancelAppointment(${appointment.id})">
+                    <i class="fas fa-times"></i> Отмени
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+async function cancelAppointment(appointmentId) {
+    if (!confirm('Сигурни ли сте, че искате да отмените тази резервация?')) {
+        return;
+    }
+    
+    const reason = prompt('Причина за отмяна (опционално):');
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointments/${appointmentId}/cancel`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ cancelNote: reason || 'Cancelled by manager' })
+        });
+        
+        if (response.ok) {
+            alert('Резервацията е отменена успешно!');
+            document.getElementById('appointment-details').innerHTML = '';
+            await loadAppointments();
+        } else {
+            const error = await response.text();
+            alert('Грешка при отмяна на резервацията: ' + error);
+        }
+    } catch (error) {
+        console.error('Error cancelling appointment:', error);
+        alert('Грешка при отмяна на резервацията');
+    }
+}
+
+async function rescheduleAppointment(appointmentId) {
+    const newDateTime = prompt('Нова дата и час (формат: YYYY-MM-DDTHH:MM):');
+    
+    if (!newDateTime) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointments/${appointmentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ datetime: newDateTime })
+        });
+        
+        if (response.ok) {
+            alert('Резервацията е пренасрочена успешно!');
+            document.getElementById('appointment-details').innerHTML = '';
+            await loadAppointments();
+        } else {
+            const error = await response.text();
+            alert('Грешка при пренасрочване на резервацията: ' + error);
+        }
+    } catch (error) {
+        console.error('Error rescheduling appointment:', error);
+        alert('Грешка при пренасрочване на резервацията');
+    }
+}
+
+// Bulk Operations
+let bulkAppointmentsToCancel = [];
+
+async function previewBulkCancel() {
+    const calendarID = document.getElementById('bulk-calendarID').value;
+    const startDate = document.getElementById('bulk-start-date').value;
+    const endDate = document.getElementById('bulk-end-date').value;
+    
+    if (!calendarID || !startDate || !endDate) {
+        alert('Моля, попълнете всички полета');
+        return;
+    }
+    
+    // Filter appointments
+    bulkAppointmentsToCancel = appointments.filter(apt => {
+        const aptDate = new Date(apt.datetime).toISOString().split('T')[0];
+        return apt.calendarID == calendarID && 
+               aptDate >= startDate && 
+               aptDate <= endDate &&
+               apt.canceled !== true;
+    });
+    
+    const container = document.getElementById('bulk-preview');
+    
+    if (bulkAppointmentsToCancel.length === 0) {
+        container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Няма намерени резервации за този период</p>';
+        return;
+    }
+    
+    const html = `
+        <div style="background: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ffc107;">
+            <h4 style="color: #856404; margin-bottom: 15px;">
+                <i class="fas fa-exclamation-triangle"></i> Намерени ${bulkAppointmentsToCancel.length} резервации
+            </h4>
+            <div style="max-height: 300px; overflow-y: auto;">
+                ${bulkAppointmentsToCancel.map(apt => `
+                    <div style="padding: 8px; border-bottom: 1px solid #e0e0e0;">
+                        ${apt.date} ${apt.time} - ${apt.firstName} ${apt.lastName}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+async function executeBulkCancel() {
+    if (bulkAppointmentsToCancel.length === 0) {
+        alert('Моля, първо прегледайте резервациите за отмяна');
+        return;
+    }
+    
+    const confirmation = prompt(`ВНИМАНИЕ! Ще бъдат отменени ${bulkAppointmentsToCancel.length} резервации!\n\nНапишете "ОТМЕНИ" за потвърждение:`);
+    
+    if (confirmation !== 'ОТМЕНИ') {
+        alert('Операцията е отказана');
+        return;
+    }
+    
+    let cancelled = 0;
+    let failed = 0;
+    
+    for (const apt of bulkAppointmentsToCancel) {
+        try {
+            const response = await fetch(`${WORKER_URL}/acuity/appointments/${apt.id}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cancelNote: 'Bulk cancellation by manager' })
+            });
+            
+            if (response.ok) {
+                cancelled++;
+            } else {
+                failed++;
+            }
+        } catch (error) {
+            failed++;
+        }
+        
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    alert(`Операция завършена!\nОтменени: ${cancelled}\nНеуспешни: ${failed}`);
+    
+    bulkAppointmentsToCancel = [];
+    document.getElementById('bulk-preview').innerHTML = '';
+    await loadAppointments();
+}
+
+// Emergency Lockdown Functions
+let lockdownBlocks = [];
+
+async function activateLockdown() {
+    const confirmed = document.getElementById('lockdown-confirm').checked;
+    
+    if (!confirmed) {
+        alert('Моля, потвърдете че разбирате последствията преди да активирате Lockdown режим');
+        return;
+    }
+    
+    if (!confirm('ПОСЛЕДНА ПРОВЕРКА: Наистина ли искате да блокирате ВСИЧКИ календари за следващите 30 дни?')) {
+        return;
+    }
+    
+    const statusContainer = document.getElementById('lockdown-status');
+    statusContainer.style.display = 'block';
+    statusContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Активиране на Lockdown режим...</p>';
+    
+    // Load calendars if not loaded
+    if (calendars.length === 0) {
+        await loadCalendarsManagement();
+    }
+    
+    const now = new Date();
+    const endDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+    
+    lockdownBlocks = [];
+    let success = 0;
+    let failed = 0;
+    
+    for (const calendar of calendars) {
+        try {
+            const blockData = {
+                calendarID: calendar.id,
+                start: now.toISOString(),
+                end: endDate.toISOString(),
+                notes: 'EMERGENCY LOCKDOWN - Account security measure'
+            };
+            
+            const response = await fetch(`${WORKER_URL}/acuity/blocks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(blockData)
+            });
+            
+            if (response.ok) {
+                const block = await response.json();
+                lockdownBlocks.push(block);
+                success++;
+            } else {
+                failed++;
+            }
+        } catch (error) {
+            failed++;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    statusContainer.innerHTML = `
+        <h4 style="color: white; margin-bottom: 10px;">✓ Lockdown режим активиран!</h4>
+        <p>Блокирани календари: ${success}</p>
+        <p>Неуспешни: ${failed}</p>
+        <p style="margin-top: 10px;">Всички календари са блокирани за следващите 30 дни.</p>
+        <p>Съществуващите резервации са запазени.</p>
+    `;
+    
+    // Save lockdown blocks to localStorage for tracking
+    localStorage.setItem('lockdownBlocks', JSON.stringify(lockdownBlocks.map(b => b.id)));
+}
+
+async function deactivateLockdown() {
+    if (!confirm('Искате ли да деактивирате Lockdown режима и да възстановите достъпа за резервации?')) {
+        return;
+    }
+    
+    const statusContainer = document.getElementById('lockdown-status');
+    statusContainer.style.display = 'block';
+    statusContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Деактивиране на Lockdown режим...</p>';
+    
+    // Get lockdown blocks from localStorage
+    const savedBlocks = JSON.parse(localStorage.getItem('lockdownBlocks') || '[]');
+    
+    if (savedBlocks.length === 0) {
+        statusContainer.innerHTML = '<p style="color: #ffc107;">Няма активен Lockdown режим или блоковете не са запазени локално.</p>';
+        return;
+    }
+    
+    let success = 0;
+    let failed = 0;
+    
+    for (const blockId of savedBlocks) {
+        try {
+            const response = await fetch(`${WORKER_URL}/acuity/blocks/${blockId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                success++;
+            } else {
+                failed++;
+            }
+        } catch (error) {
+            failed++;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    statusContainer.innerHTML = `
+        <h4 style="color: white; margin-bottom: 10px;">✓ Lockdown режим деактивиран!</h4>
+        <p>Премахнати блокове: ${success}</p>
+        <p>Неуспешни: ${failed}</p>
+        <p style="margin-top: 10px;">Календарите са отново достъпни за резервации.</p>
+    `;
+    
+    localStorage.removeItem('lockdownBlocks');
+    lockdownBlocks = [];
+}
+
+// Initialize bulk calendar select when calendars are loaded
+function updateBulkCalendarSelect() {
+    const select = document.getElementById('bulk-calendarID');
+    if (calendars.length === 0) {
+        select.innerHTML = '<option value="">Няма налични календари</option>';
+        return;
+    }
+    
+    select.innerHTML = '<option value="">Избери календар...</option>' + 
+        calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+}
+
+// Update loadCalendarsManagement to also update bulk select
+const originalLoadCalendarsManagement = loadCalendarsManagement;
+loadCalendarsManagement = async function() {
+    await originalLoadCalendarsManagement();
+    updateBulkCalendarSelect();
+};
+
 // Export functions for HTML onclick handlers
 window.loadAppointments = loadAppointments;
 window.loadClients = loadClients;
@@ -908,3 +1253,10 @@ window.exportClients = exportClients;
 window.exportAppointments = exportAppointments;
 window.exportAppointmentTypes = exportAppointmentTypes;
 window.loadBusinessInfo = loadBusinessInfo;
+window.searchAppointmentById = searchAppointmentById;
+window.cancelAppointment = cancelAppointment;
+window.rescheduleAppointment = rescheduleAppointment;
+window.previewBulkCancel = previewBulkCancel;
+window.executeBulkCancel = executeBulkCancel;
+window.activateLockdown = activateLockdown;
+window.deactivateLockdown = deactivateLockdown;

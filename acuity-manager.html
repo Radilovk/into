@@ -620,6 +620,60 @@
                         </button>
                         <div id="appointments-list"></div>
                     </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i> Управление на резервации
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Отмяна и модификация на резервации</p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Намери резервация по ID</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="appointment-id-search" class="form-control" placeholder="Въведи ID на резервация">
+                                <button class="btn btn-primary" onclick="searchAppointmentById()">
+                                    <i class="fas fa-search"></i> Търси
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="appointment-details"></div>
+                    </div>
+
+                    <div class="card" style="background: #fff3cd; border: 2px solid #ffc107;">
+                        <div class="card-header" style="color: #856404;">
+                            <i class="fas fa-exclamation-triangle"></i> Масови операции (ВНИМАНИЕ!)
+                        </div>
+                        <p style="color: #856404; margin-bottom: 15px;">
+                            Използвайте тези функции само в спешни случаи!
+                        </p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Избери календар за масови операции</label>
+                            <select id="bulk-calendarID" class="form-control">
+                                <option value="">Избери календар...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-day"></i> Избери период</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="date" id="bulk-start-date" class="form-control" placeholder="От дата">
+                                <input type="date" id="bulk-end-date" class="form-control" placeholder="До дата">
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-warning" onclick="previewBulkCancel()">
+                                <i class="fas fa-eye"></i> Покажи резервации за отмяна
+                            </button>
+                            <button class="btn btn-danger" onclick="executeBulkCancel()">
+                                <i class="fas fa-ban"></i> ОТМЕНИ ВСИЧКИ (ОПАСНО!)
+                            </button>
+                        </div>
+                        
+                        <div id="bulk-preview" style="margin-top: 20px;"></div>
+                    </div>
                 </div>
 
                 <div id="clients" class="tab-content">
@@ -876,6 +930,44 @@ wrangler deploy</pre>
                                 <li>Поискайте временно замразяване на акаунта</li>
                             </ul>
                         </div>
+                    </div>
+
+                    <div class="card" style="background: #dc3545; border: 3px solid #a71d2a; color: white;">
+                        <div class="card-header" style="color: white; font-size: 1.3rem;">
+                            <i class="fas fa-shield-alt"></i> СПЕШЕН РЕЖИМ "LOCKDOWN"
+                        </div>
+                        <p style="margin-bottom: 15px; line-height: 1.6;">
+                            Този режим блокира ВСЕ календари за нови резервации, като запазва съществуващите. 
+                            Използвайте САМО ако подозирате активно хакване на акаунта.
+                        </p>
+                        
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Какво прави Lockdown:</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>✓ Създава блокове за всички календари за следващите 30 дни</li>
+                                <li>✓ Запазва съществуващите резервации</li>
+                                <li>✓ Предотвратява нови резервации от клиенти</li>
+                                <li>✓ Може да бъде обратим (премахване на блоковете)</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.9); color: #333; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="lockdown-confirm" style="margin-right: 10px; width: 20px; height: 20px;">
+                                <span style="font-weight: 600;">Разбирам последствията и искам да активирам LOCKDOWN режим</span>
+                            </label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn" style="background: #fff; color: #dc3545; font-weight: 700;" onclick="activateLockdown()">
+                                <i class="fas fa-lock"></i> АКТИВИРАЙ LOCKDOWN
+                            </button>
+                            <button class="btn" style="background: rgba(255,255,255,0.3); color: white;" onclick="deactivateLockdown()">
+                                <i class="fas fa-unlock"></i> Деактивирай Lockdown
+                            </button>
+                        </div>
+                        
+                        <div id="lockdown-status" style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 5px; display: none;"></div>
                     </div>
                 </div>
 
