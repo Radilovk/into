@@ -1270,7 +1270,7 @@ async function editCalendar(calendarId) {
     
     try {
         const response = await fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -1661,7 +1661,7 @@ async function rescheduleAppointment(appointmentId) {
     
     try {
         const response = await fetch(`${WORKER_URL}/acuity/appointments/${appointmentId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -2037,7 +2037,7 @@ async function updateService() {
     
     try {
         const response = await fetch(`${WORKER_URL}/acuity/appointment-types/${serviceId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updateData)
         });

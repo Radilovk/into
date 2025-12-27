@@ -77,7 +77,7 @@ export default {
           status: 204,
           headers: {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Authorization, Content-Type'
           }
         });
@@ -124,7 +124,7 @@ export default {
       }
 
       // PUT /acuity/appointment-types/:id - update appointment type
-      if (pathname.match(/^\/acuity\/appointment-types\/\d+$/) && request.method === 'PUT') {
+      if (pathname.match(/^\/acuity\/appointment-types\/\d+$/) && (request.method === 'PUT' || request.method === 'PATCH')) {
         const typeId = pathname.split('/').pop();
         let body;
         try {
@@ -134,7 +134,7 @@ export default {
         }
         const acuityUrl = `https://acuityscheduling.com/api/v1/appointment-types/${typeId}`;
         return callAcuityAPI(acuityUrl, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
@@ -163,8 +163,8 @@ export default {
         return callAcuityAPI(acuityUrl);
       }
 
-      // PUT /acuity/appointments/:id - update appointment
-      if (pathname.match(/^\/acuity\/appointments\/\d+$/) && request.method === 'PUT') {
+      // PUT/PATCH /acuity/appointments/:id - update appointment
+      if (pathname.match(/^\/acuity\/appointments\/\d+$/) && (request.method === 'PUT' || request.method === 'PATCH')) {
         const appointmentId = pathname.split('/').pop();
         let body;
         try {
@@ -174,7 +174,7 @@ export default {
         }
         const acuityUrl = `https://acuityscheduling.com/api/v1/appointments/${appointmentId}`;
         return callAcuityAPI(acuityUrl, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
@@ -198,8 +198,8 @@ export default {
         });
       }
 
-      // PUT /acuity/calendars/:id - update calendar
-      if (pathname.match(/^\/acuity\/calendars\/\d+$/) && request.method === 'PUT') {
+      // PUT/PATCH /acuity/calendars/:id - update calendar
+      if (pathname.match(/^\/acuity\/calendars\/\d+$/) && (request.method === 'PUT' || request.method === 'PATCH')) {
         const calendarId = pathname.split('/').pop();
         let body;
         try {
@@ -209,7 +209,7 @@ export default {
         }
         const acuityUrl = `https://acuityscheduling.com/api/v1/calendars/${calendarId}`;
         return callAcuityAPI(acuityUrl, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
@@ -248,8 +248,8 @@ export default {
         return callAcuityAPI(acuityUrl, { method: 'DELETE' });
       }
 
-      // PUT /acuity/clients/:id - update client
-      if (pathname.match(/^\/acuity\/clients\/\d+$/) && request.method === 'PUT') {
+      // PUT/PATCH /acuity/clients/:id - update client
+      if (pathname.match(/^\/acuity\/clients\/\d+$/) && (request.method === 'PUT' || request.method === 'PATCH')) {
         const clientId = pathname.split('/').pop();
         let body;
         try {
@@ -259,7 +259,7 @@ export default {
         }
         const acuityUrl = `https://acuityscheduling.com/api/v1/clients/${clientId}`;
         return callAcuityAPI(acuityUrl, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
