@@ -1,5 +1,3 @@
-import { Ai } from '@cloudflare/ai';
-
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
@@ -150,47 +148,9 @@ export default {
       });
     }
 
-    if (request.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
-    }
-
-    let data;
-    try {
-      data = await request.json();
-    } catch (err) {
-      return new Response('Invalid JSON', { status: 400 });
-    }
-
-    const model = data.model || env.MODEL;
-    const options = { ...data };
-    delete options.model;
-
-    if (!env.AI) {
-      return new Response(JSON.stringify({ error: 'Missing AI binding' }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    const ai = new Ai(env.AI);
-    let result;
-    try {
-      result = await ai.runModel(model, options);
-    } catch (err) {
-      return new Response(JSON.stringify({ error: 'Request failed' }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    }
-
-    return new Response(JSON.stringify(result), {
-      status: 200,
+    // AI functionality removed - use external AI service instead
+    return new Response(JSON.stringify({ error: 'AI endpoint not configured. Please use an external AI service.' }), {
+      status: 501,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
