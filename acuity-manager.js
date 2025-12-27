@@ -113,6 +113,8 @@ async function loadAppointments() {
 async function loadAppointmentsByFilter() {
     const calendarSelectElement = document.getElementById('appointments-calendar-select');
     const typeSelectElement = document.getElementById('appointments-type-select');
+    const dateFromElement = document.getElementById('appointments-date-from');
+    const dateToElement = document.getElementById('appointments-date-to');
     
     if (!calendarSelectElement || !typeSelectElement) {
         console.error('Calendar or type select elements not found');
@@ -122,6 +124,8 @@ async function loadAppointmentsByFilter() {
     
     const calendarID = calendarSelectElement.value;
     const appointmentTypeID = typeSelectElement.value;
+    const dateFrom = dateFromElement ? dateFromElement.value : '';
+    const dateTo = dateToElement ? dateToElement.value : '';
     
     if (!calendarID) {
         showError('appointments-list', 'Моля, изберете календар');
@@ -134,10 +138,28 @@ async function loadAppointmentsByFilter() {
         if (appointmentTypeID) {
             url += `&appointmentTypeID=${appointmentTypeID}`;
         }
+        if (dateFrom) {
+            url += `&minDate=${dateFrom}`;
+        }
+        if (dateTo) {
+            url += `&maxDate=${dateTo}`;
+        }
         
         const response = await fetch(url);
         if (response.ok) {
-            appointments = await response.json();
+            let allAppointments = await response.json();
+            
+            // Client-side filtering if date range is specified
+            if (dateFrom || dateTo) {
+                allAppointments = allAppointments.filter(apt => {
+                    const aptDate = new Date(apt.datetime).toISOString().split('T')[0];
+                    if (dateFrom && aptDate < dateFrom) return false;
+                    if (dateTo && aptDate > dateTo) return false;
+                    return true;
+                });
+            }
+            
+            appointments = allAppointments;
             displayAppointments();
             updateDashboard();
         } else {
@@ -1888,6 +1910,235 @@ function updateBulkCalendarSelect() {
         calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
 }
 
+// ==================== SERVICE MANAGEMENT ====================
+
+async function loadServices() {
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointment-types`);
+        if (response.ok) {
+            appointmentTypes = await response.json();
+            displayServices();
+        } else {
+            console.error('Failed to load services:', response.statusText);
+            showError('services-list', 'Не може да се заредят услугите');
+        }
+    } catch (error) {
+        console.error('Error loading services:', error);
+        showError('services-list', 'Грешка при зареждане на услугите');
+    }
+}
+
+function displayServices() {
+    const container = document.getElementById('services-list');
+    
+    if (!appointmentTypes || appointmentTypes.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-tools"></i>
+                <p>Няма намерени услуги</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Име</th>
+                    <th>Продължителност</th>
+                    <th>Цена</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${appointmentTypes.map(service => `
+                    <tr>
+                        <td>${service.id}</td>
+                        <td>${service.name || 'N/A'}</td>
+                        <td>${service.duration || 'N/A'} мин</td>
+                        <td>${service.price ? service.price + ' лв.' : 'N/A'}</td>
+                        <td>
+                            <span class="status-badge ${service.active !== false ? 'status-confirmed' : 'status-cancelled'}">
+                                ${service.active !== false ? 'Активна' : 'Неактивна'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editService(${service.id})" style="padding: 5px 10px; font-size: 0.85rem;">
+                                <i class="fas fa-edit"></i> Редактирай
+                            </button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    container.innerHTML = html;
+}
+
+async function searchServiceById() {
+    const serviceId = document.getElementById('service-id-search').value;
+    if (!serviceId) {
+        alert('Моля, въведете ID на услуга');
+        return;
+    }
+    
+    const service = appointmentTypes.find(s => s.id == serviceId);
+    if (service) {
+        editService(serviceId);
+    } else {
+        alert('Услуга с ID ' + serviceId + ' не е намерена');
+    }
+}
+
+function editService(serviceId) {
+    const service = appointmentTypes.find(s => s.id == serviceId);
+    if (!service) {
+        alert('Услуга не е намерена');
+        return;
+    }
+    
+    // Show form
+    document.getElementById('service-edit-form').style.display = 'block';
+    
+    // Fill form
+    document.getElementById('service-id-edit').value = service.id;
+    document.getElementById('service-name').value = service.name || '';
+    document.getElementById('service-description').value = service.description || '';
+    document.getElementById('service-duration').value = service.duration || 60;
+    document.getElementById('service-price').value = service.price || 0;
+    document.getElementById('service-color').value = service.color || '#667eea';
+    document.getElementById('service-active').checked = service.active !== false;
+    document.getElementById('service-private').checked = service.private === true;
+    
+    // Scroll to form
+    document.getElementById('service-edit-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function updateService() {
+    const serviceId = document.getElementById('service-id-edit').value;
+    if (!serviceId) {
+        alert('Няма избрана услуга');
+        return;
+    }
+    
+    const updateData = {
+        name: document.getElementById('service-name').value,
+        description: document.getElementById('service-description').value,
+        duration: parseInt(document.getElementById('service-duration').value),
+        price: parseFloat(document.getElementById('service-price').value),
+        color: document.getElementById('service-color').value,
+        active: document.getElementById('service-active').checked,
+        private: document.getElementById('service-private').checked
+    };
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointment-types/${serviceId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        });
+        
+        if (response.ok) {
+            alert('Услугата е актуализирана успешно!');
+            cancelServiceEdit();
+            loadServices();
+        } else {
+            const error = await response.text();
+            alert('Грешка при актуализация: ' + error);
+        }
+    } catch (error) {
+        console.error('Error updating service:', error);
+        alert('Грешка при актуализация на услугата');
+    }
+}
+
+function cancelServiceEdit() {
+    document.getElementById('service-edit-form').style.display = 'none';
+    document.getElementById('service-id-search').value = '';
+}
+
+// Default schedule management
+function saveDefaultSchedule() {
+    const startTime = document.getElementById('default-start-time').value;
+    const endTime = document.getElementById('default-end-time').value;
+    const interval = parseInt(document.getElementById('default-interval').value);
+    const breakTime = parseInt(document.getElementById('default-break').value);
+    
+    if (!startTime || !endTime) {
+        alert('Моля, въведете начален и краен час');
+        return;
+    }
+    
+    // Save to localStorage
+    const defaultSchedule = { startTime, endTime, interval, breakTime };
+    localStorage.setItem('defaultSchedule', JSON.stringify(defaultSchedule));
+    
+    // Show preview
+    showSchedulePreview(startTime, endTime, interval, breakTime);
+    
+    alert('Графикът по подразбиране е запазен!');
+}
+
+function showSchedulePreview(startTime, endTime, interval, breakTime) {
+    const previewContainer = document.getElementById('default-schedule-preview');
+    const slotsContainer = document.getElementById('schedule-preview-slots');
+    
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    
+    const startMinutes = startHour * 60 + startMin;
+    const endMinutes = endHour * 60 + endMin;
+    
+    const slots = [];
+    let currentMinutes = startMinutes;
+    
+    while (currentMinutes + interval <= endMinutes) {
+        const hour = Math.floor(currentMinutes / 60);
+        const min = currentMinutes % 60;
+        const timeStr = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+        slots.push(timeStr);
+        currentMinutes += interval + breakTime;
+    }
+    
+    slotsContainer.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px;">
+            ${slots.map(slot => `
+                <div style="padding: 8px; background: #667eea; color: white; border-radius: 5px; text-align: center; font-weight: 500;">
+                    ${slot}
+                </div>
+            `).join('')}
+        </div>
+        <p style="margin-top: 15px; color: #666;">
+            <strong>Общо ${slots.length} часа</strong> с интервал от ${interval} минути${breakTime > 0 ? ` и ${breakTime} мин. почивка` : ''}
+        </p>
+    `;
+    
+    previewContainer.style.display = 'block';
+}
+
+// Load default schedule on page load
+function loadDefaultSchedule() {
+    const saved = localStorage.getItem('defaultSchedule');
+    if (saved) {
+        const schedule = JSON.parse(saved);
+        if (document.getElementById('default-start-time')) {
+            document.getElementById('default-start-time').value = schedule.startTime;
+            document.getElementById('default-end-time').value = schedule.endTime;
+            document.getElementById('default-interval').value = schedule.interval;
+            document.getElementById('default-break').value = schedule.breakTime;
+        }
+    }
+}
+
+// Call on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadDefaultSchedule();
+});
+
 // Export functions for HTML onclick handlers
 window.loadAppointments = loadAppointments;
 window.loadAppointmentsByFilter = loadAppointmentsByFilter;
@@ -1922,3 +2173,9 @@ window.deleteClient = deleteClient;
 window.showQuickScheduleHelper = showQuickScheduleHelper;
 window.hideQuickScheduleHelper = hideQuickScheduleHelper;
 window.applyQuickSchedule = applyQuickSchedule;
+window.loadServices = loadServices;
+window.searchServiceById = searchServiceById;
+window.editService = editService;
+window.updateService = updateService;
+window.cancelServiceEdit = cancelServiceEdit;
+window.saveDefaultSchedule = saveDefaultSchedule;
