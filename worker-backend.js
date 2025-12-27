@@ -153,7 +153,8 @@ export default {
 
       // PUT /acuity/appointments/:id/cancel - cancel appointment
       if (pathname.match(/^\/acuity\/appointments\/\d+\/cancel$/) && request.method === 'PUT') {
-        const appointmentId = pathname.split('/')[3];
+        const pathParts = pathname.split('/');
+        const appointmentId = pathParts[pathParts.length - 2]; // Get ID before 'cancel'
         let body = {};
         try {
           body = await request.json();

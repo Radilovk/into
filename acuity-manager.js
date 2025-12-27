@@ -9,6 +9,9 @@ const DEFAULT_CONFIG = {
     appointmentTypeID: '80052001'
 };
 
+// UTF-8 BOM for Excel compatibility
+const UTF8_BOM = '\uFEFF';
+
 // AI System Prompt
 const AI_SYSTEM_PROMPT = `Вие сте AI асистент за управление на Acuity Scheduling резервации. Имате достъп до следните данни:
 
@@ -139,6 +142,9 @@ async function loadCalendars() {
         if (response.ok) {
             calendars = await response.json();
             updateCalendarSelect();
+            updateBlockCalendarSelect();
+            updateExportCalendarSelect();
+            updateBulkCalendarSelect();
         } else {
             console.error('Failed to load calendars');
         }
@@ -269,11 +275,62 @@ function filterClients() {
         return name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
     });
     
-    // Temporarily replace clients with filtered
-    const originalClients = clients;
-    clients = filtered;
-    displayClients();
-    clients = originalClients;
+    // Display filtered results without mutating global
+    displayFilteredClients(filtered);
+}
+
+function displayFilteredClients(filteredClients) {
+    const container = document.getElementById('clients-list');
+    
+    if (!filteredClients || filteredClients.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <p>Няма намерени клиенти, отговарящи на критериите</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const blockedClients = getBlockedClients();
+    
+    const html = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Име</th>
+                    <th>Имейл</th>
+                    <th>Телефон</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${filteredClients.map(client => {
+                    const isBlocked = blockedClients.includes(String(client.id));
+                    return `
+                        <tr style="${isBlocked ? 'background: #f8d7da;' : ''}">
+                            <td>${client.id}</td>
+                            <td>${client.firstName} ${client.lastName}</td>
+                            <td>${client.email || 'N/A'}</td>
+                            <td>${client.phone || 'N/A'}</td>
+                            <td>
+                                ${isBlocked ? '<span class="status-badge status-cancelled">Блокиран</span>' : '<span class="status-badge status-confirmed">Активен</span>'}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="viewClientDetails(${client.id})" style="padding: 5px 10px; font-size: 0.85rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    container.innerHTML = html;
 }
 
 // Client Management Functions
@@ -521,6 +578,11 @@ async function applyQuickSchedule() {
                 alert('Моля, задайте от и до час');
                 return;
             }
+            // Validate time format
+            if (!/^\d{2}:\d{2}$/.test(fromTime) || !/^\d{2}:\d{2}$/.test(toTime)) {
+                alert('Невалиден формат на час. Използвайте HH:MM');
+                return;
+            }
             break;
     }
     
@@ -539,10 +601,12 @@ async function applyQuickSchedule() {
         const currentDate = new Date(start);
         while (currentDate <= end) {
             const blockStart = new Date(currentDate);
-            blockStart.setHours(parseInt(fromTime.split(':')[0]), parseInt(fromTime.split(':')[1]), 0);
+            const fromParts = fromTime.split(':');
+            blockStart.setHours(parseInt(fromParts[0], 10), parseInt(fromParts[1], 10), 0);
             
             const blockEnd = new Date(currentDate);
-            blockEnd.setHours(parseInt(toTime.split(':')[0]), parseInt(toTime.split(':')[1]), 0);
+            const toParts = toTime.split(':');
+            blockEnd.setHours(parseInt(toParts[0], 10), parseInt(toParts[1], 10), 0);
             
             try {
                 const response = await fetch(`${WORKER_URL}/acuity/blocks`, {
@@ -907,10 +971,9 @@ async function loadCalendarsManagement() {
         if (response.ok) {
             calendars = await response.json();
             displayCalendarsManagement();
-            // Also update the calendar select in block form
             updateBlockCalendarSelect();
-            // Update export calendar select
             updateExportCalendarSelect();
+            updateBulkCalendarSelect();
         } else {
             showError('calendars-management-list', 'Не може да се заредят календарите');
         }
@@ -1110,7 +1173,7 @@ function exportClientsAsCSV() {
     });
     
     // Create and download file
-    const csvContent = '\uFEFF' + csvRows.join('\n'); // UTF-8 BOM for Excel
+    const csvContent = UTF8_BOM + csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -1163,7 +1226,7 @@ function exportAppointmentsAsCSV() {
         csvRows.push(row.join(','));
     });
     
-    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const csvContent = UTF8_BOM + csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -1212,7 +1275,7 @@ function exportAppointmentTypesAsCSV() {
         csvRows.push(row.join(','));
     });
     
-    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const csvContent = UTF8_BOM + csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -1599,13 +1662,6 @@ function updateBulkCalendarSelect() {
     select.innerHTML = '<option value="">Избери календар...</option>' + 
         calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
 }
-
-// Update loadCalendarsManagement to also update bulk select
-const originalLoadCalendarsManagement = loadCalendarsManagement;
-loadCalendarsManagement = async function() {
-    await originalLoadCalendarsManagement();
-    updateBulkCalendarSelect();
-};
 
 // Export functions for HTML onclick handlers
 window.loadAppointments = loadAppointments;
