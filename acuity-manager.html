@@ -680,11 +680,49 @@
                     <h2 class="section-title">
                         <i class="fas fa-users"></i> Клиенти
                     </h2>
+                    
                     <div class="card">
-                        <button class="btn btn-primary" onclick="loadClients()">
-                            <i class="fas fa-sync"></i> Презареди
-                        </button>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="loadClients()">
+                                <i class="fas fa-sync"></i> Презареди
+                            </button>
+                            <input type="text" id="client-search" class="form-control" placeholder="Търси по име, email или телефон..." style="flex: 1; min-width: 250px;" oninput="filterClients()">
+                        </div>
                         <div id="clients-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tools"></i> Управление на клиенти
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Търсене, редактиране и блокиране на клиенти</p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Намери клиент по ID</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="client-id-search" class="form-control" placeholder="Въведи ID на клиент">
+                                <button class="btn btn-primary" onclick="searchClientById()">
+                                    <i class="fas fa-search"></i> Търси
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="client-details"></div>
+                    </div>
+
+                    <div class="card" style="background: #fff3cd; border: 2px solid #ffc107;">
+                        <div class="card-header" style="color: #856404;">
+                            <i class="fas fa-ban"></i> Черен списък (Блокирани клиенти)
+                        </div>
+                        <p style="color: #856404; margin-bottom: 15px;">
+                            Управление на блокирани клиенти. Блокираните клиенти се съхраняват локално в браузъра.
+                        </p>
+                        
+                        <button class="btn btn-primary" onclick="showBlockedClients()" style="margin-bottom: 15px;">
+                            <i class="fas fa-list"></i> Покажи блокирани клиенти (<span id="blocked-count">0</span>)
+                        </button>
+                        
+                        <div id="blocked-clients-list"></div>
                     </div>
                 </div>
 
@@ -744,6 +782,94 @@
                                 <i class="fas fa-ban"></i> Създай блокиран период
                             </button>
                         </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-clock"></i> Работно време на календарите
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">
+                            Промяната на стандартното работно време се прави директно в Acuity. 
+                            Използвайте блокирането на часове за временни промени.
+                        </p>
+                        <div style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Как да промените работното време:</h4>
+                            <ol style="line-height: 1.8;">
+                                <li>Влезте в Acuity (или рестартирайте паролата)</li>
+                                <li>Отидете на Calendar → Business Hours</li>
+                                <li>Променете работните часове за всеки ден</li>
+                                <li>Запазете промените</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                            <h4 style="margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> Алтернативен метод чрез блокове:</h4>
+                            <p style="margin-bottom: 10px;">Ако нямате достъп до Acuity, можете да използвате блокове за да симулирате промяна на работното време:</p>
+                            <ol style="line-height: 1.8;">
+                                <li>За да затворите сутрините: Блокирайте 00:00-09:00 за всеки ден</li>
+                                <li>За да затворите вечерите: Блокирайте 18:00-23:59 за всеки ден</li>
+                                <li>За почивни дни: Блокирайте целия ден 00:00-23:59</li>
+                            </ol>
+                            <button class="btn btn-warning" onclick="showQuickScheduleHelper()" style="margin-top: 10px;">
+                                <i class="fas fa-magic"></i> Бърз помощник за график
+                            </button>
+                        </div>
+                        
+                        <div id="quick-schedule-helper" style="display: none; margin-top: 20px; padding: 20px; background: white; border: 2px solid #667eea; border-radius: 10px;">
+                            <h4 style="color: #667eea; margin-bottom: 15px;"><i class="fas fa-magic"></i> Бърз помощник за график</h4>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Избери календар</label>
+                                <select id="schedule-helper-calendar" class="form-control">
+                                    <option value="">Избери календар...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar-alt"></i> Период</label>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <input type="date" id="schedule-start-date" class="form-control" placeholder="От дата">
+                                    <input type="date" id="schedule-end-date" class="form-control" placeholder="До дата">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Затвори часове</label>
+                                <select id="schedule-preset" class="form-control">
+                                    <option value="morning">Сутрините (00:00-09:00)</option>
+                                    <option value="evening">Вечерите (18:00-23:59)</option>
+                                    <option value="fullday">Целия ден (00:00-23:59)</option>
+                                    <option value="custom">Персонализиран период</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-hours" style="display: none;">
+                                <div class="form-group">
+                                    <label><i class="fas fa-clock"></i> От час</label>
+                                    <input type="time" id="schedule-from-time" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-clock"></i> До час</label>
+                                    <input type="time" id="schedule-to-time" class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="schedule-recurring" style="margin-right: 10px;">
+                                    <span>Повтаряй за всеки ден в периода</span>
+                                </label>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-success" onclick="applyQuickSchedule()">
+                                    <i class="fas fa-check"></i> Приложи график
+                                </button>
+                                <button class="btn btn-secondary" onclick="hideQuickScheduleHelper()">
+                                    <i class="fas fa-times"></i> Отказ
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

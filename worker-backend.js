@@ -235,6 +235,13 @@ export default {
         });
       }
 
+      // DELETE /acuity/clients/:id - delete client
+      if (pathname.match(/^\/acuity\/clients\/\d+$/) && request.method === 'DELETE') {
+        const clientId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/clients/${clientId}`;
+        return callAcuityAPI(acuityUrl, { method: 'DELETE' });
+      }
+
       // GET /acuity/business-info - get business information
       if (pathname === '/acuity/business-info' && request.method === 'GET') {
         return callAcuityAPI('https://acuityscheduling.com/api/v1/business-info');

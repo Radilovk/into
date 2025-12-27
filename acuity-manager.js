@@ -208,28 +208,396 @@ function displayClients() {
         return;
     }
     
+    // Get blocked clients
+    const blockedClients = getBlockedClients();
+    updateBlockedCount();
+    
     const html = `
         <table class="data-table">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Име</th>
                     <th>Имейл</th>
                     <th>Телефон</th>
+                    <th>Статус</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
-                ${clients.map(client => `
-                    <tr>
-                        <td>${client.firstName} ${client.lastName}</td>
-                        <td>${client.email || 'N/A'}</td>
-                        <td>${client.phone || 'N/A'}</td>
-                    </tr>
-                `).join('')}
+                ${clients.map(client => {
+                    const isBlocked = blockedClients.includes(String(client.id));
+                    return `
+                        <tr style="${isBlocked ? 'background: #f8d7da;' : ''}">
+                            <td>${client.id}</td>
+                            <td>${client.firstName} ${client.lastName}</td>
+                            <td>${client.email || 'N/A'}</td>
+                            <td>${client.phone || 'N/A'}</td>
+                            <td>
+                                ${isBlocked ? '<span class="status-badge status-cancelled">Блокиран</span>' : '<span class="status-badge status-confirmed">Активен</span>'}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="viewClientDetails(${client.id})" style="padding: 5px 10px; font-size: 0.85rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
             </tbody>
         </table>
     `;
     
     container.innerHTML = html;
+}
+
+// Client search and filter
+let allClients = [];
+
+function filterClients() {
+    const searchTerm = document.getElementById('client-search').value.toLowerCase();
+    
+    if (!searchTerm) {
+        displayClients();
+        return;
+    }
+    
+    const filtered = clients.filter(client => {
+        const name = `${client.firstName} ${client.lastName}`.toLowerCase();
+        const email = (client.email || '').toLowerCase();
+        const phone = (client.phone || '').toLowerCase();
+        return name.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
+    });
+    
+    // Temporarily replace clients with filtered
+    const originalClients = clients;
+    clients = filtered;
+    displayClients();
+    clients = originalClients;
+}
+
+// Client Management Functions
+async function searchClientById() {
+    const clientId = document.getElementById('client-id-search').value;
+    
+    if (!clientId) {
+        alert('Моля, въведете ID на клиент');
+        return;
+    }
+    
+    const client = clients.find(c => c.id == clientId);
+    
+    if (client) {
+        displayClientDetails(client);
+    } else {
+        alert('Клиент с този ID не е намерен. Моля, презаредете списъка с клиенти.');
+    }
+}
+
+function viewClientDetails(clientId) {
+    const client = clients.find(c => c.id == clientId);
+    if (client) {
+        displayClientDetails(client);
+        // Scroll to details
+        document.getElementById('client-details').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function displayClientDetails(client) {
+    const container = document.getElementById('client-details');
+    const blockedClients = getBlockedClients();
+    const isBlocked = blockedClients.includes(String(client.id));
+    
+    const html = `
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; ${isBlocked ? 'border: 2px solid #dc3545;' : ''}">
+            <h4 style="color: #667eea; margin-bottom: 15px;">
+                <i class="fas fa-user"></i> Детайли за клиент #${client.id}
+                ${isBlocked ? '<span class="status-badge status-cancelled">БЛОКИРАН</span>' : ''}
+            </h4>
+            <div style="line-height: 2;">
+                <p><strong>Име:</strong> ${client.firstName} ${client.lastName}</p>
+                <p><strong>Email:</strong> ${client.email || 'N/A'}</p>
+                <p><strong>Телефон:</strong> ${client.phone || 'N/A'}</p>
+                <p><strong>Създаден:</strong> ${client.created ? new Date(client.created).toLocaleString('bg-BG') : 'N/A'}</p>
+            </div>
+            <div class="action-buttons" style="margin-top: 20px;">
+                ${!isBlocked ? `
+                    <button class="btn btn-warning" onclick="blockClient(${client.id})">
+                        <i class="fas fa-ban"></i> Блокирай клиент
+                    </button>
+                ` : `
+                    <button class="btn btn-success" onclick="unblockClient(${client.id})">
+                        <i class="fas fa-check"></i> Отблокирай клиент
+                    </button>
+                `}
+                <button class="btn btn-danger" onclick="deleteClient(${client.id})">
+                    <i class="fas fa-trash"></i> Изтрий клиент
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Blocked Clients Management (using localStorage)
+function getBlockedClients() {
+    const blocked = localStorage.getItem('blockedClients');
+    return blocked ? JSON.parse(blocked) : [];
+}
+
+function saveBlockedClients(blockedList) {
+    localStorage.setItem('blockedClients', JSON.stringify(blockedList));
+    updateBlockedCount();
+}
+
+function updateBlockedCount() {
+    const count = getBlockedClients().length;
+    const countElement = document.getElementById('blocked-count');
+    if (countElement) {
+        countElement.textContent = count;
+    }
+}
+
+function blockClient(clientId) {
+    const client = clients.find(c => c.id == clientId);
+    
+    if (!confirm(`Сигурни ли сте, че искате да блокирате ${client.firstName} ${client.lastName}?\n\nБлокираните клиенти няма да могат да правят нови резервации (трябва ръчно да откажете техните заявки).`)) {
+        return;
+    }
+    
+    const blockedClients = getBlockedClients();
+    if (!blockedClients.includes(String(clientId))) {
+        blockedClients.push(String(clientId));
+        saveBlockedClients(blockedClients);
+        alert(`Клиент ${client.firstName} ${client.lastName} е блокиран успешно!`);
+        displayClientDetails(client);
+        displayClients();
+    } else {
+        alert('Този клиент вече е блокиран');
+    }
+}
+
+function unblockClient(clientId) {
+    const client = clients.find(c => c.id == clientId);
+    
+    if (!confirm(`Искате ли да отблокирате ${client.firstName} ${client.lastName}?`)) {
+        return;
+    }
+    
+    let blockedClients = getBlockedClients();
+    blockedClients = blockedClients.filter(id => id !== String(clientId));
+    saveBlockedClients(blockedClients);
+    alert(`Клиент ${client.firstName} ${client.lastName} е отблокиран успешно!`);
+    displayClientDetails(client);
+    displayClients();
+}
+
+function showBlockedClients() {
+    const blockedClients = getBlockedClients();
+    const container = document.getElementById('blocked-clients-list');
+    
+    if (blockedClients.length === 0) {
+        container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Няма блокирани клиенти</p>';
+        return;
+    }
+    
+    const blockedDetails = blockedClients.map(clientId => {
+        const client = clients.find(c => String(c.id) === clientId);
+        return client || { id: clientId, firstName: 'Неизвестен', lastName: '', email: 'N/A' };
+    });
+    
+    const html = `
+        <div style="margin-top: 15px; background: white; padding: 15px; border-radius: 8px;">
+            <h4 style="margin-bottom: 15px; color: #856404;">Блокирани клиенти (${blockedClients.length})</h4>
+            ${blockedDetails.map(client => `
+                <div style="padding: 10px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${client.firstName} ${client.lastName}</strong>
+                        <br><small style="color: #666;">${client.email}</small>
+                    </div>
+                    <button class="btn btn-success btn-sm" onclick="unblockClient(${client.id})">
+                        <i class="fas fa-unlock"></i> Отблокирай
+                    </button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+async function deleteClient(clientId) {
+    const client = clients.find(c => c.id == clientId);
+    
+    if (!confirm(`ВНИМАНИЕ! Това действие е необратимо!\n\nИскате ли да изтриете клиент ${client.firstName} ${client.lastName}?\n\nВсички негови резервации ще останат, но клиентът ще бъде премахнат от системата.`)) {
+        return;
+    }
+    
+    const finalConfirm = prompt(`Напишете "ИЗТРИЙ" за финално потвърждение:`);
+    
+    if (finalConfirm !== 'ИЗТРИЙ') {
+        alert('Операцията е отказана');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/clients/${clientId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Клиентът е изтрит успешно!');
+            document.getElementById('client-details').innerHTML = '';
+            await loadClients();
+        } else {
+            const error = await response.text();
+            alert('Грешка при изтриване на клиента: ' + error);
+        }
+    } catch (error) {
+        console.error('Error deleting client:', error);
+        alert('Грешка при изтриване на клиента');
+    }
+}
+
+// Quick Schedule Helper Functions
+function showQuickScheduleHelper() {
+    const helper = document.getElementById('quick-schedule-helper');
+    helper.style.display = 'block';
+    
+    // Update calendar select
+    const select = document.getElementById('schedule-helper-calendar');
+    select.innerHTML = '<option value="">Избери календар...</option>' + 
+        calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+    
+    // Set default dates (today to 7 days from now)
+    const today = new Date();
+    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    document.getElementById('schedule-start-date').value = today.toISOString().split('T')[0];
+    document.getElementById('schedule-end-date').value = nextWeek.toISOString().split('T')[0];
+    
+    // Handle preset change
+    document.getElementById('schedule-preset').addEventListener('change', function() {
+        const customHours = document.getElementById('custom-hours');
+        customHours.style.display = this.value === 'custom' ? 'block' : 'none';
+    });
+}
+
+function hideQuickScheduleHelper() {
+    document.getElementById('quick-schedule-helper').style.display = 'none';
+}
+
+async function applyQuickSchedule() {
+    const calendarId = document.getElementById('schedule-helper-calendar').value;
+    const startDate = document.getElementById('schedule-start-date').value;
+    const endDate = document.getElementById('schedule-end-date').value;
+    const preset = document.getElementById('schedule-preset').value;
+    const recurring = document.getElementById('schedule-recurring').checked;
+    
+    if (!calendarId || !startDate || !endDate) {
+        alert('Моля, попълнете всички полета');
+        return;
+    }
+    
+    let fromTime, toTime;
+    
+    switch (preset) {
+        case 'morning':
+            fromTime = '00:00';
+            toTime = '09:00';
+            break;
+        case 'evening':
+            fromTime = '18:00';
+            toTime = '23:59';
+            break;
+        case 'fullday':
+            fromTime = '00:00';
+            toTime = '23:59';
+            break;
+        case 'custom':
+            fromTime = document.getElementById('schedule-from-time').value;
+            toTime = document.getElementById('schedule-to-time').value;
+            if (!fromTime || !toTime) {
+                alert('Моля, задайте от и до час');
+                return;
+            }
+            break;
+    }
+    
+    if (!confirm(`Ще бъдат създадени блокове за календар ${calendarId} от ${startDate} до ${endDate}, ${fromTime}-${toTime}. Продължаваме?`)) {
+        return;
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    let success = 0;
+    let failed = 0;
+    
+    if (recurring) {
+        // Create blocks for each day
+        const currentDate = new Date(start);
+        while (currentDate <= end) {
+            const blockStart = new Date(currentDate);
+            blockStart.setHours(parseInt(fromTime.split(':')[0]), parseInt(fromTime.split(':')[1]), 0);
+            
+            const blockEnd = new Date(currentDate);
+            blockEnd.setHours(parseInt(toTime.split(':')[0]), parseInt(toTime.split(':')[1]), 0);
+            
+            try {
+                const response = await fetch(`${WORKER_URL}/acuity/blocks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        calendarID: calendarId,
+                        start: blockStart.toISOString(),
+                        end: blockEnd.toISOString(),
+                        notes: 'Quick schedule helper block'
+                    })
+                });
+                
+                if (response.ok) {
+                    success++;
+                } else {
+                    failed++;
+                }
+            } catch (error) {
+                failed++;
+            }
+            
+            currentDate.setDate(currentDate.getDate() + 1);
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+    } else {
+        // Create single block for entire period
+        const blockStart = new Date(`${startDate}T${fromTime}:00`);
+        const blockEnd = new Date(`${endDate}T${toTime}:00`);
+        
+        try {
+            const response = await fetch(`${WORKER_URL}/acuity/blocks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    calendarID: calendarId,
+                    start: blockStart.toISOString(),
+                    end: blockEnd.toISOString(),
+                    notes: 'Quick schedule helper block'
+                })
+            });
+            
+            if (response.ok) {
+                success = 1;
+            } else {
+                failed = 1;
+            }
+        } catch (error) {
+            failed = 1;
+        }
+    }
+    
+    alert(`График приложен!\nУспешни: ${success}\nНеуспешни: ${failed}`);
+    hideQuickScheduleHelper();
+    await loadBlocks();
 }
 
 function updateDashboard() {
@@ -1260,3 +1628,13 @@ window.previewBulkCancel = previewBulkCancel;
 window.executeBulkCancel = executeBulkCancel;
 window.activateLockdown = activateLockdown;
 window.deactivateLockdown = deactivateLockdown;
+window.filterClients = filterClients;
+window.searchClientById = searchClientById;
+window.viewClientDetails = viewClientDetails;
+window.blockClient = blockClient;
+window.unblockClient = unblockClient;
+window.showBlockedClients = showBlockedClients;
+window.deleteClient = deleteClient;
+window.showQuickScheduleHelper = showQuickScheduleHelper;
+window.hideQuickScheduleHelper = hideQuickScheduleHelper;
+window.applyQuickSchedule = applyQuickSchedule;
