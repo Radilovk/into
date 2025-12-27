@@ -1282,7 +1282,20 @@ async function editCalendar(calendarId) {
             await loadCalendarsManagement();
         } else {
             const error = await response.json().catch(() => ({}));
-            alert('Грешка при актуализиране на календара: ' + (error.message || response.statusText));
+            
+            // Check for plan limitation error
+            if (response.status === 403 && error.status_code === 403) {
+                alert('❌ Грешка при актуализация на календар\n\n' +
+                      'Вашият Acuity план не поддържа редактиране на календари чрез API.\n\n' +
+                      '📋 За да промените настройките на календара:\n' +
+                      '1. Влезте директно в Acuity Scheduling\n' +
+                      '2. Отидете в Calendar → My Calendar\n' +
+                      '3. Редактирайте календара оттам\n\n' +
+                      'Или надградете вашия Acuity план за пълен API достъп.\n\n' +
+                      'Техническа информация: ' + (error.message || error.error || response.statusText));
+            } else {
+                alert('Грешка при актуализиране на календара: ' + (error.message || response.statusText));
+            }
         }
     } catch (error) {
         console.error('Error updating calendar:', error);
@@ -2048,7 +2061,20 @@ async function updateService() {
             loadServices();
         } else {
             const error = await response.json().catch(() => ({}));
-            alert('Грешка при актуализация: ' + (error.message || response.statusText));
+            
+            // Check for plan limitation error
+            if (response.status === 403 && error.status_code === 403) {
+                alert('❌ Грешка при актуализация\n\n' +
+                      'Вашият Acuity план не поддържа редактиране на услуги чрез API.\n\n' +
+                      '📋 За да промените настройките на услугата:\n' +
+                      '1. Влезте директно в Acuity Scheduling\n' +
+                      '2. Отидете в Calendar → Appointment Types\n' +
+                      '3. Редактирайте услугата оттам\n\n' +
+                      'Или надградете вашия Acuity план за пълен API достъп.\n\n' +
+                      'Техническа информация: ' + (error.message || error.error || response.statusText));
+            } else {
+                alert('Грешка при актуализация: ' + (error.message || response.statusText));
+            }
         }
     } catch (error) {
         console.error('Error updating service:', error);
