@@ -245,6 +245,7 @@ async function loadCalendars() {
             updateBulkCalendarSelect();
             updateAppointmentsFilterSelects();
             updateAvailabilitySelects();
+            updateCalendarTimeRangeSelect();
         } else {
             console.error('Failed to load calendars');
         }
@@ -2972,6 +2973,214 @@ function saveDefaultSchedule() {
     alert('Графикът по подразбиране е запазен!');
 }
 
+// Calendar time ranges management
+let timeRangeInputCount = 0;
+
+function loadCalendarTimeRanges() {
+    const calendarId = document.getElementById('calendar-timerange-select').value;
+    
+    if (!calendarId) {
+        alert('Моля, изберете календар');
+        return;
+    }
+    
+    // Fetch calendar data from API
+    fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`)
+        .then(response => response.json())
+        .then(calendar => {
+            displayCalendarTimeRanges(calendar);
+        })
+        .catch(error => {
+            console.error('Error loading calendar:', error);
+            alert('Грешка при зареждане на календара');
+        });
+}
+
+function displayCalendarTimeRanges(calendar) {
+    const container = document.getElementById('calendar-timeranges-display');
+    
+    // Display current time ranges if available
+    if (calendar.timeRanges && calendar.timeRanges.length > 0) {
+        const html = `
+            <div style="background: #d4edda; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #155724; margin-bottom: 10px;">
+                    <i class="fas fa-clock"></i> Текущо работно време:
+                </h5>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    ${calendar.timeRanges.map(range => `
+                        <li style="padding: 5px 0;">
+                            <i class="fas fa-arrow-right" style="color: #28a745;"></i> 
+                            ${range.start} - ${range.end}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+        container.innerHTML = html;
+    } else {
+        container.innerHTML = `
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                <p style="color: #856404; margin: 0;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Няма зададени времеви диапазони за този календар
+                </p>
+            </div>
+        `;
+    }
+    
+    // Initialize inputs with current time ranges
+    if (calendar.timeRanges && calendar.timeRanges.length > 0) {
+        resetTimeRangeInputs();
+        calendar.timeRanges.forEach(range => {
+            addTimeRangeInput(range.start, range.end);
+        });
+    }
+}
+
+function addTimeRangeInput(startValue = '', endValue = '') {
+    const container = document.getElementById('timerange-inputs');
+    timeRangeInputCount++;
+    
+    const div = document.createElement('div');
+    div.id = `timerange-${timeRangeInputCount}`;
+    div.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;';
+    
+    div.innerHTML = `
+        <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.85rem;">От:</label>
+            <input type="time" class="form-control timerange-start" value="${startValue}" placeholder="08:00">
+        </div>
+        <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.85rem;">До:</label>
+            <input type="time" class="form-control timerange-end" value="${endValue}" placeholder="17:00">
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="removeTimeRangeInput(${timeRangeInputCount})" style="height: 38px;">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    
+    container.appendChild(div);
+}
+
+function removeTimeRangeInput(id) {
+    const element = document.getElementById(`timerange-${id}`);
+    if (element) {
+        element.remove();
+    }
+}
+
+function resetTimeRangeInputs() {
+    const container = document.getElementById('timerange-inputs');
+    container.innerHTML = '';
+    timeRangeInputCount = 0;
+    
+    // Add one default time range input
+    addTimeRangeInput();
+}
+
+async function updateCalendarTimeRanges() {
+    const calendarId = document.getElementById('calendar-timerange-select').value;
+    
+    if (!calendarId) {
+        alert('Моля, изберете календар');
+        return;
+    }
+    
+    // Collect time ranges from inputs
+    const timeRanges = [];
+    const startInputs = document.querySelectorAll('.timerange-start');
+    const endInputs = document.querySelectorAll('.timerange-end');
+    
+    for (let i = 0; i < startInputs.length; i++) {
+        const start = startInputs[i].value;
+        const end = endInputs[i].value;
+        
+        if (start && end) {
+            timeRanges.push({ start, end });
+        }
+    }
+    
+    if (timeRanges.length === 0) {
+        alert('Моля, въведете поне един времеви диапазон');
+        return;
+    }
+    
+    // Validate time ranges
+    for (const range of timeRanges) {
+        if (range.start >= range.end) {
+            alert(`Невалиден времеви диапазон: ${range.start} - ${range.end}. Началото трябва да е преди края.`);
+            return;
+        }
+    }
+    
+    if (!confirm(`Искате ли да обновите работното време на календара с ${timeRanges.length} времеви диапазона?`)) {
+        return;
+    }
+    
+    const statusContainer = document.getElementById('calendar-timerange-status');
+    statusContainer.style.display = 'block';
+    statusContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Обновяване на работно време...</p>';
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ timeRanges })
+        });
+        
+        if (response.ok) {
+            statusContainer.innerHTML = `
+                <div style="background: #d4edda; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #155724; margin: 0;">
+                        <i class="fas fa-check-circle"></i> Работното време е обновено успешно!
+                    </h5>
+                </div>
+            `;
+            
+            // Reload to show updated time ranges
+            setTimeout(() => {
+                loadCalendarTimeRanges();
+            }, 1000);
+        } else {
+            const error = await response.json().catch(() => ({}));
+            statusContainer.innerHTML = `
+                <div style="background: #f8d7da; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #721c24; margin: 0;">
+                        <i class="fas fa-exclamation-circle"></i> Грешка при обновяване
+                    </h5>
+                    <p style="margin: 10px 0 0 0; color: #721c24;">
+                        ${error.message || response.statusText}
+                    </p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error updating calendar time ranges:', error);
+        statusContainer.innerHTML = `
+            <div style="background: #f8d7da; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #721c24; margin: 0;">
+                    <i class="fas fa-exclamation-circle"></i> Грешка при обновяване
+                </h5>
+                <p style="margin: 10px 0 0 0; color: #721c24;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// Populate calendar select for time ranges
+function updateCalendarTimeRangeSelect() {
+    const select = document.getElementById('calendar-timerange-select');
+    if (!select) return;
+    
+    if (calendars.length === 0) {
+        select.innerHTML = '<option value="">Няма налични календари</option>';
+        return;
+    }
+    
+    select.innerHTML = '<option value="">Избери календар...</option>' + 
+        calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+}
+
 function showSchedulePreview(startTime, endTime, interval, breakTime) {
     const previewContainer = document.getElementById('default-schedule-preview');
     const slotsContainer = document.getElementById('schedule-preview-slots');
@@ -3026,6 +3235,7 @@ function loadDefaultSchedule() {
 // Call on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadDefaultSchedule();
+    resetTimeRangeInputs(); // Initialize with one empty time range input
 });
 
 // Export functions for HTML onclick handlers
@@ -3087,3 +3297,8 @@ window.deleteAppointment = deleteAppointment;
 window.filterAppointmentsByClient = filterAppointmentsByClient;
 window.checkAvailability = checkAvailability;
 window.checkAvailableTimes = checkAvailableTimes;
+window.loadCalendarTimeRanges = loadCalendarTimeRanges;
+window.addTimeRangeInput = addTimeRangeInput;
+window.removeTimeRangeInput = removeTimeRangeInput;
+window.resetTimeRangeInputs = resetTimeRangeInputs;
+window.updateCalendarTimeRanges = updateCalendarTimeRanges;
