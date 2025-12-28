@@ -245,6 +245,7 @@ async function loadCalendars() {
             updateBulkCalendarSelect();
             updateAppointmentsFilterSelects();
             updateAvailabilitySelects();
+            updateCalendarTimeRangeSelect();
         } else {
             console.error('Failed to load calendars');
         }
@@ -927,6 +928,132 @@ async function checkAvailability() {
     }
 }
 
+// New function to check available time slots for a specific date
+async function checkAvailableTimes() {
+    const appointmentTypeID = document.getElementById('availability-times-type').value;
+    const calendarID = document.getElementById('availability-times-calendar').value;
+    const date = document.getElementById('availability-times-date').value;
+    const filter45min = document.getElementById('availability-times-filter-45').checked;
+    
+    if (!appointmentTypeID || !date) {
+        alert('Моля, изберете услуга и дата');
+        return;
+    }
+    
+    try {
+        let url = `${WORKER_URL}/acuity/availability/times?appointmentTypeID=${appointmentTypeID}&date=${date}`;
+        if (calendarID) {
+            url += `&calendarID=${calendarID}`;
+        }
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            let slots = await response.json();
+            
+            // Filter slots to 45-minute intervals if checkbox is enabled
+            if (filter45min && Array.isArray(slots)) {
+                slots = filterSlotsTo45MinIntervals(slots);
+            }
+            
+            displayAvailableTimes(slots);
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при проверка на свободни часове: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error checking available times:', error);
+        alert('Грешка при проверка на свободни часове');
+    }
+}
+
+// Helper function to filter slots to 45-minute intervals (:00 and :45)
+function filterSlotsTo45MinIntervals(slots) {
+    return slots.filter(slot => {
+        // Handle both object format {time: "..."} and string format
+        const timeStr = typeof slot === 'object' ? slot.time : slot;
+        
+        if (!timeStr) return false;
+        
+        // Parse the time string to get minutes
+        const date = new Date(timeStr);
+        
+        // Validate date parsing
+        if (isNaN(date.getTime())) return false;
+        
+        const minutes = date.getMinutes();
+        
+        // Keep only slots at :00 or :45 minutes
+        return minutes === 0 || minutes === 45;
+    });
+}
+
+// Helper function to format time slot display
+function formatTimeSlot(timeStr) {
+    const date = new Date(timeStr);
+    if (isNaN(date.getTime())) {
+        return 'Invalid time';
+    }
+    return date.toLocaleTimeString('bg-BG', {hour: '2-digit', minute: '2-digit'});
+}
+
+// Display available time slots
+function displayAvailableTimes(slots) {
+    const container = document.getElementById('availability-times-results');
+    
+    if (!slots || slots.length === 0) {
+        container.innerHTML = `
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="color: #856404; margin: 0;">Няма свободни часове за избраната дата</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = `
+        <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            <h4 style="color: #155724; margin: 0 0 10px 0;">
+                <i class="fas fa-clock"></i> Налични часове: ${slots.length}
+            </h4>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto;">
+            ${slots.map(slot => {
+                const timeStr = typeof slot === 'object' ? slot.time : slot;
+                const displayTime = formatTimeSlot(timeStr);
+                return `
+                    <div style="background: #667eea; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 500; cursor: pointer;" 
+                         onclick="selectTimeSlot('${timeStr}')">
+                        ${displayTime}
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Select a time slot (can be used to pre-fill booking form)
+function selectTimeSlot(timeStr) {
+    // Validate the time string
+    const date = new Date(timeStr);
+    if (isNaN(date.getTime())) {
+        alert('Невалиден час за резервация');
+        return;
+    }
+    
+    if (confirm(`Искате ли да създадете резервация за ${date.toLocaleString('bg-BG')}?`)) {
+        // Pre-fill the booking form
+        const datetime = date.toISOString().slice(0, 16);
+        document.getElementById('datetime').value = datetime;
+        
+        // Switch to booking tab
+        switchTab('booking');
+        
+        // Scroll to form
+        document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
 function displayAvailability(data) {
     const container = document.getElementById('availability-results');
     
@@ -982,6 +1109,28 @@ function updateAvailabilitySelects() {
         }
     }
     
+    // Update availability times type select
+    const timesTypeSelect = document.getElementById('availability-times-type');
+    if (timesTypeSelect) {
+        if (appointmentTypes.length === 0) {
+            timesTypeSelect.innerHTML = '<option value="">Няма налични услуги</option>';
+        } else {
+            timesTypeSelect.innerHTML = '<option value="">Избери услуга...</option>' + 
+                appointmentTypes.map(type => `<option value="${type.id}">${type.name || type.type}</option>`).join('');
+        }
+    }
+    
+    // Update availability times calendar select
+    const timesCalendarSelect = document.getElementById('availability-times-calendar');
+    if (timesCalendarSelect) {
+        if (calendars.length === 0) {
+            timesCalendarSelect.innerHTML = '<option value="">Няма налични календари</option>';
+        } else {
+            timesCalendarSelect.innerHTML = '<option value="">Всички календари</option>' + 
+                calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+        }
+    }
+    
     // Set default month to current month
     const monthInput = document.getElementById('availability-month');
     if (monthInput && !monthInput.value) {
@@ -989,6 +1138,13 @@ function updateAvailabilitySelects() {
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         monthInput.value = `${year}-${month}`;
+    }
+    
+    // Set default date to today
+    const dateInput = document.getElementById('availability-times-date');
+    if (dateInput && !dateInput.value) {
+        const now = new Date();
+        dateInput.value = now.toISOString().split('T')[0];
     }
 }
 
@@ -2837,6 +2993,251 @@ function saveDefaultSchedule() {
     alert('Графикът по подразбиране е запазен!');
 }
 
+// Calendar time ranges management
+let timeRangeInputCount = 0;
+
+function loadCalendarTimeRanges() {
+    const calendarId = document.getElementById('calendar-timerange-select').value;
+    
+    if (!calendarId) {
+        alert('Моля, изберете календар');
+        return;
+    }
+    
+    // Fetch calendar data from API
+    fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(calendar => {
+            displayCalendarTimeRanges(calendar);
+        })
+        .catch(error => {
+            console.error('Error loading calendar:', error);
+            alert('Грешка при зареждане на календара: ' + error.message);
+        });
+}
+
+function displayCalendarTimeRanges(calendar) {
+    const container = document.getElementById('calendar-timeranges-display');
+    
+    // Display current time ranges if available
+    if (calendar.timeRanges && calendar.timeRanges.length > 0) {
+        const html = `
+            <div style="background: #d4edda; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #155724; margin-bottom: 10px;">
+                    <i class="fas fa-clock"></i> Текущо работно време:
+                </h5>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    ${calendar.timeRanges.map(range => `
+                        <li style="padding: 5px 0;">
+                            <i class="fas fa-arrow-right" style="color: #28a745;"></i> 
+                            ${range.start} - ${range.end}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+        container.innerHTML = html;
+    } else {
+        container.innerHTML = `
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
+                <p style="color: #856404; margin: 0;">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Няма зададени времеви диапазони за този календар
+                </p>
+            </div>
+        `;
+    }
+    
+    // Initialize inputs with current time ranges
+    if (calendar.timeRanges && calendar.timeRanges.length > 0) {
+        resetTimeRangeInputs();
+        calendar.timeRanges.forEach(range => {
+            addTimeRangeInput(range.start, range.end);
+        });
+    }
+}
+
+function addTimeRangeInput(startValue = '', endValue = '') {
+    const container = document.getElementById('timerange-inputs');
+    timeRangeInputCount++;
+    
+    const div = document.createElement('div');
+    div.id = `timerange-${timeRangeInputCount}`;
+    div.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;';
+    
+    div.innerHTML = `
+        <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.85rem;">От:</label>
+            <input type="time" class="form-control timerange-start" value="${startValue}" placeholder="08:00">
+        </div>
+        <div class="form-group" style="margin: 0;">
+            <label style="font-size: 0.85rem;">До:</label>
+            <input type="time" class="form-control timerange-end" value="${endValue}" placeholder="17:00">
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="removeTimeRangeInput(${timeRangeInputCount})" style="height: 38px;">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    
+    container.appendChild(div);
+}
+
+function removeTimeRangeInput(id) {
+    const element = document.getElementById(`timerange-${id}`);
+    if (element) {
+        element.remove();
+    }
+}
+
+function resetTimeRangeInputs() {
+    const container = document.getElementById('timerange-inputs');
+    container.innerHTML = '';
+    timeRangeInputCount = 0;
+    
+    // Add one default time range input
+    addTimeRangeInput();
+}
+
+async function updateCalendarTimeRanges() {
+    const calendarId = document.getElementById('calendar-timerange-select').value;
+    
+    if (!calendarId) {
+        alert('Моля, изберете календар');
+        return;
+    }
+    
+    // Collect time ranges from inputs
+    const timeRanges = [];
+    const startInputs = document.querySelectorAll('.timerange-start');
+    const endInputs = document.querySelectorAll('.timerange-end');
+    
+    // Validate array lengths match
+    if (startInputs.length !== endInputs.length) {
+        alert('Грешка: Несъответствие в броя на полетата. Моля, презаредете страницата.');
+        return;
+    }
+    
+    for (let i = 0; i < startInputs.length; i++) {
+        const start = startInputs[i].value;
+        const end = endInputs[i].value;
+        
+        if (start && end) {
+            timeRanges.push({ start, end });
+        }
+    }
+    
+    if (timeRanges.length === 0) {
+        alert('Моля, въведете поне един времеви диапазон');
+        return;
+    }
+    
+    // Validate time ranges - convert to minutes for proper comparison
+    for (const range of timeRanges) {
+        const startMinutes = convertTimeToMinutes(range.start);
+        const endMinutes = convertTimeToMinutes(range.end);
+        
+        if (startMinutes >= endMinutes) {
+            alert(`Невалиден времеви диапазон: ${range.start} - ${range.end}. Началото трябва да е преди края.`);
+            return;
+        }
+    }
+    
+    if (!confirm(`Искате ли да обновите работното време на календара с ${timeRanges.length} времеви диапазона?`)) {
+        return;
+    }
+    
+    const statusContainer = document.getElementById('calendar-timerange-status');
+    statusContainer.style.display = 'block';
+    statusContainer.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Обновяване на работно време...</p>';
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ timeRanges })
+        });
+        
+        if (response.ok) {
+            statusContainer.innerHTML = `
+                <div style="background: #d4edda; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #155724; margin: 0;">
+                        <i class="fas fa-check-circle"></i> Работното време е обновено успешно!
+                    </h5>
+                </div>
+            `;
+            
+            // Reload to show updated time ranges
+            setTimeout(() => {
+                loadCalendarTimeRanges();
+            }, 1000);
+        } else {
+            const error = await response.json().catch(() => ({}));
+            statusContainer.innerHTML = `
+                <div style="background: #f8d7da; padding: 15px; border-radius: 8px;">
+                    <h5 style="color: #721c24; margin: 0;">
+                        <i class="fas fa-exclamation-circle"></i> Грешка при обновяване
+                    </h5>
+                    <p style="margin: 10px 0 0 0; color: #721c24;">
+                        ${error.message || response.statusText}
+                    </p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error updating calendar time ranges:', error);
+        statusContainer.innerHTML = `
+            <div style="background: #f8d7da; padding: 15px; border-radius: 8px;">
+                <h5 style="color: #721c24; margin: 0;">
+                    <i class="fas fa-exclamation-circle"></i> Грешка при обновяване
+                </h5>
+                <p style="margin: 10px 0 0 0; color: #721c24;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// Helper function to convert time string (HH:MM) to minutes
+function convertTimeToMinutes(timeStr) {
+    if (!timeStr || typeof timeStr !== 'string') {
+        return 0;
+    }
+    
+    const parts = timeStr.split(':');
+    if (parts.length !== 2) {
+        console.warn(`Invalid time format: ${timeStr}`);
+        return 0;
+    }
+    
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    
+    if (isNaN(hours) || isNaN(minutes)) {
+        console.warn(`Invalid time values in: ${timeStr}`);
+        return 0;
+    }
+    
+    return hours * 60 + minutes;
+}
+
+// Populate calendar select for time ranges
+function updateCalendarTimeRangeSelect() {
+    const select = document.getElementById('calendar-timerange-select');
+    if (!select) return;
+    
+    if (calendars.length === 0) {
+        select.innerHTML = '<option value="">Няма налични календари</option>';
+        return;
+    }
+    
+    select.innerHTML = '<option value="">Избери календар...</option>' + 
+        calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+}
+
 function showSchedulePreview(startTime, endTime, interval, breakTime) {
     const previewContainer = document.getElementById('default-schedule-preview');
     const slotsContainer = document.getElementById('schedule-preview-slots');
@@ -2891,6 +3292,7 @@ function loadDefaultSchedule() {
 // Call on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadDefaultSchedule();
+    resetTimeRangeInputs(); // Initialize with one empty time range input
 });
 
 // Export functions for HTML onclick handlers
@@ -2951,3 +3353,9 @@ window.updateClient = updateClient;
 window.deleteAppointment = deleteAppointment;
 window.filterAppointmentsByClient = filterAppointmentsByClient;
 window.checkAvailability = checkAvailability;
+window.checkAvailableTimes = checkAvailableTimes;
+window.loadCalendarTimeRanges = loadCalendarTimeRanges;
+window.addTimeRangeInput = addTimeRangeInput;
+window.removeTimeRangeInput = removeTimeRangeInput;
+window.resetTimeRangeInputs = resetTimeRangeInputs;
+window.updateCalendarTimeRanges = updateCalendarTimeRanges;
