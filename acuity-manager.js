@@ -927,6 +927,112 @@ async function checkAvailability() {
     }
 }
 
+// New function to check available time slots for a specific date
+async function checkAvailableTimes() {
+    const appointmentTypeID = document.getElementById('availability-times-type').value;
+    const calendarID = document.getElementById('availability-times-calendar').value;
+    const date = document.getElementById('availability-times-date').value;
+    const filter45min = document.getElementById('availability-times-filter-45').checked;
+    
+    if (!appointmentTypeID || !date) {
+        alert('Моля, изберете услуга и дата');
+        return;
+    }
+    
+    try {
+        let url = `${WORKER_URL}/acuity/availability/times?appointmentTypeID=${appointmentTypeID}&date=${date}`;
+        if (calendarID) {
+            url += `&calendarID=${calendarID}`;
+        }
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            let slots = await response.json();
+            
+            // Filter slots to 45-minute intervals if checkbox is enabled
+            if (filter45min && Array.isArray(slots)) {
+                slots = filterSlotsTo45MinIntervals(slots);
+            }
+            
+            displayAvailableTimes(slots);
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при проверка на свободни часове: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error checking available times:', error);
+        alert('Грешка при проверка на свободни часове');
+    }
+}
+
+// Helper function to filter slots to 45-minute intervals (:00 and :45)
+function filterSlotsTo45MinIntervals(slots) {
+    return slots.filter(slot => {
+        // Handle both object format {time: "..."} and string format
+        const timeStr = typeof slot === 'object' ? slot.time : slot;
+        
+        if (!timeStr) return false;
+        
+        // Parse the time string to get minutes
+        const date = new Date(timeStr);
+        const minutes = date.getMinutes();
+        
+        // Keep only slots at :00 or :45 minutes
+        return minutes === 0 || minutes === 45;
+    });
+}
+
+// Display available time slots
+function displayAvailableTimes(slots) {
+    const container = document.getElementById('availability-times-results');
+    
+    if (!slots || slots.length === 0) {
+        container.innerHTML = `
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="color: #856404; margin: 0;">Няма свободни часове за избраната дата</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = `
+        <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            <h4 style="color: #155724; margin: 0 0 10px 0;">
+                <i class="fas fa-clock"></i> Налични часове: ${slots.length}
+            </h4>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto;">
+            ${slots.map(slot => {
+                const timeStr = typeof slot === 'object' ? slot.time : slot;
+                const displayTime = new Date(timeStr).toLocaleTimeString('bg-BG', {hour: '2-digit', minute: '2-digit'});
+                return `
+                    <div style="background: #667eea; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 500; cursor: pointer;" 
+                         onclick="selectTimeSlot('${timeStr}')">
+                        ${displayTime}
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Select a time slot (can be used to pre-fill booking form)
+function selectTimeSlot(timeStr) {
+    if (confirm(`Искате ли да създадете резервация за ${new Date(timeStr).toLocaleString('bg-BG')}?`)) {
+        // Pre-fill the booking form
+        const datetime = new Date(timeStr).toISOString().slice(0, 16);
+        document.getElementById('datetime').value = datetime;
+        
+        // Switch to booking tab
+        switchTab('booking');
+        
+        // Scroll to form
+        document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
 function displayAvailability(data) {
     const container = document.getElementById('availability-results');
     
@@ -982,6 +1088,28 @@ function updateAvailabilitySelects() {
         }
     }
     
+    // Update availability times type select
+    const timesTypeSelect = document.getElementById('availability-times-type');
+    if (timesTypeSelect) {
+        if (appointmentTypes.length === 0) {
+            timesTypeSelect.innerHTML = '<option value="">Няма налични услуги</option>';
+        } else {
+            timesTypeSelect.innerHTML = '<option value="">Избери услуга...</option>' + 
+                appointmentTypes.map(type => `<option value="${type.id}">${type.name || type.type}</option>`).join('');
+        }
+    }
+    
+    // Update availability times calendar select
+    const timesCalendarSelect = document.getElementById('availability-times-calendar');
+    if (timesCalendarSelect) {
+        if (calendars.length === 0) {
+            timesCalendarSelect.innerHTML = '<option value="">Няма налични календари</option>';
+        } else {
+            timesCalendarSelect.innerHTML = '<option value="">Всички календари</option>' + 
+                calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+        }
+    }
+    
     // Set default month to current month
     const monthInput = document.getElementById('availability-month');
     if (monthInput && !monthInput.value) {
@@ -989,6 +1117,13 @@ function updateAvailabilitySelects() {
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         monthInput.value = `${year}-${month}`;
+    }
+    
+    // Set default date to today
+    const dateInput = document.getElementById('availability-times-date');
+    if (dateInput && !dateInput.value) {
+        const now = new Date();
+        dateInput.value = now.toISOString().split('T')[0];
     }
 }
 
@@ -2951,3 +3086,4 @@ window.updateClient = updateClient;
 window.deleteAppointment = deleteAppointment;
 window.filterAppointmentsByClient = filterAppointmentsByClient;
 window.checkAvailability = checkAvailability;
+window.checkAvailableTimes = checkAvailableTimes;

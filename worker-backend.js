@@ -145,7 +145,7 @@ export default {
         return callAcuityAPI('https://acuityscheduling.com/api/v1/calendars');
       }
 
-      // GET /acuity/availability - check availability
+      // GET /acuity/availability - check availability (dates only)
       if (pathname === '/acuity/availability' && request.method === 'GET') {
         const url = new URL(request.url);
         const appointmentTypeID = url.searchParams.get('appointmentTypeID');
@@ -160,6 +160,24 @@ export default {
         if (calendarID) params.append('calendarID', calendarID);
         
         const acuityUrl = `https://acuityscheduling.com/api/v1/availability/dates?${params.toString()}`;
+        return callAcuityAPI(acuityUrl);
+      }
+
+      // GET /acuity/availability/times - check available time slots
+      if (pathname === '/acuity/availability/times' && request.method === 'GET') {
+        const url = new URL(request.url);
+        const appointmentTypeID = url.searchParams.get('appointmentTypeID');
+        const date = url.searchParams.get('date');
+        const calendarID = url.searchParams.get('calendarID');
+        
+        if (!appointmentTypeID || !date) {
+          return new Response('Missing appointmentTypeID or date', { status: 400 });
+        }
+        
+        const params = new URLSearchParams({ appointmentTypeID, date });
+        if (calendarID) params.append('calendarID', calendarID);
+        
+        const acuityUrl = `https://acuityscheduling.com/api/v1/availability/times?${params.toString()}`;
         return callAcuityAPI(acuityUrl);
       }
 
