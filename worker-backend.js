@@ -277,6 +277,103 @@ export default {
         return callAcuityAPI('https://acuityscheduling.com/api/v1/business-info');
       }
 
+      // POST /acuity/appointment-types - create appointment type (service)
+      if (pathname === '/acuity/appointment-types' && request.method === 'POST') {
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointment-types`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // DELETE /acuity/appointment-types/:id - delete appointment type (service)
+      if (pathname.match(/^\/acuity\/appointment-types\/\d+$/) && request.method === 'DELETE') {
+        const typeId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointment-types/${typeId}`;
+        return callAcuityAPI(acuityUrl, { method: 'DELETE' });
+      }
+
+      // GET /acuity/appointment-types/:id - get single appointment type
+      if (pathname.match(/^\/acuity\/appointment-types\/\d+$/) && request.method === 'GET') {
+        const typeId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointment-types/${typeId}`;
+        return callAcuityAPI(acuityUrl);
+      }
+
+      // POST /acuity/calendars - create calendar
+      if (pathname === '/acuity/calendars' && request.method === 'POST') {
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/calendars`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // DELETE /acuity/calendars/:id - delete calendar
+      if (pathname.match(/^\/acuity\/calendars\/\d+$/) && request.method === 'DELETE') {
+        const calendarId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/calendars/${calendarId}`;
+        return callAcuityAPI(acuityUrl, { method: 'DELETE' });
+      }
+
+      // GET /acuity/calendars/:id - get single calendar
+      if (pathname.match(/^\/acuity\/calendars\/\d+$/) && request.method === 'GET') {
+        const calendarId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/calendars/${calendarId}`;
+        return callAcuityAPI(acuityUrl);
+      }
+
+      // POST /acuity/clients - create client
+      if (pathname === '/acuity/clients' && request.method === 'POST') {
+        let body;
+        try {
+          body = await request.json();
+        } catch {
+          return new Response('Invalid JSON', { status: 400 });
+        }
+        const acuityUrl = `https://acuityscheduling.com/api/v1/clients`;
+        return callAcuityAPI(acuityUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+
+      // GET /acuity/clients/:id - get single client
+      if (pathname.match(/^\/acuity\/clients\/\d+$/) && request.method === 'GET') {
+        const clientId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/clients/${clientId}`;
+        return callAcuityAPI(acuityUrl);
+      }
+
+      // DELETE /acuity/appointments/:id - delete appointment
+      if (pathname.match(/^\/acuity\/appointments\/\d+$/) && request.method === 'DELETE') {
+        const appointmentId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointments/${appointmentId}`;
+        return callAcuityAPI(acuityUrl, { method: 'DELETE' });
+      }
+
+      // GET /acuity/appointments/:id - get single appointment
+      if (pathname.match(/^\/acuity\/appointments\/\d+$/) && request.method === 'GET') {
+        const appointmentId = pathname.split('/').pop();
+        const acuityUrl = `https://acuityscheduling.com/api/v1/appointments/${appointmentId}`;
+        return callAcuityAPI(acuityUrl);
+      }
+
       return new Response('Not Found', { status: 404 });
     }
 

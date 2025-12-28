@@ -694,6 +694,19 @@
                             </div>
                         </div>
                         
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Филтрирай по клиент</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="filter-client-id" class="form-control" placeholder="Въведи ID на клиент">
+                                <button class="btn btn-info" onclick="filterAppointmentsByClient()">
+                                    <i class="fas fa-filter"></i> Филтрирай
+                                </button>
+                            </div>
+                            <small style="color: #666; margin-top: 5px; display: block;">
+                                Показва само резервации за конкретен клиент
+                            </small>
+                        </div>
+                        
                         <div id="appointment-details"></div>
                     </div>
 
@@ -750,6 +763,48 @@
 
                     <div class="card">
                         <div class="card-header">
+                            <i class="fas fa-plus"></i> Създаване на нов клиент
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Добавете нов клиент в базата данни</p>
+                        
+                        <button class="btn btn-success" onclick="showClientCreateForm()" style="margin-bottom: 15px;">
+                            <i class="fas fa-plus"></i> Нов клиент
+                        </button>
+                        
+                        <div id="client-create-form" style="display: none;">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Име *</label>
+                                <input type="text" id="client-create-firstname" class="form-control" placeholder="Име">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Фамилия *</label>
+                                <input type="text" id="client-create-lastname" class="form-control" placeholder="Фамилия">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" id="client-create-email" class="form-control" placeholder="email@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Телефон</label>
+                                <input type="tel" id="client-create-phone" class="form-control" placeholder="+359...">
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-success" onclick="createClient()">
+                                    <i class="fas fa-check"></i> Създай клиент
+                                </button>
+                                <button class="btn btn-secondary" onclick="cancelClientCreate()">
+                                    <i class="fas fa-times"></i> Откажи
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
                             <i class="fas fa-tools"></i> Управление на клиенти
                         </div>
                         <p style="margin-bottom: 15px; color: #666;">Търсене, редактиране и блокиране на клиенти</p>
@@ -801,6 +856,72 @@
                             <i class="fas fa-sync"></i> Презареди календари
                         </button>
                         <div id="calendars-management-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-plus"></i> Създаване на нов календар
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Създайте нов календар за вашия бизнес</p>
+                        
+                        <button class="btn btn-success" onclick="showCalendarCreateForm()" style="margin-bottom: 15px;">
+                            <i class="fas fa-plus"></i> Нов календар
+                        </button>
+                        
+                        <div id="calendar-create-form" style="display: none;">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Име на календара *</label>
+                                <input type="text" id="calendar-create-name" class="form-control" placeholder="напр. Главен календар">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Email *</label>
+                                <input type="email" id="calendar-create-email" class="form-control" placeholder="calendar@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-align-left"></i> Описание</label>
+                                <textarea id="calendar-create-description" class="form-control" rows="3" placeholder="Описание на календара"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-globe"></i> Часова зона</label>
+                                <input type="text" id="calendar-create-timezone" class="form-control" placeholder="Europe/Sofia" value="Europe/Sofia">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-hourglass-half"></i> Интервал на резервации (минути)</label>
+                                <select id="calendar-create-scheduling-increment" class="form-control">
+                                    <option value="5">5 минути</option>
+                                    <option value="10">10 минути</option>
+                                    <option value="15" selected>15 минути</option>
+                                    <option value="30">30 минути</option>
+                                    <option value="45">45 минути</option>
+                                    <option value="60">60 минути (1 час)</option>
+                                    <option value="90">90 минути (1.5 часа)</option>
+                                    <option value="120">120 минути (2 часа)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-align-center"></i> Подравняване (минути)</label>
+                                <select id="calendar-create-alignment" class="form-control">
+                                    <option value="0" selected>0 - Точно на часа</option>
+                                    <option value="15">15 - На 15-та минута</option>
+                                    <option value="30">30 - На половин час</option>
+                                    <option value="45">45 - На 45-та минута</option>
+                                </select>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-success" onclick="createCalendar()">
+                                    <i class="fas fa-check"></i> Създай календар
+                                </button>
+                                <button class="btn btn-secondary" onclick="cancelCalendarCreate()">
+                                    <i class="fas fa-times"></i> Откажи
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card">
@@ -1023,6 +1144,91 @@
                             <i class="fas fa-sync"></i> Презареди услуги
                         </button>
                         <div id="services-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-plus"></i> Създаване на нова услуга
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Създайте нова услуга за вашия бизнес</p>
+                        
+                        <button class="btn btn-success" onclick="showServiceCreateForm()" style="margin-bottom: 15px;">
+                            <i class="fas fa-plus"></i> Нова услуга
+                        </button>
+                        
+                        <div id="service-create-form" style="display: none;">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Име на услугата *</label>
+                                <input type="text" id="service-create-name" class="form-control" placeholder="напр. Персонална тренировка">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-align-left"></i> Описание</label>
+                                <textarea id="service-create-description" class="form-control" rows="3" placeholder="Описание на услугата"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Продължителност (минути)</label>
+                                <input type="number" id="service-create-duration" class="form-control" placeholder="60" min="5" step="5" value="60">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-money-bill-wave"></i> Цена (лв.)</label>
+                                <input type="number" id="service-create-price" class="form-control" placeholder="50.00" step="0.01" min="0" value="0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-hourglass-half"></i> Интервал на резервации (минути)</label>
+                                <select id="service-create-scheduling-increment" class="form-control">
+                                    <option value="5">5 минути</option>
+                                    <option value="10">10 минути</option>
+                                    <option value="15" selected>15 минути</option>
+                                    <option value="30">30 минути</option>
+                                    <option value="45">45 минути</option>
+                                    <option value="60">60 минути (1 час)</option>
+                                    <option value="90">90 минути (1.5 часа)</option>
+                                    <option value="120">120 минути (2 часа)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-align-center"></i> Подравняване (минути)</label>
+                                <select id="service-create-alignment" class="form-control">
+                                    <option value="0" selected>0 - Точно на часа</option>
+                                    <option value="15">15 - На 15-та минута</option>
+                                    <option value="30">30 - На половин час</option>
+                                    <option value="45">45 - На 45-та минута</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-palette"></i> Цвят</label>
+                                <input type="color" id="service-create-color" class="form-control" style="height: 50px;" value="#667eea">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="service-create-active" style="margin-right: 10px;" checked>
+                                    <span>Услугата е активна</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="service-create-private" style="margin-right: 10px;">
+                                    <span>Частна услуга (не се показва публично)</span>
+                                </label>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-success" onclick="createService()">
+                                    <i class="fas fa-check"></i> Създай услуга
+                                </button>
+                                <button class="btn btn-secondary" onclick="cancelServiceCreate()">
+                                    <i class="fas fa-times"></i> Откажи
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card">
@@ -1404,6 +1610,38 @@ wrangler deploy</pre>
                     <div class="info-box">
                         <i class="fas fa-info-circle"></i>
                         <strong>Съвет:</strong> Използвайте AI асистента отдясно за да създадете резервация с естествен език!
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-clock"></i> Проверка на свободни времена
+                        </div>
+                        <p style="margin-bottom: 15px; color: #666;">Проверете кои времена са свободни за резервация</p>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-dumbbell"></i> Тип услуга</label>
+                            <select id="availability-type" class="form-control">
+                                <option value="">Избери услуга...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Календар (опционално)</label>
+                            <select id="availability-calendar" class="form-control">
+                                <option value="">Всички календари</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-alt"></i> Месец</label>
+                            <input type="month" id="availability-month" class="form-control">
+                        </div>
+                        
+                        <button class="btn btn-info" onclick="checkAvailability()">
+                            <i class="fas fa-search"></i> Провери наличност
+                        </button>
+                        
+                        <div id="availability-results" style="margin-top: 20px;"></div>
                     </div>
 
                     <div class="card">
