@@ -976,11 +976,24 @@ function filterSlotsTo45MinIntervals(slots) {
         
         // Parse the time string to get minutes
         const date = new Date(timeStr);
+        
+        // Validate date parsing
+        if (isNaN(date.getTime())) return false;
+        
         const minutes = date.getMinutes();
         
         // Keep only slots at :00 or :45 minutes
         return minutes === 0 || minutes === 45;
     });
+}
+
+// Helper function to format time slot display
+function formatTimeSlot(timeStr) {
+    const date = new Date(timeStr);
+    if (isNaN(date.getTime())) {
+        return 'Invalid time';
+    }
+    return date.toLocaleTimeString('bg-BG', {hour: '2-digit', minute: '2-digit'});
 }
 
 // Display available time slots
@@ -1005,7 +1018,7 @@ function displayAvailableTimes(slots) {
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto;">
             ${slots.map(slot => {
                 const timeStr = typeof slot === 'object' ? slot.time : slot;
-                const displayTime = new Date(timeStr).toLocaleTimeString('bg-BG', {hour: '2-digit', minute: '2-digit'});
+                const displayTime = formatTimeSlot(timeStr);
                 return `
                     <div style="background: #667eea; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 500; cursor: pointer;" 
                          onclick="selectTimeSlot('${timeStr}')">
@@ -2986,13 +2999,18 @@ function loadCalendarTimeRanges() {
     
     // Fetch calendar data from API
     fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(calendar => {
             displayCalendarTimeRanges(calendar);
         })
         .catch(error => {
             console.error('Error loading calendar:', error);
-            alert('Грешка при зареждане на календара');
+            alert('Грешка при зареждане на календара: ' + error.message);
         });
 }
 
@@ -3091,6 +3109,12 @@ async function updateCalendarTimeRanges() {
     const startInputs = document.querySelectorAll('.timerange-start');
     const endInputs = document.querySelectorAll('.timerange-end');
     
+    // Validate array lengths match
+    if (startInputs.length !== endInputs.length) {
+        alert('Грешка: Несъответствие в броя на полетата. Моля, презаредете страницата.');
+        return;
+    }
+    
     for (let i = 0; i < startInputs.length; i++) {
         const start = startInputs[i].value;
         const end = endInputs[i].value;
@@ -3105,9 +3129,12 @@ async function updateCalendarTimeRanges() {
         return;
     }
     
-    // Validate time ranges
+    // Validate time ranges - convert to minutes for proper comparison
     for (const range of timeRanges) {
-        if (range.start >= range.end) {
+        const startMinutes = convertTimeToMinutes(range.start);
+        const endMinutes = convertTimeToMinutes(range.end);
+        
+        if (startMinutes >= endMinutes) {
             alert(`Невалиден времеви диапазон: ${range.start} - ${range.end}. Началото трябва да е преди края.`);
             return;
         }
@@ -3165,6 +3192,12 @@ async function updateCalendarTimeRanges() {
             </div>
         `;
     }
+}
+
+// Helper function to convert time string (HH:MM) to minutes
+function convertTimeToMinutes(timeStr) {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
 }
 
 // Populate calendar select for time ranges
