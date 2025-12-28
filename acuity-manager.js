@@ -1034,9 +1034,16 @@ function displayAvailableTimes(slots) {
 
 // Select a time slot (can be used to pre-fill booking form)
 function selectTimeSlot(timeStr) {
-    if (confirm(`Искате ли да създадете резервация за ${new Date(timeStr).toLocaleString('bg-BG')}?`)) {
+    // Validate the time string
+    const date = new Date(timeStr);
+    if (isNaN(date.getTime())) {
+        alert('Невалиден час за резервация');
+        return;
+    }
+    
+    if (confirm(`Искате ли да създадете резервация за ${date.toLocaleString('bg-BG')}?`)) {
         // Pre-fill the booking form
-        const datetime = new Date(timeStr).toISOString().slice(0, 16);
+        const datetime = date.toISOString().slice(0, 16);
         document.getElementById('datetime').value = datetime;
         
         // Switch to booking tab
@@ -3196,7 +3203,24 @@ async function updateCalendarTimeRanges() {
 
 // Helper function to convert time string (HH:MM) to minutes
 function convertTimeToMinutes(timeStr) {
-    const [hours, minutes] = timeStr.split(':').map(Number);
+    if (!timeStr || typeof timeStr !== 'string') {
+        return 0;
+    }
+    
+    const parts = timeStr.split(':');
+    if (parts.length !== 2) {
+        console.warn(`Invalid time format: ${timeStr}`);
+        return 0;
+    }
+    
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    
+    if (isNaN(hours) || isNaN(minutes)) {
+        console.warn(`Invalid time values in: ${timeStr}`);
+        return 0;
+    }
+    
     return hours * 60 + minutes;
 }
 
