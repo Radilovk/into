@@ -1184,6 +1184,8 @@ function displayCalendarsManagement() {
             <p><strong>ID:</strong> ${cal.id}</p>
             <p><strong>Описание:</strong> ${cal.description || 'Няма описание'}</p>
             <p><strong>Часова зона:</strong> ${cal.timezone || 'N/A'}</p>
+            <p><strong>Интервал на резервации:</strong> ${cal.schedulingIncrement || 15} минути</p>
+            <p><strong>Подравняване:</strong> ${cal.alignment !== undefined ? cal.alignment : 0} минути</p>
             <div class="action-buttons">
                 <button class="btn btn-primary" onclick="viewCalendarBlocks(${cal.id})">
                     <i class="fas fa-clock"></i> Виж блокирани часове
@@ -1284,12 +1286,47 @@ async function editCalendar(calendarId) {
     const newTimezone = prompt(`Редактирай часова зона на календар:\n\nТекуща часова зона: ${calendar.timezone || 'N/A'}`, calendar.timezone || '');
     if (newTimezone === null) return; // User cancelled
     
+    // Add scheduling increment prompt
+    const currentIncrement = calendar.schedulingIncrement || 15;
+    const newSchedulingIncrement = prompt(
+        `Интервал на резервации (schedulingIncrement):\n\n` +
+        `Текуща стойност: ${currentIncrement} минути\n\n` +
+        `Изберете стойност (5, 10, 15, 30, 45, 60, 90, 120):\n` +
+        `5 = на всеки 5 мин, 15 = на всеки 15 мин, 30 = на всеки 30 мин, 60 = на всеки час`,
+        currentIncrement
+    );
+    if (newSchedulingIncrement === null) return; // User cancelled
+    
+    // Add alignment prompt
+    const currentAlignment = calendar.alignment !== undefined ? calendar.alignment : 0;
+    const newAlignment = prompt(
+        `Подравняване (alignment):\n\n` +
+        `Текуща стойност: ${currentAlignment} минути\n\n` +
+        `Изберете стойност (0, 15, 30, 45):\n` +
+        `0 = точно на часа (10:00, 11:00...)\n` +
+        `15 = на 15-та минута (10:15, 11:15...)\n` +
+        `30 = на половин час (10:30, 11:30...)\n` +
+        `45 = на 45-та минута (10:45, 11:45...)`,
+        currentAlignment
+    );
+    if (newAlignment === null) return; // User cancelled
+    
     // Prepare update data
     const updateData = {};
     if (newName && newName !== calendar.name) updateData.name = newName;
     if (newEmail && newEmail !== calendar.email) updateData.email = newEmail;
     if (newDescription && newDescription !== calendar.description) updateData.description = newDescription;
     if (newTimezone && newTimezone !== calendar.timezone) updateData.timezone = newTimezone;
+    
+    // Add scheduling parameters if changed
+    const parsedIncrement = parseInt(newSchedulingIncrement);
+    const parsedAlignment = parseInt(newAlignment);
+    if (!isNaN(parsedIncrement) && parsedIncrement !== currentIncrement) {
+        updateData.schedulingIncrement = parsedIncrement;
+    }
+    if (!isNaN(parsedAlignment) && parsedAlignment !== currentAlignment) {
+        updateData.alignment = parsedAlignment;
+    }
     
     if (Object.keys(updateData).length === 0) {
         alert('Няма промени за запазване');
@@ -1992,6 +2029,8 @@ function displayServices() {
                     <th>Име</th>
                     <th>Продължителност</th>
                     <th>Цена</th>
+                    <th>Интервал</th>
+                    <th>Alignment</th>
                     <th>Статус</th>
                     <th>Действия</th>
                 </tr>
@@ -2003,6 +2042,8 @@ function displayServices() {
                         <td>${service.name || 'N/A'}</td>
                         <td>${service.duration || 'N/A'} мин</td>
                         <td>${service.price ? service.price + ' лв.' : 'N/A'}</td>
+                        <td>${service.schedulingIncrement || 15} мин</td>
+                        <td>${service.alignment !== undefined ? service.alignment : 0}</td>
                         <td>
                             <span class="status-badge ${service.active !== false ? 'status-confirmed' : 'status-cancelled'}">
                                 ${service.active !== false ? 'Активна' : 'Неактивна'}
@@ -2053,6 +2094,8 @@ function editService(serviceId) {
     document.getElementById('service-description').value = service.description || '';
     document.getElementById('service-duration').value = service.duration || 60;
     document.getElementById('service-price').value = service.price || 0;
+    document.getElementById('service-scheduling-increment').value = service.schedulingIncrement || 15;
+    document.getElementById('service-alignment').value = service.alignment !== undefined ? service.alignment : 0;
     document.getElementById('service-color').value = service.color || '#667eea';
     document.getElementById('service-active').checked = service.active !== false;
     document.getElementById('service-private').checked = service.private === true;
@@ -2073,6 +2116,8 @@ async function updateService() {
         description: document.getElementById('service-description').value,
         duration: parseInt(document.getElementById('service-duration').value),
         price: parseFloat(document.getElementById('service-price').value),
+        schedulingIncrement: parseInt(document.getElementById('service-scheduling-increment').value),
+        alignment: parseInt(document.getElementById('service-alignment').value),
         color: document.getElementById('service-color').value,
         active: document.getElementById('service-active').checked,
         private: document.getElementById('service-private').checked
