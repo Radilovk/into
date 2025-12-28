@@ -224,6 +224,7 @@ async function loadAppointmentTypes() {
             appointmentTypes = await response.json();
             updateAppointmentTypeSelect();
             updateAppointmentsFilterSelects();
+            updateAvailabilitySelects();
             updateDashboard();
         } else {
             console.error('Failed to load appointment types');
@@ -243,6 +244,7 @@ async function loadCalendars() {
             updateExportCalendarSelect();
             updateBulkCalendarSelect();
             updateAppointmentsFilterSelects();
+            updateAvailabilitySelects();
         } else {
             console.error('Failed to load calendars');
         }
@@ -892,6 +894,101 @@ function updateDashboard() {
                 </tbody>
             </table>
         `;
+    }
+}
+
+async function checkAvailability() {
+    const appointmentTypeID = document.getElementById('availability-type').value;
+    const calendarID = document.getElementById('availability-calendar').value;
+    const month = document.getElementById('availability-month').value;
+    
+    if (!appointmentTypeID || !month) {
+        alert('Моля, изберете услуга и месец');
+        return;
+    }
+    
+    try {
+        let url = `${WORKER_URL}/acuity/availability?appointmentTypeID=${appointmentTypeID}&month=${month}`;
+        if (calendarID) {
+            url += `&calendarID=${calendarID}`;
+        }
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            displayAvailability(data);
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при проверка на наличност: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error checking availability:', error);
+        alert('Грешка при проверка на наличност');
+    }
+}
+
+function displayAvailability(data) {
+    const container = document.getElementById('availability-results');
+    
+    if (!data || data.length === 0) {
+        container.innerHTML = `
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="color: #856404; margin: 0;">Няма свободни времена за избрания период</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = `
+        <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            <h4 style="color: #155724; margin: 0 0 10px 0;">
+                <i class="fas fa-check-circle"></i> Налични дати: ${data.length}
+            </h4>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+            ${data.map(item => `
+                <div style="background: #667eea; color: white; padding: 10px; border-radius: 8px; text-align: center;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">
+                        ${item.date ? new Date(item.date).toLocaleDateString('bg-BG') : item}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+function updateAvailabilitySelects() {
+    // Update availability type select
+    const typeSelect = document.getElementById('availability-type');
+    if (typeSelect) {
+        if (appointmentTypes.length === 0) {
+            typeSelect.innerHTML = '<option value="">Няма налични услуги</option>';
+        } else {
+            typeSelect.innerHTML = '<option value="">Избери услуга...</option>' + 
+                appointmentTypes.map(type => `<option value="${type.id}">${type.name || type.type}</option>`).join('');
+        }
+    }
+    
+    // Update availability calendar select
+    const calendarSelect = document.getElementById('availability-calendar');
+    if (calendarSelect) {
+        if (calendars.length === 0) {
+            calendarSelect.innerHTML = '<option value="">Няма налични календари</option>';
+        } else {
+            calendarSelect.innerHTML = '<option value="">Всички календари</option>' + 
+                calendars.map(cal => `<option value="${cal.id}">${cal.name || cal.email}</option>`).join('');
+        }
+    }
+    
+    // Set default month to current month
+    const monthInput = document.getElementById('availability-month');
+    if (monthInput && !monthInput.value) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        monthInput.value = `${year}-${month}`;
     }
 }
 
@@ -2853,3 +2950,4 @@ window.cancelClientCreate = cancelClientCreate;
 window.updateClient = updateClient;
 window.deleteAppointment = deleteAppointment;
 window.filterAppointmentsByClient = filterAppointmentsByClient;
+window.checkAvailability = checkAvailability;
