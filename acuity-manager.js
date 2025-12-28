@@ -476,6 +476,9 @@ function displayClientDetails(client) {
                 <p><strong>Създаден:</strong> ${client.created ? new Date(client.created).toLocaleString('bg-BG') : 'N/A'}</p>
             </div>
             <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="updateClient(${client.id})">
+                    <i class="fas fa-edit"></i> Редактирай клиент
+                </button>
                 ${!isBlocked ? `
                     <button class="btn btn-warning" onclick="blockClient(${client.id})">
                         <i class="fas fa-ban"></i> Блокирай клиент
@@ -612,6 +615,103 @@ async function deleteClient(clientId) {
     } catch (error) {
         console.error('Error deleting client:', error);
         alert('Грешка при изтриване на клиента');
+    }
+}
+
+async function createClient() {
+    const clientData = {
+        firstName: document.getElementById('client-create-firstname').value,
+        lastName: document.getElementById('client-create-lastname').value,
+        email: document.getElementById('client-create-email').value,
+        phone: document.getElementById('client-create-phone').value || ''
+    };
+    
+    if (!clientData.firstName || !clientData.lastName) {
+        alert('Моля, въведете име и фамилия на клиента');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/clients`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(clientData)
+        });
+        
+        if (response.ok) {
+            alert('Клиентът е създаден успешно!');
+            cancelClientCreate();
+            loadClients();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при създаване на клиент: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error creating client:', error);
+        alert('Грешка при създаване на клиента');
+    }
+}
+
+function showClientCreateForm() {
+    document.getElementById('client-create-form').style.display = 'block';
+    document.getElementById('client-create-firstname').value = '';
+    document.getElementById('client-create-lastname').value = '';
+    document.getElementById('client-create-email').value = '';
+    document.getElementById('client-create-phone').value = '';
+}
+
+function cancelClientCreate() {
+    document.getElementById('client-create-form').style.display = 'none';
+}
+
+async function updateClient(clientId) {
+    const client = clients.find(c => c.id == clientId);
+    if (!client) {
+        alert('Клиент не е намерен');
+        return;
+    }
+    
+    const newFirstName = prompt(`Ново име:\n\nТекущо име: ${client.firstName}`, client.firstName || '');
+    if (newFirstName === null) return; // User cancelled
+    
+    const newLastName = prompt(`Нова фамилия:\n\nТекуща фамилия: ${client.lastName}`, client.lastName || '');
+    if (newLastName === null) return; // User cancelled
+    
+    const newEmail = prompt(`Нов email:\n\nТекущ email: ${client.email || 'N/A'}`, client.email || '');
+    if (newEmail === null) return; // User cancelled
+    
+    const newPhone = prompt(`Нов телефон:\n\nТекущ телефон: ${client.phone || 'N/A'}`, client.phone || '');
+    if (newPhone === null) return; // User cancelled
+    
+    const updateData = {};
+    if (newFirstName && newFirstName !== client.firstName) updateData.firstName = newFirstName;
+    if (newLastName && newLastName !== client.lastName) updateData.lastName = newLastName;
+    if (newEmail && newEmail !== client.email) updateData.email = newEmail;
+    if (newPhone && newPhone !== client.phone) updateData.phone = newPhone;
+    
+    if (Object.keys(updateData).length === 0) {
+        alert('Няма промени за запазване');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/clients/${clientId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        });
+        
+        if (response.ok) {
+            alert('Клиентът е актуализиран успешно!');
+            await loadClients();
+            displayClientDetails(await response.json());
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при актуализация: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error updating client:', error);
+        alert('Грешка при актуализация на клиента');
     }
 }
 
@@ -1193,6 +1293,9 @@ function displayCalendarsManagement() {
                 <button class="btn btn-success" onclick="editCalendar(${cal.id})">
                     <i class="fas fa-edit"></i> Редактирай
                 </button>
+                <button class="btn btn-danger" onclick="deleteCalendar(${cal.id})">
+                    <i class="fas fa-trash"></i> Изтрий
+                </button>
             </div>
             <div id="calendar-blocks-${cal.id}" class="calendar-blocks-container" style="display: none; margin-top: 15px;"></div>
         </div>
@@ -1366,6 +1469,88 @@ async function editCalendar(calendarId) {
     } catch (error) {
         console.error('Error updating calendar:', error);
         alert('Грешка при актуализиране на календара: ' + error.message);
+    }
+}
+
+async function createCalendar() {
+    const calendarData = {
+        name: document.getElementById('calendar-create-name').value,
+        email: document.getElementById('calendar-create-email').value,
+        description: document.getElementById('calendar-create-description').value || '',
+        timezone: document.getElementById('calendar-create-timezone').value || 'Europe/Sofia',
+        schedulingIncrement: parseInt(document.getElementById('calendar-create-scheduling-increment').value) || 15,
+        alignment: parseInt(document.getElementById('calendar-create-alignment').value) || 0
+    };
+    
+    if (!calendarData.name || !calendarData.email) {
+        alert('Моля, въведете име и email на календара');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/calendars`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(calendarData)
+        });
+        
+        if (response.ok) {
+            alert('Календарът е създаден успешно!');
+            cancelCalendarCreate();
+            loadCalendarsManagement();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при създаване на календар: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error creating calendar:', error);
+        alert('Грешка при създаване на календара');
+    }
+}
+
+function showCalendarCreateForm() {
+    document.getElementById('calendar-create-form').style.display = 'block';
+    document.getElementById('calendar-create-name').value = '';
+    document.getElementById('calendar-create-email').value = '';
+    document.getElementById('calendar-create-description').value = '';
+    document.getElementById('calendar-create-timezone').value = 'Europe/Sofia';
+    document.getElementById('calendar-create-scheduling-increment').value = 15;
+    document.getElementById('calendar-create-alignment').value = 0;
+}
+
+function cancelCalendarCreate() {
+    document.getElementById('calendar-create-form').style.display = 'none';
+}
+
+async function deleteCalendar(calendarId) {
+    const calendar = calendars.find(c => c.id == calendarId);
+    
+    if (!confirm(`ВНИМАНИЕ! Това действие е необратимо!\n\nИскате ли да изтриете календар "${calendar.name || calendar.email}"?\n\nВсички резервации свързани с този календар ще останат, но календарът няма да е достъпен занапред.`)) {
+        return;
+    }
+    
+    const finalConfirm = prompt(`Напишете "ИЗТРИЙ" за финално потвърждение:`);
+    
+    if (finalConfirm !== 'ИЗТРИЙ') {
+        alert('Операцията е отказана');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/calendars/${calendarId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Календарът е изтрит успешно!');
+            loadCalendarsManagement();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при изтриване на календара: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error deleting calendar:', error);
+        alert('Грешка при изтриване на календара');
     }
 }
 
@@ -1694,6 +1879,9 @@ function displayAppointmentDetails(appointment) {
                 <button class="btn btn-danger" onclick="cancelAppointment(${appointment.id})">
                     <i class="fas fa-times"></i> Отмени
                 </button>
+                <button class="btn btn-danger" onclick="deleteAppointment(${appointment.id})">
+                    <i class="fas fa-trash"></i> Изтрий
+                </button>
             </div>
         </div>
     `;
@@ -1759,6 +1947,99 @@ async function rescheduleAppointment(appointmentId) {
         console.error('Error rescheduling appointment:', error);
         alert('Грешка при пренасрочване на резервацията');
     }
+}
+
+async function deleteAppointment(appointmentId) {
+    if (!confirm('ВНИМАНИЕ! Това действие е необратимо!\n\nИскате ли да изтриете тази резервация напълно?\n\n(Забележка: За да запазите информацията, използвайте "Отмени" вместо "Изтрий")')) {
+        return;
+    }
+    
+    const finalConfirm = prompt(`Напишете "ИЗТРИЙ" за финално потвърждение:`);
+    
+    if (finalConfirm !== 'ИЗТРИЙ') {
+        alert('Операцията е отказана');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointments/${appointmentId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Резервацията е изтрита успешно!');
+            document.getElementById('appointment-details').innerHTML = '';
+            await loadAppointments();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при изтриване на резервацията: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error deleting appointment:', error);
+        alert('Грешка при изтриване на резервацията');
+    }
+}
+
+async function filterAppointmentsByClient() {
+    const clientId = document.getElementById('filter-client-id').value;
+    
+    if (!clientId) {
+        alert('Моля, въведете ID на клиент');
+        return;
+    }
+    
+    // Filter appointments by client
+    const filteredAppointments = appointments.filter(apt => apt.clientID == clientId);
+    
+    if (filteredAppointments.length === 0) {
+        const container = document.getElementById('appointments-list');
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>Няма намерени резервации за клиент #${clientId}</p>
+            </div>
+        `;
+    } else {
+        // Display filtered appointments
+        displayFilteredAppointments(filteredAppointments);
+    }
+}
+
+function displayFilteredAppointments(filteredAppointments) {
+    const container = document.getElementById('appointments-list');
+    
+    const sortedAppointments = [...filteredAppointments].sort((a, b) => 
+        new Date(b.datetime) - new Date(a.datetime)
+    );
+    
+    const html = `
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Час</th>
+                    <th>Клиент</th>
+                    <th>Телефон</th>
+                    <th>Тип</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${sortedAppointments.map(apt => `
+                    <tr>
+                        <td>${apt.date || new Date(apt.datetime).toLocaleDateString('bg-BG')}</td>
+                        <td>${apt.time || new Date(apt.datetime).toLocaleTimeString('bg-BG', {hour: '2-digit', minute: '2-digit'})}</td>
+                        <td>${apt.firstName} ${apt.lastName}</td>
+                        <td>${apt.phone || 'N/A'}</td>
+                        <td>${apt.type || 'N/A'}</td>
+                        <td><span class="status-badge status-${(apt.status || 'confirmed').toLowerCase()}">${apt.status || 'Confirmed'}</span></td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    container.innerHTML = html;
 }
 
 // Bulk Operations
@@ -2050,8 +2331,11 @@ function displayServices() {
                             </span>
                         </td>
                         <td>
-                            <button class="btn btn-primary" onclick="editService(${service.id})" style="padding: 5px 10px; font-size: 0.85rem;">
+                            <button class="btn btn-primary" onclick="editService(${service.id})" style="padding: 5px 10px; font-size: 0.85rem; margin-right: 5px;">
                                 <i class="fas fa-edit"></i> Редактирай
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteService(${service.id})" style="padding: 5px 10px; font-size: 0.85rem;">
+                                <i class="fas fa-trash"></i> Изтрий
                             </button>
                         </td>
                     </tr>
@@ -2161,6 +2445,94 @@ async function updateService() {
 function cancelServiceEdit() {
     document.getElementById('service-edit-form').style.display = 'none';
     document.getElementById('service-id-search').value = '';
+}
+
+async function createService() {
+    const serviceData = {
+        name: document.getElementById('service-create-name').value,
+        description: document.getElementById('service-create-description').value || '',
+        duration: parseInt(document.getElementById('service-create-duration').value) || 60,
+        price: parseFloat(document.getElementById('service-create-price').value) || 0,
+        schedulingIncrement: parseInt(document.getElementById('service-create-scheduling-increment').value) || 15,
+        alignment: parseInt(document.getElementById('service-create-alignment').value) || 0,
+        color: document.getElementById('service-create-color').value || '#667eea',
+        active: document.getElementById('service-create-active').checked,
+        private: document.getElementById('service-create-private').checked
+    };
+    
+    if (!serviceData.name) {
+        alert('Моля, въведете име на услугата');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointment-types`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(serviceData)
+        });
+        
+        if (response.ok) {
+            alert('Услугата е създадена успешно!');
+            cancelServiceCreate();
+            loadServices();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при създаване на услуга: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error creating service:', error);
+        alert('Грешка при създаване на услугата');
+    }
+}
+
+function showServiceCreateForm() {
+    document.getElementById('service-create-form').style.display = 'block';
+    document.getElementById('service-create-name').value = '';
+    document.getElementById('service-create-description').value = '';
+    document.getElementById('service-create-duration').value = 60;
+    document.getElementById('service-create-price').value = 0;
+    document.getElementById('service-create-scheduling-increment').value = 15;
+    document.getElementById('service-create-alignment').value = 0;
+    document.getElementById('service-create-color').value = '#667eea';
+    document.getElementById('service-create-active').checked = true;
+    document.getElementById('service-create-private').checked = false;
+}
+
+function cancelServiceCreate() {
+    document.getElementById('service-create-form').style.display = 'none';
+}
+
+async function deleteService(serviceId) {
+    const service = appointmentTypes.find(s => s.id == serviceId);
+    
+    if (!confirm(`ВНИМАНИЕ! Това действие е необратимо!\n\nИскате ли да изтриете услуга "${service.name}"?\n\nВсички резервации свързани с тази услуга ще останат, но услугата няма да е налична занапред.`)) {
+        return;
+    }
+    
+    const finalConfirm = prompt(`Напишете "ИЗТРИЙ" за финално потвърждение:`);
+    
+    if (finalConfirm !== 'ИЗТРИЙ') {
+        alert('Операцията е отказана');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${WORKER_URL}/acuity/appointment-types/${serviceId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Услугата е изтрита успешно!');
+            loadServices();
+        } else {
+            const error = await response.json().catch(() => ({}));
+            alert('Грешка при изтриване на услугата: ' + (error.message || response.statusText));
+        }
+    } catch (error) {
+        console.error('Error deleting service:', error);
+        alert('Грешка при изтриване на услугата');
+    }
 }
 
 // ==================== SERVICE WORKAROUND: DISABLE VIA BLOCKS ====================
@@ -2467,3 +2839,17 @@ window.saveDefaultSchedule = saveDefaultSchedule;
 window.disableServiceViaBlocks = disableServiceViaBlocks;
 window.viewServiceBlocks = viewServiceBlocks;
 window.removeServiceDisable = removeServiceDisable;
+window.createService = createService;
+window.showServiceCreateForm = showServiceCreateForm;
+window.cancelServiceCreate = cancelServiceCreate;
+window.deleteService = deleteService;
+window.createCalendar = createCalendar;
+window.showCalendarCreateForm = showCalendarCreateForm;
+window.cancelCalendarCreate = cancelCalendarCreate;
+window.deleteCalendar = deleteCalendar;
+window.createClient = createClient;
+window.showClientCreateForm = showClientCreateForm;
+window.cancelClientCreate = cancelClientCreate;
+window.updateClient = updateClient;
+window.deleteAppointment = deleteAppointment;
+window.filterAppointmentsByClient = filterAppointmentsByClient;
