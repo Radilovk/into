@@ -262,6 +262,104 @@ export default {
         );
       }
 
+      // GET /api/appointment-types - Get available appointment types
+      if (pathname === '/api/appointment-types' && request.method === 'GET') {
+        try {
+          const appointmentTypes = await acuityRequest('/appointment-types');
+          
+          // Filter to only active appointment types
+          const activeTypes = appointmentTypes
+            .filter(type => type.active !== false)
+            .map(type => ({
+              id: type.id,
+              name: type.name,
+              duration: type.duration,
+              price: type.price,
+              description: type.description,
+              category: type.category,
+            }));
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              data: activeTypes
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (error) {
+          console.error('Error fetching appointment types:', error);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Грешка при зареждане на услугите'
+            }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
+      // GET /api/availability?appointmentTypeID=...&date=...
+      if (pathname === '/api/availability' && request.method === 'GET') {
+        const appointmentTypeID = url.searchParams.get('appointmentTypeID');
+        const date = url.searchParams.get('date');
+        const calendarID = url.searchParams.get('calendarID');
+        
+        if (!appointmentTypeID || !date) {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Missing required parameters: appointmentTypeID and date' 
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        try {
+          // Build query params
+          const params = new URLSearchParams({
+            appointmentTypeID,
+            date,
+            timezone: 'Europe/Sofia'
+          });
+          
+          if (calendarID) {
+            params.append('calendarID', calendarID);
+          }
+
+          // Get available times from Acuity
+          const times = await acuityRequest(`/availability/times?${params.toString()}`);
+          
+          // Filter to only show slots at :00 and :45 (45-minute intervals)
+          const filteredTimes = times.filter(slot => {
+            const timeStr = typeof slot === 'object' ? slot.time : slot;
+            if (!timeStr) return false;
+            
+            const slotDate = new Date(timeStr);
+            if (isNaN(slotDate.getTime())) return false;
+            
+            const minutes = slotDate.getMinutes();
+            return minutes === 0 || minutes === 45;
+          });
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              data: filteredTimes
+            }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (error) {
+          console.error('Error fetching availability:', error);
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Грешка при зареждане на свободните часове'
+            }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
       // POST /api/book
       if (pathname === '/api/book' && request.method === 'POST') {
         const body = await request.json();
