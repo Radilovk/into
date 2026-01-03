@@ -6,5 +6,9 @@ compatibility_date = "2024-07-01"
 binding = "SETTINGS"
 id = "<your_kv_id>"
 
+[[kv_namespaces]]
+binding = "APP_KV"
+id = "<your_app_kv_id>"
+
 [[ai]]
 binding = "AI"

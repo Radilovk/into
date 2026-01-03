@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клиентски портал - IntoDesign</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .card-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .card-info .balance {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .appointments-list {
+            list-style: none;
+        }
+
+        .appointment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .appointment-item:hover {
+            transform: translateX(5px);
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-time {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .appointment-type {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .appointment-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .appointment-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .appointment-actions button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏋️ Клиентски портал</h1>
+            <p>Управлявайте вашите резервации</p>
+        </div>
+
+        <div class="content">
+            <!-- Alert Messages -->
+            <div id="alert" class="alert"></div>
+
+            <!-- Email Input Section -->
+            <div id="email-section" class="section">
+                <h2>Вход</h2>
+                <div class="input-group">
+                    <label for="email">Вашият имейл</label>
+                    <input type="email" id="email" placeholder="example@email.com" required>
+                </div>
+                <button class="btn" onclick="loadClientInfo()">Зареди информация</button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading hidden">
+                <p>⏳ Зареждане...</p>
+            </div>
+
+            <!-- Client Info Section -->
+            <div id="client-info-section" class="section hidden">
+                <h2>Вашата карта</h2>
+                <div class="card-info">
+                    <p>Имейл: <strong id="client-email"></strong></p>
+                    <div id="balance-display">
+                        <p>Оставащи посещения:</p>
+                        <div class="balance" id="client-balance">-</div>
+                    </div>
+                    <p id="booking-status" style="margin-top: 10px; color: #666;"></p>
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div id="upcoming-section" class="section hidden">
+                <h2>Предстоящи резервации</h2>
+                <ul id="upcoming-list" class="appointments-list"></ul>
+            </div>
+
+            <!-- Past Appointments -->
+            <div id="past-section" class="section hidden">
+                <h2>Минали резервации</h2>
+                <ul id="past-list" class="appointments-list"></ul>
+            </div>
+
+            <!-- Booking Section -->
+            <div id="booking-section" class="section hidden">
+                <h2>Запази час</h2>
+                <div class="alert alert-info show" id="booking-info">
+                    <p id="booking-rules"></p>
+                </div>
+                <form id="booking-form" onsubmit="return bookAppointment(event)">
+                    <div class="input-group">
+                        <label for="appointmentTypeID">Тип услуга *</label>
+                        <input type="number" id="appointmentTypeID" placeholder="ID на услугата" required>
+                        <small style="color: #999;">Попитайте администратора за ID на услугата</small>
+                    </div>
+                    <div class="input-group">
+                        <label for="datetime">Дата и час *</label>
+                        <input type="datetime-local" id="datetime" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="firstName">Име</label>
+                        <input type="text" id="firstName" placeholder="Вашето име">
+                    </div>
+                    <div class="input-group">
+                        <label for="lastName">Фамилия</label>
+                        <input type="text" id="lastName" placeholder="Вашата фамилия">
+                    </div>
+                    <div class="input-group">
+                        <label for="phone">Телефон</label>
+                        <input type="tel" id="phone" placeholder="+359...">
+                    </div>
+                    <button type="submit" class="btn" id="book-btn">📅 Запази час</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="client-portal.js"></script>
+</body>
+</html>
