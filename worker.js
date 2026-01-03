@@ -40,11 +40,15 @@ export default {
 
     // Helper: Acuity API request
     const acuityRequest = async (path, method = 'GET', body = null) => {
-      if (!env.ACUITY_USER_ID || !env.ACUITY_API_KEY) {
+      // Support both new and legacy secret names for backward compatibility
+      const userId = env.ACUITY_USER_ID || env.ACUITY_USER;
+      const apiKey = env.ACUITY_API_KEY || env.ACUITY_KEY;
+      
+      if (!userId || !apiKey) {
         throw new Error('Acuity credentials not configured');
       }
 
-      const auth = btoa(`${env.ACUITY_USER_ID}:${env.ACUITY_API_KEY}`);
+      const auth = btoa(`${userId}:${apiKey}`);
       const options = {
         method,
         headers: {

@@ -47,6 +47,8 @@ wrangler secret put ACUITY_API_KEY
 # Enter your Acuity API Key when prompted
 ```
 
+**Забележка за съвместимост**: Worker-ът поддържа и legacy secret names (`ACUITY_USER` и `ACUITY_KEY`) за обратна съвместимост. Ако вече имате настроени тези secrets, не е нужно да ги променяте.
+
 **Важно**: Acuity credentials можете да намерите в:
 - Login to Acuity Scheduling
 - Go to Settings → Integrations → API
