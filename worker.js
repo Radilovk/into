@@ -222,11 +222,11 @@ export default {
         
         const upcomingAppointments = allAppointments
           .filter(apt => new Date(apt.datetime) >= now && apt.canceled === false)
-          .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+          .sort((a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime());
         
         const pastAppointments = allAppointments
           .filter(apt => new Date(apt.datetime) < now || apt.canceled === true)
-          .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
+          .sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime())
           .slice(0, 10); // Last 10
 
         // Get balance
@@ -417,7 +417,7 @@ export default {
           }
 
           // Check if cancellation is >= 12 hours before appointment
-          const hoursUntilAppointment = (appointmentTime - now) / (1000 * 60 * 60);
+          const hoursUntilAppointment = (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
           const shouldRefund = hoursUntilAppointment >= 12;
 
           // Cancel appointment
