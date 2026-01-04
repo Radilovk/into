@@ -375,7 +375,7 @@ export default {
           );
         }
         
-        if (!acceptTerms) {
+        if (acceptTerms !== true) {
           return new Response(
             JSON.stringify({ 
               success: false, 
@@ -428,7 +428,7 @@ export default {
           timezone: timezone || 'Europe/Sofia',
           // Add form fields - the terms acceptance checkbox
           // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
-          // This is a required field (already validated above)
+          // This is a required field (validated above that acceptTerms is truthy)
           fields: [
             {
               id: 3583430,
