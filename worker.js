@@ -428,7 +428,7 @@ export default {
           timezone: timezone || 'Europe/Sofia',
           // Add form fields - the terms acceptance checkbox
           // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
-          // This is a required field (validated above that acceptTerms is truthy)
+          // This is a required field (validated above that acceptTerms === true)
           fields: [
             {
               id: 3583430,
