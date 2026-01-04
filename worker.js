@@ -363,7 +363,7 @@ export default {
       // POST /api/book
       if (pathname === '/api/book' && request.method === 'POST') {
         const body = await request.json();
-        const { email, appointmentTypeID, datetime, timezone, firstName, lastName, phone } = body;
+        const { email, appointmentTypeID, datetime, timezone, firstName, lastName, phone, acceptTerms } = body;
 
         if (!email || !appointmentTypeID || !datetime) {
           return new Response(
@@ -421,6 +421,17 @@ export default {
         if (firstName) appointmentData.firstName = firstName;
         if (lastName) appointmentData.lastName = lastName;
         if (phone) appointmentData.phone = phone;
+        
+        // Add form fields - the terms acceptance checkbox
+        // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
+        if (acceptTerms) {
+          appointmentData.fields = [
+            {
+              id: 3583430,
+              value: 'yes'
+            }
+          ];
+        }
 
         try {
           const appointment = await createAppointment(appointmentData);

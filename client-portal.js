@@ -297,9 +297,15 @@ async function bookAppointment(event) {
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
     const phone = document.getElementById('phone').value;
+    const acceptTerms = document.getElementById('acceptTerms').checked;
     
     if (!appointmentTypeID || !timeslot) {
         showAlert('Моля, попълнете задължителните полета', 'error');
+        return;
+    }
+    
+    if (!acceptTerms) {
+        showAlert('Моля, приемете условията за да продължите', 'error');
         return;
     }
     
@@ -322,6 +328,7 @@ async function bookAppointment(event) {
                 firstName,
                 lastName,
                 phone,
+                acceptTerms,
             }),
         });
         
