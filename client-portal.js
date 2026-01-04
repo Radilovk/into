@@ -4,6 +4,8 @@
 const API_BASE = 'https://workerai.radilov-k.workers.dev';
 let currentEmail = '';
 let clientData = null;
+let appointmentTypes = [];
+let selectedDate = null;
 
 // Show alert message
 function showAlert(message, type = 'info') {
@@ -122,6 +124,9 @@ function displayClientInfo() {
     
     // Display past appointments
     displayPastAppointments();
+    
+    // Load appointment types for booking
+    loadAppointmentTypes();
 }
 
 // Display upcoming appointments
@@ -185,23 +190,121 @@ function displayPastAppointments() {
     });
 }
 
+// Load appointment types
+async function loadAppointmentTypes() {
+    const selectEl = document.getElementById('appointmentTypeID');
+    selectEl.innerHTML = '<option value="">Зареждане...</option>';
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/appointment-types`);
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Грешка при зареждане на услугите');
+        }
+        
+        if (result.success && result.data) {
+            appointmentTypes = result.data;
+            selectEl.innerHTML = '<option value="">Изберете услуга...</option>';
+            
+            result.data.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.id;
+                option.textContent = `${type.name} (${type.duration} мин)`;
+                if (type.price) {
+                    option.textContent += ` - ${type.price} лв.`;
+                }
+                selectEl.appendChild(option);
+            });
+        } else {
+            throw new Error('Неуспешно зареждане на услугите');
+        }
+    } catch (error) {
+        console.error('Error loading appointment types:', error);
+        selectEl.innerHTML = '<option value="">Грешка при зареждане</option>';
+        showAlert(error.message || 'Грешка при зареждане на услугите', 'error');
+    }
+}
+
+// Load available time slots
+async function loadAvailableSlots() {
+    const appointmentTypeID = document.getElementById('appointmentTypeID').value;
+    const date = document.getElementById('booking-date').value;
+    const timeslotEl = document.getElementById('timeslot');
+    const timeslotsGroup = document.getElementById('timeslots-group');
+    const timeslotsInfo = document.getElementById('timeslots-info');
+    
+    if (!appointmentTypeID || !date) {
+        timeslotsGroup.style.display = 'none';
+        return;
+    }
+    
+    timeslotEl.innerHTML = '<option value="">Зареждане...</option>';
+    timeslotsGroup.style.display = 'block';
+    timeslotsInfo.textContent = 'Зареждане на свободни часове...';
+    
+    try {
+        const response = await fetch(
+            `${API_BASE}/api/availability?appointmentTypeID=${appointmentTypeID}&date=${date}`
+        );
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Грешка при зареждане на часове');
+        }
+        
+        if (result.success && result.data && result.data.length > 0) {
+            timeslotEl.innerHTML = '<option value="">Изберете час...</option>';
+            
+            result.data.forEach(slot => {
+                const timeStr = typeof slot === 'object' ? slot.time : slot;
+                const option = document.createElement('option');
+                option.value = timeStr;
+                option.textContent = formatTimeSlot(timeStr);
+                timeslotEl.appendChild(option);
+            });
+            
+            timeslotsInfo.textContent = `${result.data.length} свободни часа (интервали на 45 мин)`;
+            timeslotsInfo.style.color = '#28a745';
+        } else {
+            timeslotEl.innerHTML = '<option value="">Няма свободни часове</option>';
+            timeslotsInfo.textContent = 'Няма налични часове за тази дата';
+            timeslotsInfo.style.color = '#dc3545';
+        }
+    } catch (error) {
+        console.error('Error loading availability:', error);
+        timeslotEl.innerHTML = '<option value="">Грешка при зареждане</option>';
+        timeslotsInfo.textContent = error.message || 'Грешка при зареждане';
+        timeslotsInfo.style.color = '#dc3545';
+    }
+}
+
+// Format time slot for display
+function formatTimeSlot(timeStr) {
+    const date = new Date(timeStr);
+    if (isNaN(date.getTime())) {
+        return 'Невалиден час';
+    }
+    return date.toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
+}
+
 // Book appointment
 async function bookAppointment(event) {
     event.preventDefault();
     
     const appointmentTypeID = document.getElementById('appointmentTypeID').value;
-    const datetime = document.getElementById('datetime').value;
+    const timeslot = document.getElementById('timeslot').value;
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
     const phone = document.getElementById('phone').value;
     
-    if (!appointmentTypeID || !datetime) {
+    if (!appointmentTypeID || !timeslot) {
         showAlert('Моля, попълнете задължителните полета', 'error');
         return;
     }
     
-    // Convert datetime-local to ISO format
-    const isoDatetime = new Date(datetime).toISOString();
+    // timeslot is already in ISO format from the API
+    const datetime = timeslot;
     
     setLoading(true);
     
@@ -214,7 +317,7 @@ async function bookAppointment(event) {
             body: JSON.stringify({
                 email: currentEmail,
                 appointmentTypeID: parseInt(appointmentTypeID),
-                datetime: isoDatetime,
+                datetime: datetime,
                 timezone: 'Europe/Sofia',
                 firstName,
                 lastName,
@@ -233,6 +336,7 @@ async function bookAppointment(event) {
             
             // Reset form
             document.getElementById('booking-form').reset();
+            document.getElementById('timeslots-group').style.display = 'none';
             
             // Reload client info
             setTimeout(() => loadClientInfo(), 1000);
@@ -297,4 +401,15 @@ document.addEventListener('DOMContentLoaded', () => {
             loadClientInfo();
         }
     });
+    
+    // Add event listeners for appointment type and date selection
+    const appointmentTypeSelect = document.getElementById('appointmentTypeID');
+    const bookingDateInput = document.getElementById('booking-date');
+    
+    appointmentTypeSelect.addEventListener('change', loadAvailableSlots);
+    bookingDateInput.addEventListener('change', loadAvailableSlots);
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    bookingDateInput.setAttribute('min', today);
 });

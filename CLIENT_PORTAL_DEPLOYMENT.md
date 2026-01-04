@@ -131,6 +131,54 @@ curl https://workerai.radilov-k.workers.dev/api/health
 }
 ```
 
+### GET /api/appointment-types
+Извлича списък с налични услуги от Acuity.
+
+**Request:**
+```bash
+curl https://workerai.radilov-k.workers.dev/api/appointment-types
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 80052001,
+      "name": "Personal Training",
+      "duration": 60,
+      "price": "50.00",
+      "description": "Лична тренировка",
+      "category": "Fitness"
+    }
+  ]
+}
+```
+
+### GET /api/availability?appointmentTypeID=...&date=...
+Извлича свободни часове за конкретна услуга и дата.
+
+**Request:**
+```bash
+curl "https://workerai.radilov-k.workers.dev/api/availability?appointmentTypeID=80052001&date=2026-01-20"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    { "time": "2026-01-20T08:00:00+02:00" },
+    { "time": "2026-01-20T08:45:00+02:00" },
+    { "time": "2026-01-20T09:00:00+02:00" },
+    { "time": "2026-01-20T09:45:00+02:00" }
+  ]
+}
+```
+
+**Забележка:** Часовете са автоматично филтрирани да показват само слотове на :00 и :45 минути (интервали от 45 минути).
+
 ### GET /api/me?email=...
 Извлича информация за клиент, баланс, резервации.
 

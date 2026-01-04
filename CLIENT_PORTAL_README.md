@@ -68,6 +68,8 @@ curl "https://workerai.radilov-k.workers.dev/api/me?email=test@example.com"
 |--------|----------|----------|
 | GET | `/api/health` | Health check |
 | GET | `/api/me?email=...` | Клиент инфо + резервации |
+| GET | `/api/appointment-types` | Списък с налични услуги |
+| GET | `/api/availability?appointmentTypeID=...&date=...` | Свободни часове за дата и услуга |
 | POST | `/api/book` | Създаване на резервация |
 | POST | `/api/cancel` | Отмяна на резервация |
 
@@ -94,6 +96,16 @@ curl "https://workerai.radilov-k.workers.dev/api/me?email=test@example.com"
 const res = await fetch('https://workerai.radilov-k.workers.dev/api/me?email=test@example.com');
 const data = await res.json();
 console.log(data);
+
+// Get appointment types
+const types = await fetch('https://workerai.radilov-k.workers.dev/api/appointment-types');
+const typesData = await types.json();
+console.log(typesData);
+
+// Get available time slots
+const availability = await fetch('https://workerai.radilov-k.workers.dev/api/availability?appointmentTypeID=80052001&date=2026-01-20');
+const slots = await availability.json();
+console.log(slots);
 
 // Book appointment
 const book = await fetch('https://workerai.radilov-k.workers.dev/api/book', {
@@ -127,6 +139,12 @@ console.log(await cancel.json());
 ```bash
 # Get client info
 curl "https://workerai.radilov-k.workers.dev/api/me?email=test@example.com"
+
+# Get appointment types
+curl "https://workerai.radilov-k.workers.dev/api/appointment-types"
+
+# Get available slots
+curl "https://workerai.radilov-k.workers.dev/api/availability?appointmentTypeID=80052001&date=2026-01-20"
 
 # Book appointment
 curl -X POST "https://workerai.radilov-k.workers.dev/api/book" \
@@ -244,11 +262,15 @@ wrangler kv:key list --binding=APP_KV --prefix="client:test@example.com"
 - ✅ Преглед на баланс
 - ✅ Списък бъдещи резервации
 - ✅ Списък минали резервации
-- ✅ Запазване на час
+- ✅ Автоматично зареждане на налични услуги
+- ✅ Избор на дата и преглед на свободни часове
+- ✅ Филтриране на часове (само :00 и :45 - интервали от 45 мин)
+- ✅ Запазване на час от свободните слотове
 - ✅ Отмяна на час
 - ✅ Автоматични имейл уведомления (от Acuity)
 - ✅ Rate limiting за защита
 - ✅ Responsive за мобилни устройства
+- ✅ Синхронизация в реално време с Acuity платформата
 
 ## 📞 Support
 

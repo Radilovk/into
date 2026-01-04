@@ -306,12 +306,20 @@
                 <form id="booking-form" onsubmit="return bookAppointment(event)">
                     <div class="input-group">
                         <label for="appointmentTypeID">Тип услуга *</label>
-                        <input type="number" id="appointmentTypeID" placeholder="ID на услугата" required>
-                        <small style="color: #999;">Попитайте администратора за ID на услугата</small>
+                        <select id="appointmentTypeID" required>
+                            <option value="">Зареждане на услуги...</option>
+                        </select>
                     </div>
                     <div class="input-group">
-                        <label for="datetime">Дата и час *</label>
-                        <input type="datetime-local" id="datetime" required>
+                        <label for="booking-date">Дата *</label>
+                        <input type="date" id="booking-date" required>
+                    </div>
+                    <div class="input-group" id="timeslots-group" style="display: none;">
+                        <label for="timeslot">Свободни часове *</label>
+                        <select id="timeslot" required>
+                            <option value="">Изберете час...</option>
+                        </select>
+                        <small style="color: #999;" id="timeslots-info"></small>
                     </div>
                     <div class="input-group">
                         <label for="firstName">Име</label>
