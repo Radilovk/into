@@ -85,6 +85,17 @@
             border-color: #667eea;
         }
 
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+        }
+
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -332,6 +343,12 @@
                     <div class="input-group">
                         <label for="phone">Телефон</label>
                         <input type="tel" id="phone" placeholder="+359...">
+                    </div>
+                    <div class="input-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="acceptTerms" required>
+                            <span>Запознат съм и приемам условията *</span>
+                        </label>
                     </div>
                     <button type="submit" class="btn" id="book-btn">📅 Запази час</button>
                 </form>

@@ -363,13 +363,23 @@ export default {
       // POST /api/book
       if (pathname === '/api/book' && request.method === 'POST') {
         const body = await request.json();
-        const { email, appointmentTypeID, datetime, timezone, firstName, lastName, phone } = body;
+        const { email, appointmentTypeID, datetime, timezone, firstName, lastName, phone, acceptTerms } = body;
 
         if (!email || !appointmentTypeID || !datetime) {
           return new Response(
             JSON.stringify({ 
               success: false, 
               message: 'Missing required fields: email, appointmentTypeID, datetime' 
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        if (acceptTerms !== true) {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Трябва да приемете условията за да запазите час' 
             }),
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
@@ -416,6 +426,15 @@ export default {
           datetime,
           email,
           timezone: timezone || 'Europe/Sofia',
+          // Add form fields - the terms acceptance checkbox
+          // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
+          // This is a required field (validated above that acceptTerms === true)
+          fields: [
+            {
+              id: 3583430,
+              value: 'yes'
+            }
+          ]
         };
 
         if (firstName) appointmentData.firstName = firstName;
