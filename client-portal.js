@@ -304,6 +304,11 @@ async function bookAppointment(event) {
         return;
     }
     
+    if (!firstName || !lastName) {
+        showAlert('Моля, въведете име и фамилия', 'error');
+        return;
+    }
+    
     if (!acceptTerms) {
         showAlert('Моля, приемете условията за да продължите', 'error');
         return;

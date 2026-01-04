@@ -426,6 +426,8 @@ export default {
           datetime,
           email,
           timezone: timezone || 'Europe/Sofia',
+          firstName: firstName || '',
+          lastName: lastName || '',
           // Add form fields - the terms acceptance checkbox
           // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
           // This is a required field (validated above that acceptTerms === true)
@@ -437,8 +439,6 @@ export default {
           ]
         };
 
-        if (firstName) appointmentData.firstName = firstName;
-        if (lastName) appointmentData.lastName = lastName;
         if (phone) appointmentData.phone = phone;
 
         try {
