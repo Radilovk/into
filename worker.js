@@ -374,6 +374,16 @@ export default {
             { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
+        
+        if (!acceptTerms) {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Трябва да приемете условията за да запазите час' 
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
 
         // Rate limiting
         const rateLimit = await checkRateLimit(email);
@@ -416,22 +426,20 @@ export default {
           datetime,
           email,
           timezone: timezone || 'Europe/Sofia',
+          // Add form fields - the terms acceptance checkbox
+          // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
+          // This is a required field, so we always include it
+          fields: [
+            {
+              id: 3583430,
+              value: acceptTerms ? 'yes' : 'no'
+            }
+          ]
         };
 
         if (firstName) appointmentData.firstName = firstName;
         if (lastName) appointmentData.lastName = lastName;
         if (phone) appointmentData.phone = phone;
-        
-        // Add form fields - the terms acceptance checkbox
-        // Field ID 3583430 is the "Запознат съм и приемам условията" checkbox
-        if (acceptTerms) {
-          appointmentData.fields = [
-            {
-              id: 3583430,
-              value: 'yes'
-            }
-          ];
-        }
 
         try {
           const appointment = await createAppointment(appointmentData);
