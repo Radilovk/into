@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@200;300;400;500;600;700;800&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,8 +28,8 @@
         </div>
     </div>
 
-    <!-- Fixed Left Sidebar Header -->
-    <header class="main-header">
+    <!-- Fixed Left Sidebar (desktop) -->
+    <aside class="main-header" aria-label="Странична лента">
         <div class="logo-holder">
             <a href="#" class="logo-link" aria-label="IntoDesign Studio">
                 <div class="logo-text">
@@ -44,17 +45,7 @@
                 <li><a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>
             </ul>
         </div>
-        <div class="nav-button-wrap">
-            <button class="nav-button but-hol" id="navToggle" aria-label="Menu" aria-expanded="false">
-                <span class="menu-burger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-                <span class="menu-text">Menu</span>
-            </button>
-        </div>
-    </header>
+    </aside>
 
     <!-- Slide-out Navigation -->
     <div class="nav-overlay" id="navOverlay"></div>
@@ -85,24 +76,38 @@
         </div>
     </div>
 
-    <!-- Top Header Bar (Archimak style) -->
-    <div class="top-header" id="topHeader">
-        <nav class="page-scroll-nav" aria-label="Секции">
-            <ul>
-                <li><a href="#" class="act-link" data-section="home">Начало</a></li>
-                <li><a href="#about" data-section="about">За нас</a></li>
-                <li><a href="#portfolio" data-section="portfolio">Проекти</a></li>
-                <li><a href="#services" data-section="services">Услуги</a></li>
-                <li><a href="#contact" data-section="contact">Контакт</a></li>
-            </ul>
-        </nav>
-        <a href="#contact" class="top-header-cta">
-            <i class="fas fa-envelope"></i> Свържете се
-        </a>
+    <!-- Top Header Bar -->
+    <header class="top-header" id="topHeader">
+        <div class="top-header-left">
+            <a href="#" class="mobile-logo" aria-label="IntoDesign Studio">
+                <span class="mobile-logo-text">INTO</span>
+                <span class="mobile-logo-sub">design studio</span>
+            </a>
+            <nav class="page-scroll-nav" aria-label="Секции">
+                <ul>
+                    <li><a href="#" class="act-link" data-section="home">Начало</a></li>
+                    <li><a href="#about" data-section="about">За нас</a></li>
+                    <li><a href="#portfolio" data-section="portfolio">Проекти</a></li>
+                    <li><a href="#services" data-section="services">Услуги</a></li>
+                    <li><a href="#contact" data-section="contact">Контакт</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="top-header-center">
+            <span class="header-tagline">Архитектура · Дизайн · Интериор</span>
+        </div>
+        <div class="top-header-right">
+            <a href="tel:+359898889946" class="header-phone"><i class="fas fa-phone"></i> +359 898 889 946</a>
+            <a href="#contact" class="top-header-cta"><i class="fas fa-envelope"></i> Свържете се</a>
+            <button class="nav-button but-hol" id="navToggle" aria-label="Меню" aria-expanded="false">
+                <span class="menu-burger"><span></span><span></span><span></span></span>
+                <span class="menu-text">Menu</span>
+            </button>
+        </div>
         <div class="scroll-progress-bar">
             <div class="scroll-progress-fill" id="scrollProgress"></div>
         </div>
-    </div>
+    </header>
 
     <!-- Main Content -->
     <div class="content-holder" id="contentHolder">
@@ -236,7 +241,7 @@
                     <button class="gallery-filter" data-filter="house">Къщи</button>
                 </div>
                 <div class="gallery-items">
-                    <div class="gallery-item" data-category="apartment">
+                    <article class="gallery-item" data-category="apartment" data-project="aura" tabindex="0" role="button" aria-label="Отвори проект Aura">
                         <div class="grid-item-holder">
                             <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80" alt="Aura" loading="lazy">
                             <div class="folio-overlay">
@@ -245,11 +250,12 @@
                                     <span class="folio-cat">Апартамент</span>
                                     <h3>Aura</h3>
                                     <p>Бургас | 142кв.м.</p>
+                                    <span class="folio-view"><i class="fas fa-expand"></i> Виж проекта</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-item gallery-item-second" data-category="apartment">
+                    </article>
+                    <article class="gallery-item gallery-item-second" data-category="apartment" data-project="sea-view" tabindex="0" role="button" aria-label="Отвори проект Sea View">
                         <div class="grid-item-holder">
                             <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80" alt="Sea View" loading="lazy">
                             <div class="folio-overlay">
@@ -258,11 +264,12 @@
                                     <span class="folio-cat">Апартамент</span>
                                     <h3>Sea View</h3>
                                     <p>Бургас | 72кв.м.</p>
+                                    <span class="folio-view"><i class="fas fa-expand"></i> Виж проекта</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-item" data-category="house">
+                    </article>
+                    <article class="gallery-item" data-category="house" data-project="gold-coast" tabindex="0" role="button" aria-label="Отвори проект Gold Coast">
                         <div class="grid-item-holder">
                             <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&q=80" alt="Gold Coast" loading="lazy">
                             <div class="folio-overlay">
@@ -271,11 +278,12 @@
                                     <span class="folio-cat">Къща</span>
                                     <h3>Gold Coast</h3>
                                     <p>Сарафово | 352кв.м.</p>
+                                    <span class="folio-view"><i class="fas fa-expand"></i> Виж проекта</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-item" data-category="apartment">
+                    </article>
+                    <article class="gallery-item" data-category="apartment" data-project="coziness" tabindex="0" role="button" aria-label="Отвори проект Coziness">
                         <div class="grid-item-holder">
                             <img src="https://images.unsplash.com/photo-1600566752225-53762df0b979?w=800&q=80" alt="Coziness" loading="lazy">
                             <div class="folio-overlay">
@@ -284,11 +292,12 @@
                                     <span class="folio-cat">Апартамент</span>
                                     <h3>Coziness</h3>
                                     <p>Central Park | 75кв.м.</p>
+                                    <span class="folio-view"><i class="fas fa-expand"></i> Виж проекта</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-item gallery-item-second" data-category="house">
+                    </article>
+                    <article class="gallery-item gallery-item-second" data-category="house" data-project="wabi-sabi" tabindex="0" role="button" aria-label="Отвори проект Modern Wabi Sabi">
                         <div class="grid-item-holder">
                             <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80" alt="Modern Wabi Sabi" loading="lazy">
                             <div class="folio-overlay">
@@ -297,11 +306,12 @@
                                     <span class="folio-cat">Къща</span>
                                     <h3>Modern Wabi Sabi</h3>
                                     <p>Крайморие | 194кв.м.</p>
+                                    <span class="folio-view"><i class="fas fa-expand"></i> Виж проекта</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gallery-item" data-category="house">
+                    </article>
+                    <article class="gallery-item" data-category="house" data-project="back-to-black" tabindex="0" role="button" aria-label="Отвори проект Back to Black">
                         <div class="grid-item-holder">
                             <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80" alt="Back to Black" loading="lazy">
                             <div class="folio-overlay">
@@ -310,10 +320,11 @@
                                     <span class="folio-cat">Къща</span>
                                     <h3>Back to Black</h3>
                                     <p>Лозово | 268кв.м.</p>
+                                    <span class="folio-view"><i class="fas fa-expand"></i> Виж проекта</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
                 <div class="section-cta">
                     <a href="#contact" class="btn btn-light">Запитване за проект</a>
@@ -340,45 +351,55 @@
                     <p>Персонализирани пакети за всеки клиент и бюджет</p>
                 </div>
                 <div class="services-grid">
-                    <div class="serv-item">
-                        <span class="serv-num">01</span>
+                    <div class="serv-card">
+                        <div class="serv-card-head">
+                            <span class="serv-num">01</span>
+                            <div class="serv-icon"><i class="fas fa-ruler-combined"></i></div>
+                        </div>
                         <h4>Standard</h4>
-                        <p>Основен пакет услуги за интериорно проектиране</p>
-                        <div class="serv-price">35€/кв.м.</div>
-                        <ul>
-                            <li>Точно замерване на помещенията</li>
-                            <li>2D функционално разпределение</li>
-                            <li>3D визуализации</li>
-                            <li>Работни чертежи</li>
+                        <p class="serv-desc">Основен пакет за интериорно проектиране — идеален за апартаменти и едностайни жилища.</p>
+                        <div class="serv-price">35<span>€/кв.м.</span></div>
+                        <ul class="serv-features">
+                            <li><i class="fas fa-check"></i> Точно замерване на помещенията</li>
+                            <li><i class="fas fa-check"></i> 2D функционално разпределение</li>
+                            <li><i class="fas fa-check"></i> 3D визуализации</li>
+                            <li><i class="fas fa-check"></i> Работни чертежи</li>
                         </ul>
-                        <a href="#contact" class="btn">Виж детайли</a>
+                        <a href="#contact" class="serv-btn">Запитване <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="serv-item">
-                        <span class="serv-num">02</span>
+                    <div class="serv-card">
+                        <div class="serv-card-head">
+                            <span class="serv-num">02</span>
+                            <div class="serv-icon"><i class="fas fa-cube"></i></div>
+                        </div>
                         <h4>Standard+</h4>
-                        <p>Разширен пакет с допълнителни услуги</p>
-                        <div class="serv-price">45€/кв.м.</div>
-                        <ul>
-                            <li>Всичко от Standard пакет</li>
-                            <li>Ценови оферти за изпълнение</li>
-                            <li>Консултация с инженер</li>
-                            <li>Подбор на изпълнители</li>
+                        <p class="serv-desc">Разширен пакет с инженерна консултация и подбор на изпълнители.</p>
+                        <div class="serv-price">45<span>€/кв.м.</span></div>
+                        <ul class="serv-features">
+                            <li><i class="fas fa-check"></i> Всичко от Standard пакет</li>
+                            <li><i class="fas fa-check"></i> Ценови оферти за изпълнение</li>
+                            <li><i class="fas fa-check"></i> Консултация с инженер</li>
+                            <li><i class="fas fa-check"></i> Подбор на изпълнители</li>
                         </ul>
-                        <a href="#contact" class="btn">Виж детайли</a>
+                        <a href="#contact" class="serv-btn">Запитване <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <div class="serv-item serv-featured">
-                        <span class="serv-num">03</span>
+                    <div class="serv-card serv-featured">
+                        <div class="serv-badge">Препоръчан</div>
+                        <div class="serv-card-head">
+                            <span class="serv-num">03</span>
+                            <div class="serv-icon"><i class="fas fa-star"></i></div>
+                        </div>
                         <h4>Premium</h4>
-                        <p>Комплексно решение от идея до реализация</p>
-                        <div class="serv-price">50€/кв.м.</div>
-                        <ul>
-                            <li>Всичко от Standard+ пакет</li>
-                            <li>Авторски надзор</li>
-                            <li>3D фотореалистични визуализации</li>
-                            <li>Персонализиран дизайн на мебели</li>
-                            <li>Доставка и монтаж</li>
+                        <p class="serv-desc">Комплексно решение от идея до реализация с авторски надзор.</p>
+                        <div class="serv-price">50<span>€/кв.м.</span></div>
+                        <ul class="serv-features">
+                            <li><i class="fas fa-check"></i> Всичко от Standard+ пакет</li>
+                            <li><i class="fas fa-check"></i> Авторски надзор</li>
+                            <li><i class="fas fa-check"></i> 3D фотореалистични визуализации</li>
+                            <li><i class="fas fa-check"></i> Персонализиран дизайн на мебели</li>
+                            <li><i class="fas fa-check"></i> Доставка и монтаж</li>
                         </ul>
-                        <a href="#contact" class="btn">Виж детайли</a>
+                        <a href="#contact" class="serv-btn serv-btn-accent">Запитване <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -625,6 +646,46 @@
         </footer>
     </div>
 
+    <!-- Project Modal -->
+    <div class="project-modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+        <div class="project-modal-backdrop" id="projectModalBackdrop"></div>
+        <div class="project-modal-panel">
+            <button class="project-modal-close" id="projectModalClose" aria-label="Затвори"><i class="fas fa-times"></i></button>
+            <div class="project-modal-header">
+                <div>
+                    <span class="project-modal-cat" id="projectModalCat"></span>
+                    <h2 id="projectModalTitle"></h2>
+                    <p class="project-modal-meta" id="projectModalMeta"></p>
+                </div>
+            </div>
+            <div class="project-modal-tabs" role="tablist">
+                <button class="project-tab active" data-tab="gallery" role="tab" aria-selected="true"><i class="fas fa-images"></i> Галерия</button>
+                <button class="project-tab" data-tab="panorama" role="tab" aria-selected="false"><i class="fas fa-street-view"></i> 360° Изглед</button>
+            </div>
+            <div class="project-tab-panel active" id="panelGallery" role="tabpanel">
+                <div class="modal-gallery-main">
+                    <button class="modal-gallery-nav modal-gallery-prev" id="modalImgPrev" aria-label="Предишна"><i class="fas fa-chevron-left"></i></button>
+                    <img id="modalMainImg" src="" alt="">
+                    <button class="modal-gallery-nav modal-gallery-next" id="modalImgNext" aria-label="Следваща"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="modal-gallery-thumbs" id="modalThumbs"></div>
+            </div>
+            <div class="project-tab-panel" id="panelPanorama" role="tabpanel">
+                <div class="panorama-viewer" id="panoramaViewer"></div>
+                <div class="panorama-upload">
+                    <label for="panoramaUpload" class="panorama-upload-label">
+                        <i class="fas fa-upload"></i>
+                        <span>Качи 360° equirectangular изображение</span>
+                        <small>JPG или PNG · панорамна проекция 2:1</small>
+                    </label>
+                    <input type="file" id="panoramaUpload" accept="image/jpeg,image/png,image/webp" hidden>
+                </div>
+                <p class="panorama-hint"><i class="fas fa-info-circle"></i> Плъзнете с мишката или пръст за интерактивен преглед. Можете да качите собствен 360° рендер.</p>
+            </div>
+            <p class="project-modal-desc" id="projectModalDesc"></p>
+        </div>
+    </div>
+
     <!-- Video Modal -->
     <div class="video-modal" id="videoModal" role="dialog" aria-label="Видео презентация">
         <div class="video-modal-inner">
@@ -640,6 +701,8 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="projects.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
