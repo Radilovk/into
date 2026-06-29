@@ -63,7 +63,11 @@ function filterEvents() {
   list.className = 'events-list';
   filtered.forEach(ev => {
     const li = document.createElement('li');
-    li.innerHTML = `<strong>${ev.title}</strong> - ${ev.date} ${ev.time || ''} (${ev.location})`;
+    li.innerHTML = `
+      <div class="event-date">${ev.date}${ev.time ? ' | ' + ev.time : ''}</div>
+      <div class="event-title">${ev.title}</div>
+      <div class="event-location">${ev.location}</div>
+    `;
     list.appendChild(li);
   });
   container.appendChild(list);

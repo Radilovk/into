@@ -4,340 +4,586 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IntoDesign Studio | Персонализирани интериорни решения</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@200;300;400;500;600;700;800&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container header-container">
-            <a href="#" class="logo">
-                <div class="logo-main">
-                    <span class="logo-box">I</span>
-                    <span class="logo-box">N</span>
-                    <span class="logo-box">T</span>
-                    <span class="logo-box">O</span>
+    <!-- Preloader -->
+    <div class="loader-wrap" id="loader">
+        <div class="loader-inner">
+            <div class="loader-logo">
+                <span class="logo-letter">I</span>
+                <span class="logo-letter">N</span>
+                <span class="logo-letter">T</span>
+                <span class="logo-letter">O</span>
+            </div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Left Sidebar Header -->
+    <header class="main-header">
+        <div class="logo-holder">
+            <a href="#" class="logo-link">
+                <div class="logo-text">
+                    <span>I</span><span>N</span><span>T</span><span>O</span>
                 </div>
-                <span class="logo-sub">design studio</span>
             </a>
-            
-            <nav>
-                <div class="nav-links">
-                    <a href="#" class="active">Начало</a>
-                    <a href="#portfolio">Портфолио</a>
-                    <a href="#services">Услуги</a>
-                    <a href="#team">Екип</a>
-                    <a href="#inquiry">Контакти</a>
-                    <a href="calendar.html">Календар</a>
-                </div>
-                <button class="mobile-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </nav>
-            
-            <button class="theme-toggle" aria-label="Toggle theme">
-                <i class="fas fa-moon"></i>
+        </div>
+        <div class="header-social">
+            <ul>
+                <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                <li><a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>
+            </ul>
+        </div>
+        <div class="nav-button-wrap">
+            <button class="nav-button but-hol" id="navToggle" aria-label="Menu">
+                <span class="menu-burger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+                <span class="menu-text">Menu</span>
             </button>
         </div>
     </header>
-    <div class="menu-overlay" aria-hidden="true"></div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Създаваме вашия свят</h1>
-                <p>Into Design Studio обединява креативност и функционалност в уникални интериорни решения. Създаваме персонализирани пространства, които отразяват вашата идентичност и визия.</p>
-                <a href="#portfolio" class="hero-btn">Разгледайте проектите</a>
+    <!-- Slide-out Navigation -->
+    <div class="nav-overlay" id="navOverlay"></div>
+    <div class="nav-holder" id="navHolder">
+        <div class="nav-holder-line"></div>
+        <div class="nav-holder-dec"></div>
+        <nav class="sliding-menu">
+            <ul>
+                <li><a href="#" class="act-link" data-section="home">Начало</a></li>
+                <li><a href="#about" data-section="about">За нас</a></li>
+                <li><a href="#portfolio" data-section="portfolio">Портфолио</a></li>
+                <li><a href="#services" data-section="services">Услуги</a></li>
+                <li><a href="#team" data-section="team">Екип</a></li>
+                <li><a href="#testimonials" data-section="testimonials">Отзиви</a></li>
+                <li><a href="#contact" data-section="contact">Контакти</a></li>
+                <li><a href="calendar.html">Календар</a></li>
+            </ul>
+        </nav>
+        <div class="nav-footer">
+            <div class="nav-footer-contacts">
+                <p>info@intodesign.bg</p>
+                <p>+359 898 889 946</p>
+            </div>
+            <div class="nav-footer-social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-pinterest-p"></i></a>
             </div>
         </div>
-        <div class="hero-bg"></div>
-    </section>
+    </div>
 
-    <!-- Portfolio Section -->
-    <section id="portfolio">
-        <div class="container">
-            <div class="section-title">
-                <h2>Нашите проекти</h2>
-                <p>Всяко пространство е уникално и отразява индивидуалността на клиента</p>
-            </div>
-            
-            <div class="portfolio-grid">
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Aura Project" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <span class="portfolio-tag">Апартамент</span>
-                        <h3>Aura</h3>
-                        <p>Бургас | 142кв.м.</p>
-                        <p>Модерен дизайн с класически елементи</p>
-                    </div>
-                </div>
-                
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Sea View Project" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <span class="portfolio-tag">Апартамент</span>
-                        <h3>Sea View</h3>
-                        <p>Бургас | 72кв.м.</p>
-                        <p>Панорамни гледки към морето</p>
-                    </div>
-                </div>
-                
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Gold Coast Project" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <span class="portfolio-tag">Къща</span>
-                        <h3>Gold Coast</h3>
-                        <p>Сарафово | 352кв.м.</p>
-                        <p>Japandi стил с естествени материали</p>
-                    </div>
-                </div>
-                
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1600566752225-53762df0b979?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Coziness Project" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <span class="portfolio-tag">Апартамент</span>
-                        <h3>Coziness</h3>
-                        <p>Central Park | 75кв.м.</p>
-                        <p>Топли неутрални тонове</p>
-                    </div>
-                </div>
-                
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Modern Wabi Sabi Project" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <span class="portfolio-tag">Къща</span>
-                        <h3>Modern Wabi Sabi</h3>
-                        <p>Крайморие | 194кв.м.</p>
-                        <p>Wabi Sabi стил с естествени материали</p>
-                    </div>
-                </div>
-                
-                <div class="portfolio-item">
-                    <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Back to Black Project" class="portfolio-img">
-                    <div class="portfolio-overlay">
-                        <span class="portfolio-tag">Къща</span>
-                        <h3>Back to Black</h3>
-                        <p>Лозово | 268кв.м.</p>
-                        <p>Смел модерен дизайн с черни акценти</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Main Content -->
+    <div class="content-holder" id="contentHolder">
 
-    <!-- Services Section -->
-    <section id="services" class="services">
-        <div class="container">
-            <div class="section-title">
-                <h2>Нашите услуги</h2>
-                <p>Персонализирани пакети за всеки клиент и бюджет</p>
-            </div>
-            
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-ruler-combined"></i>
+        <!-- Hero Fullscreen Slider -->
+        <section class="hero-wrap scroll-section" id="home">
+            <div class="hero-dec"></div>
+            <div class="fs-slider full-height">
+                <div class="fs-slider-wrap">
+                    <div class="hero-slider" id="heroSlider">
+                        <div class="hero-slide active" data-index="0">
+                            <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80')"></div>
+                            <div class="hero-slide-overlay"></div>
+                            <div class="hero-slide-content">
+                                <span class="hero-slide-date">2024</span>
+                                <h2 class="hero-slide-title">Aura<br>Апартамент</h2>
+                                <p class="hero-slide-desc">Бургас | 142кв.м. — Модерен дизайн с класически елементи</p>
+                                <a href="#portfolio" class="hero_btn">Виж детайли</a>
+                            </div>
+                        </div>
+                        <div class="hero-slide" data-index="1">
+                            <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1920&q=80')"></div>
+                            <div class="hero-slide-overlay"></div>
+                            <div class="hero-slide-content">
+                                <span class="hero-slide-date">2024</span>
+                                <h2 class="hero-slide-title">Sea View<br>Апартамент</h2>
+                                <p class="hero-slide-desc">Бургас | 72кв.м. — Панорамни гледки към морето</p>
+                                <a href="#portfolio" class="hero_btn">Виж детайли</a>
+                            </div>
+                        </div>
+                        <div class="hero-slide" data-index="2">
+                            <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1920&q=80')"></div>
+                            <div class="hero-slide-overlay"></div>
+                            <div class="hero-slide-content">
+                                <span class="hero-slide-date">2023</span>
+                                <h2 class="hero-slide-title">Gold Coast<br>Къща</h2>
+                                <p class="hero-slide-desc">Сарафово | 352кв.м. — Japandi стил с естествени материали</p>
+                                <a href="#portfolio" class="hero_btn">Виж детайли</a>
+                            </div>
+                        </div>
                     </div>
-                    <h3>Standard</h3>
-                    <p>Основен пакет услуги за интериорно проектиране</p>
-                    <div class="service-price">35€/кв.м.</div>
-                    <ul class="service-features">
-                        <li>Точно замерване на помещенията</li>
-                        <li>2D функционално разпределение</li>
-                        <li>3D визуализации</li>
-                        <li>Работни чертежи</li>
-                    </ul>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-cube"></i>
+                    <div class="hero-slider-controls">
+                        <button class="hsc hero-slider-button-prev" id="heroPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+                        <button class="hsc hero-slider-button-next" id="heroNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    <h3>Standard+</h3>
-                    <p>Разширен пакет с допълнителни услуги</p>
-                    <div class="service-price">45€/кв.м.</div>
-                    <ul class="service-features">
-                        <li>Всичко от Standard пакет</li>
-                        <li>Ценови оферти за изпълнение</li>
-                        <li>Консултация с инженер</li>
-                        <li>Подбор на изпълнители</li>
-                    </ul>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-star"></i>
+                    <div class="slide-progress-wrap">
+                        <div class="slide-progress" id="slideProgress"></div>
                     </div>
-                    <h3>Premium</h3>
-                    <p>Комплексно решение от идея до реализация</p>
-                    <div class="service-price">50€/кв.м.</div>
-                    <ul class="service-features">
-                        <li>Всичко от Standard+ пакет</li>
-                        <li>Авторски надзор</li>
-                        <li>3D фотореалистични визуализации</li>
-                        <li>Персонализиран дизайн на мебели</li>
-                        <li>Доставка и монтаж</li>
-                    </ul>
+                    <div class="swiper-counter hs_counter">
+                        <span class="current-slide" id="currentSlide">01</span>
+                        <span class="total-slides">/ 03</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+            <div class="hero-scroll-down-notifer">
+                <span>Започнете да разглеждате</span>
+                <div class="scroll-down-icon"><i class="fas fa-chevron-down"></i></div>
+            </div>
+        </section>
 
-    <!-- Team Section -->
-    <section id="team">
-        <div class="container">
-            <div class="section-title">
-                <h2>Нашият екип</h2>
-                <p>Професионалисти с внимание към детайла</p>
-            </div>
-            
-            <div class="team-grid">
-                <div class="team-member">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" alt="Юлияна Стоева" class="member-img">
-                    <h3 class="member-name">Юлияна Стоева</h3>
-                    <p class="member-position">Интериорен дизайнер</p>
-                    <p class="member-contact">
-                        <i class="fas fa-phone"></i> +359 898 889 946
-                    </p>
-                    <p class="member-contact">
-                        <i class="fas fa-envelope"></i> j.stoeva@intodesign.bg
-                    </p>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+        <!-- About Section -->
+        <section class="scroll-section" id="about">
+            <div class="section-inner">
+                <div class="section-number"><span>01</span></div>
+                <div class="about-grid">
+                    <div class="about-content">
+                        <div class="section-title">
+                            <h2>За нашето студио</h2>
+                            <p>IntoDesign Studio обединява креативност и функционалност в уникални интериорни решения.</p>
+                        </div>
+                        <div class="about-text">
+                            <h4>Наградено студио за интериорен дизайн</h4>
+                            <p>Нашият екип поема всичко — от идея и концептуално развитие до реализация. Вярваме в традициите и ги вграждаме в нашите иновации. Всеки наш проект включва уникален артистичен образ и функционални решения. Клиентът е душата на проекта.</p>
+                            <p>Нашата основна цел е да илюстрираме неговите ценности и индивидуалност чрез дизайн.</p>
+                            <div class="about-services-list">
+                                <span>Какво правим:</span>
+                                <ul>
+                                    <li>Архитектура</li>
+                                    <li>Дизайн</li>
+                                    <li>Интериор</li>
+                                </ul>
+                            </div>
+                            <a href="#portfolio" class="btn">Нашите проекти</a>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" alt="IntoDesign Studio">
+                        <div class="about-image-overlay"></div>
                     </div>
                 </div>
-                
-                <div class="team-member">
-                    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" alt="Силвана Мутафчиева" class="member-img">
-                    <h3 class="member-name">Силвана Мутафчиева</h3>
-                    <p class="member-position">Интериорен дизайнер</p>
-                    <p class="member-contact">
-                        <i class="fas fa-phone"></i> +359 877 787 839
-                    </p>
-                    <p class="member-contact">
-                        <i class="fas fa-envelope"></i> s.mutafchieva@intodesign.bg
-                    </p>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                <div class="inline-facts-container">
+                    <div class="inline-facts-wrap">
+                        <div class="num counter" data-target="48">0</div>
+                        <h6>Завършени проекти</h6>
+                    </div>
+                    <div class="inline-facts-wrap">
+                        <div class="num counter" data-target="120">0</div>
+                        <h6>Доволни клиенти</h6>
+                    </div>
+                    <div class="inline-facts-wrap">
+                        <div class="num counter" data-target="8500">0</div>
+                        <h6>Работни часове</h6>
+                    </div>
+                    <div class="inline-facts-wrap">
+                        <div class="num counter" data-target="12">0</div>
+                        <h6>Награди</h6>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Online Inquiry Form Section -->
-    <section id="inquiry" class="contact-form-section">
-        <div class="container">
-            <div class="section-title">
-                <h2>Изпратете запитване</h2>
-                <p>Ще се радваме да отговорим на вашите въпроси и да обсъдим вашия проект.</p>
+        <!-- Featured Projects -->
+        <section class="scroll-section dark-bg" id="portfolio">
+            <div class="section-inner">
+                <div class="section-number light"><span>02</span></div>
+                <div class="section-title light">
+                    <h2>Избрани проекти</h2>
+                    <p>Всяко пространство е уникално и отразява индивидуалността на клиента</p>
+                </div>
+                <div class="gallery-items">
+                    <div class="gallery-item">
+                        <div class="grid-item-holder">
+                            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80" alt="Aura">
+                            <div class="folio-overlay">
+                                <span class="folio-num">01</span>
+                                <div class="folio-content">
+                                    <span class="folio-cat">Апартамент</span>
+                                    <h3>Aura</h3>
+                                    <p>Бургас | 142кв.м.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-item gallery-item-second">
+                        <div class="grid-item-holder">
+                            <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80" alt="Sea View">
+                            <div class="folio-overlay">
+                                <span class="folio-num">02</span>
+                                <div class="folio-content">
+                                    <span class="folio-cat">Апартамент</span>
+                                    <h3>Sea View</h3>
+                                    <p>Бургас | 72кв.м.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="grid-item-holder">
+                            <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&q=80" alt="Gold Coast">
+                            <div class="folio-overlay">
+                                <span class="folio-num">03</span>
+                                <div class="folio-content">
+                                    <span class="folio-cat">Къща</span>
+                                    <h3>Gold Coast</h3>
+                                    <p>Сарафово | 352кв.м.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="grid-item-holder">
+                            <img src="https://images.unsplash.com/photo-1600566752225-53762df0b979?w=800&q=80" alt="Coziness">
+                            <div class="folio-overlay">
+                                <span class="folio-num">04</span>
+                                <div class="folio-content">
+                                    <span class="folio-cat">Апартамент</span>
+                                    <h3>Coziness</h3>
+                                    <p>Central Park | 75кв.м.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-item gallery-item-second">
+                        <div class="grid-item-holder">
+                            <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80" alt="Modern Wabi Sabi">
+                            <div class="folio-overlay">
+                                <span class="folio-num">05</span>
+                                <div class="folio-content">
+                                    <span class="folio-cat">Къща</span>
+                                    <h3>Modern Wabi Sabi</h3>
+                                    <p>Крайморие | 194кв.м.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <div class="grid-item-holder">
+                            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80" alt="Back to Black">
+                            <div class="folio-overlay">
+                                <span class="folio-num">06</span>
+                                <div class="folio-content">
+                                    <span class="folio-cat">Къща</span>
+                                    <h3>Back to Black</h3>
+                                    <p>Лозово | 268кв.м.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-cta">
+                    <a href="#contact" class="btn btn-light">Всички проекти</a>
+                </div>
             </div>
-            <form action="#" method="POST" class="inquiry-form">
-                <div class="form-group">
-                    <label for="form-name">Име:</label>
-                    <input type="text" id="form-name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="form-email">Имейл:</label>
-                    <input type="email" id="form-email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="form-phone">Телефон (по желание):</label>
-                    <input type="tel" id="form-phone" name="phone">
-                </div>
-                <div class="form-group">
-                    <label for="form-subject">Относно:</label>
-                    <select id="form-subject" name="subject">
-                        <option value="Общо запитване">Общо запитване</option>
-                        <option value="Интериорен дизайн">Интериорен дизайн</option>
-                        <option value="Мебелен дизайн">Мебелен дизайн</option>
-                        <option value="Консултация">Консултация</option>
-                        <option value="Пакет Standard">Пакет Standard</option>
-                        <option value="Пакет Standard+">Пакет Standard+</option>
-                        <option value="Пакет Premium">Пакет Premium</option>
-                        <option value="Друго">Друго</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="form-message">Съобщение:</label>
-                    <textarea id="form-message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="form-submit-btn">Изпрати запитване</button>
-            </form>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h3>IntoDesign</h3>
+        <!-- Services Section -->
+        <section class="scroll-section gray-bg" id="services">
+            <div class="section-inner">
+                <div class="section-number"><span>03</span></div>
+                <div class="section-title">
+                    <h2>Предлагани услуги</h2>
+                    <p>Персонализирани пакети за всеки клиент и бюджет</p>
+                </div>
+                <div class="services-grid">
+                    <div class="serv-item">
+                        <span class="serv-num">01</span>
+                        <h4>Standard</h4>
+                        <p>Основен пакет услуги за интериорно проектиране</p>
+                        <div class="serv-price">35€/кв.м.</div>
+                        <ul>
+                            <li>Точно замерване на помещенията</li>
+                            <li>2D функционално разпределение</li>
+                            <li>3D визуализации</li>
+                            <li>Работни чертежи</li>
+                        </ul>
+                        <a href="#contact" class="btn">Виж детайли</a>
+                    </div>
+                    <div class="serv-item">
+                        <span class="serv-num">02</span>
+                        <h4>Standard+</h4>
+                        <p>Разширен пакет с допълнителни услуги</p>
+                        <div class="serv-price">45€/кв.м.</div>
+                        <ul>
+                            <li>Всичко от Standard пакет</li>
+                            <li>Ценови оферти за изпълнение</li>
+                            <li>Консултация с инженер</li>
+                            <li>Подбор на изпълнители</li>
+                        </ul>
+                        <a href="#contact" class="btn">Виж детайли</a>
+                    </div>
+                    <div class="serv-item">
+                        <span class="serv-num">03</span>
+                        <h4>Premium</h4>
+                        <p>Комплексно решение от идея до реализация</p>
+                        <div class="serv-price">50€/кв.м.</div>
+                        <ul>
+                            <li>Всичко от Standard+ пакет</li>
+                            <li>Авторски надзор</li>
+                            <li>3D фотореалистични визуализации</li>
+                            <li>Персонализиран дизайн на мебели</li>
+                            <li>Доставка и монтаж</li>
+                        </ul>
+                        <a href="#contact" class="btn">Виж детайли</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video / CTA Section -->
+        <section class="scroll-section dark-bg-2 video-section">
+            <div class="section-inner">
+                <div class="section-number light"><span>04</span></div>
+                <div class="video-promo-wrap">
+                    <div class="video-box">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80" alt="IntoDesign Video">
+                        <a href="#" class="video-box-btn" aria-label="Play video">
+                            <i class="fas fa-play"></i>
+                        </a>
+                    </div>
+                    <div class="video-promo-text">
+                        <h3>Нашата видео презентация</h3>
+                        <p>Разгледайте как създаваме уникални интериорни пространства — от първоначалната идея до финалната реализация. Всяко пространство разказва история.</p>
+                        <a href="#" class="btn btn-light">Нашият YouTube канал</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="scroll-section" id="team">
+            <div class="section-inner">
+                <div class="section-number"><span>05</span></div>
+                <div class="section-title">
+                    <h2>Нашият екип</h2>
+                    <p>Професионалисти с внимание към детайла</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-box">
+                        <div class="team-photo">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" alt="Юлияна Стоева">
+                            <div class="overlay"></div>
+                            <div class="team-social">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                        <span class="team-num">01</span>
+                        <h3>Юлияна Стоева</h3>
+                        <h4>ИНТЕРИОРЕН ДИЗАЙНЕР</h4>
+                        <p>Специализирана в създаването на уютни и функционални жилищни пространства с внимание към всеки детайл.</p>
+                        <div class="team-contact">
+                            <span><i class="fas fa-phone"></i> +359 898 889 946</span>
+                            <span><i class="fas fa-envelope"></i> j.stoeva@intodesign.bg</span>
+                        </div>
+                    </div>
+                    <div class="team-box">
+                        <div class="team-photo">
+                            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80" alt="Силвана Мутафчиева">
+                            <div class="overlay"></div>
+                            <div class="team-social">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                        <span class="team-num">02</span>
+                        <h3>Силвана Мутафчиева</h3>
+                        <h4>ИНТЕРИОРЕН ДИЗАЙНЕР</h4>
+                        <p>Експерт в модерния и минималистичен дизайн, съчетаващ естетика и практичност във всеки проект.</p>
+                        <div class="team-contact">
+                            <span><i class="fas fa-phone"></i> +359 877 787 839</span>
+                            <span><i class="fas fa-envelope"></i> s.mutafchieva@intodesign.bg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="scroll-section gray-bg" id="testimonials">
+            <div class="section-inner">
+                <div class="section-number"><span>06</span></div>
+                <div class="section-title">
+                    <h2>Клиенти и отзиви</h2>
+                    <p>Какво казват нашите клиенти за работата ни</p>
+                </div>
+                <div class="testimonials-slider" id="testimonialsSlider">
+                    <div class="testimonials-track" id="testimonialsTrack">
+                        <div class="testimonial-item">
+                            <div class="testimonilas-text">
+                                <div class="testimonial-avatar">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Клиент">
+                                </div>
+                                <h3>Иван Петров</h3>
+                                <p>"IntoDesign превърнаха нашия апартамент в мечтан дом. Професионализмът и вниманието към детайла надминаха очакванията ни. Препоръчваме ги на всеки!"</p>
+                                <span class="testimonial-source">.01 Чрез Facebook</span>
+                            </div>
+                        </div>
+                        <div class="testimonial-item">
+                            <div class="testimonilas-text">
+                                <div class="testimonial-avatar">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt="Клиент">
+                                </div>
+                                <h3>Мария Георгиева</h3>
+                                <p>"Работата с IntoDesign беше изключително приятна. Екипът разбра нашата визия и я въплъти по начин, който не можехме да си представим. Благодарим!"</p>
+                                <span class="testimonial-source">.02 Чрез Instagram</span>
+                            </div>
+                        </div>
+                        <div class="testimonial-item">
+                            <div class="testimonilas-text">
+                                <div class="testimonial-avatar">
+                                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80" alt="Клиент">
+                                </div>
+                                <h3>Георги Димитров</h3>
+                                <p>"От първата среща до финалния монтаж — всичко беше перфектно организирано. Къщата ни в Сарафово е истинско произведение на изкуството."</p>
+                                <span class="testimonial-source">.03 Чрез Google</span>
+                            </div>
+                        </div>
+                        <div class="testimonial-item">
+                            <div class="testimonilas-text">
+                                <div class="testimonial-avatar">
+                                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80" alt="Клиент">
+                                </div>
+                                <h3>Елена Стоянова</h3>
+                                <p>"Препоръчвам IntoDesign на всеки, който търси качествен интериорен дизайн. Професионален подход и страхотен резултат!"</p>
+                                <span class="testimonial-source">.04 Чрез Facebook</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonials-nav">
+                        <button class="test-nav-btn" id="testPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+                        <button class="test-nav-btn" id="testNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="scroll-section dark-bg" id="contact">
+            <div class="section-inner">
+                <div class="section-number light"><span>07</span></div>
+                <div class="contact-grid">
+                    <div class="contact-details">
+                        <h4>Свържете се с нас</h4>
+                        <ul>
+                            <li>
+                                <span><i class="fas fa-map-marker-alt"></i></span>
+                                <div>ул. "Примерна" 123, Бургас, България</div>
+                            </li>
+                            <li>
+                                <span><i class="fas fa-phone"></i></span>
+                                <div>+359 898 889 946</div>
+                            </li>
+                            <li>
+                                <span><i class="fas fa-envelope"></i></span>
+                                <div>info@intodesign.bg</div>
+                            </li>
+                            <li>
+                                <span><i class="fas fa-clock"></i></span>
+                                <div>Пон-Пет: 09:00 - 18:00</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="contact-form-wrap">
+                        <div class="section-title light compact">
+                            <h2>Изпратете запитване</h2>
+                            <p>Ще се радваме да отговорим на вашите въпроси</p>
+                        </div>
+                        <form class="inquiry-form" action="#" method="POST">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <input type="text" name="name" placeholder="Име" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" name="email" placeholder="Имейл" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" name="phone" placeholder="Телефон (по желание)">
+                            </div>
+                            <div class="form-group">
+                                <select name="subject">
+                                    <option value="Общо запитване">Общо запитване</option>
+                                    <option value="Интериорен дизайн">Интериорен дизайн</option>
+                                    <option value="Мебелен дизайн">Мебелен дизайн</option>
+                                    <option value="Консултация">Консултация</option>
+                                    <option value="Пакет Standard">Пакет Standard</option>
+                                    <option value="Пакет Standard+">Пакет Standard+</option>
+                                    <option value="Пакет Premium">Пакет Premium</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="message" rows="5" placeholder="Съобщение" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-light">Изпрати запитване</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-widget">
+                    <div class="footer-header">
+                        <span>IntoDesign</span>
+                    </div>
                     <p>Персонализирани интериорни решения, които превръщат пространството в уютен и функционален дом.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-pinterest-p"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
-                
-                <div class="footer-col">
-                    <h3>Бързи връзки</h3>
+                <div class="footer-widget">
+                    <div class="footer-header">
+                        <span>Бързи връзки</span>
+                    </div>
                     <ul class="footer-links">
                         <li><a href="#">Начало</a></li>
                         <li><a href="#portfolio">Портфолио</a></li>
                         <li><a href="#services">Услуги</a></li>
                         <li><a href="#team">Екип</a></li>
-                        <li><a href="#inquiry">Контакти</a></li>
+                        <li><a href="#contact">Контакти</a></li>
+                        <li><a href="calendar.html">Календар</a></li>
                     </ul>
                 </div>
-                
-                <div class="footer-col">
-                    <h3>Услуги</h3>
-                    <ul class="footer-links">
-                        <li><a href="#services">Интериорен дизайн</a></li>
-                        <li><a href="#services">Мебелен дизайн</a></li>
-                        <li><a href="#services">Авторски надзор</a></li>
-                        <li><a href="#services">3D визуализации</a></li>
-                        <li><a href="#services">Консултации</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h3>Контактна информация</h3>
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt contact-icon"></i>
-                            <span>ул. "Примерна" 123, Бургас, България</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone contact-icon"></i>
-                            <span>+359 888 123 456</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-envelope contact-icon"></i>
-                            <span>info@intodesign.bg</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-clock contact-icon"></i>
-                            <span>Пон-Пет: 09:00 - 18:00</span>
-                        </div>
+                <div class="footer-widget">
+                    <div class="footer-header">
+                        <span>Абонирайте се</span>
                     </div>
+                    <p>Получавайте новини за нашите проекти и съвети за интериорен дизайн.</p>
+                    <form class="subscribe-form">
+                        <input type="email" placeholder="Вашият имейл">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
                 </div>
             </div>
-            
-            <div class="copyright">
-                <p>&copy; 2023 IntoDesign Studio. Всички права запазени.</p>
+            <div class="subfooter">
+                <p>&copy; 2026 IntoDesign Studio. Всички права запазени.</p>
             </div>
-        </div>
-    </footer>
+        </footer>
+    </div>
+
+    <!-- To Top Button -->
+    <button class="to-top-btn" id="toTop" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <script src="script.js"></script>
 </body>
