@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панел — IntoDesign Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Login -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h1>IntoDesign Админ</h1>
+            <p>Редактирайте цялото съдържание на сайта от едно място.</p>
+            <p class="login-error" id="loginError">Грешна парола. Опитайте отново.</p>
+            <form id="loginForm">
+                <label for="adminPassword">Парола за администратор</label>
+                <input type="password" id="adminPassword" placeholder="Въведете парола" required autocomplete="current-password">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-lock"></i> Вход</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin App -->
+    <div class="admin-app" id="adminApp" hidden>
+        <aside class="admin-sidebar">
+            <div class="admin-brand">
+                <h2>INTO</h2>
+                <span>Админ панел</span>
+            </div>
+            <nav class="admin-nav" id="adminNav">
+                <button type="button" data-section="meta" class="active"><i class="fas fa-cog"></i> Общи настройки</button>
+                <button type="button" data-section="header"><i class="fas fa-heading"></i> Хедър</button>
+                <button type="button" data-section="hero"><i class="fas fa-images"></i> Слайдер</button>
+                <button type="button" data-section="about"><i class="fas fa-info-circle"></i> За нас</button>
+                <button type="button" data-section="portfolio"><i class="fas fa-th"></i> Портфолио</button>
+                <button type="button" data-section="services"><i class="fas fa-concierge-bell"></i> Услуги</button>
+                <button type="button" data-section="video"><i class="fas fa-play-circle"></i> Видео</button>
+                <button type="button" data-section="team"><i class="fas fa-users"></i> Екип</button>
+                <button type="button" data-section="testimonials"><i class="fas fa-quote-left"></i> Отзиви</button>
+                <button type="button" data-section="contact"><i class="fas fa-envelope"></i> Контакти</button>
+                <button type="button" data-section="footer"><i class="fas fa-shoe-prints"></i> Футър</button>
+            </nav>
+            <div class="admin-sidebar-footer">
+                <a href="main.html" target="_blank"><i class="fas fa-external-link-alt"></i> Виж сайта</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Изход</a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 id="sectionTitle">Общи настройки</h1>
+                <div class="admin-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btnPreview"><i class="fas fa-eye"></i> Преглед</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btnDownload"><i class="fas fa-download"></i> Изтегли JSON</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="btnPublish"><i class="fas fa-cloud-upload-alt"></i> Публикувай</button>
+                </div>
+            </header>
+            <div class="admin-content" id="adminContent"></div>
+        </main>
+    </div>
+
+    <div class="admin-toast" id="toast"></div>
+    <script src="admin.js"></script>
+</body>
+</html>
