@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IntoDesign Studio | Персонализирани интериорни решения</title>
+    <meta name="description" content="IntoDesign Studio — персонализирани интериорни решения в Бургас. Портфолио, услуги и екип от професионални интериорни дизайнери.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@200;300;400;500;600;700;800&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,10 +30,11 @@
     <!-- Fixed Left Sidebar Header -->
     <header class="main-header">
         <div class="logo-holder">
-            <a href="#" class="logo-link">
+            <a href="#" class="logo-link" aria-label="IntoDesign Studio">
                 <div class="logo-text">
                     <span>I</span><span>N</span><span>T</span><span>O</span>
                 </div>
+                <span class="logo-sub">design studio</span>
             </a>
         </div>
         <div class="header-social">
@@ -43,7 +45,7 @@
             </ul>
         </div>
         <div class="nav-button-wrap">
-            <button class="nav-button but-hol" id="navToggle" aria-label="Menu">
+            <button class="nav-button but-hol" id="navToggle" aria-label="Menu" aria-expanded="false">
                 <span class="menu-burger">
                     <span></span>
                     <span></span>
@@ -83,6 +85,25 @@
         </div>
     </div>
 
+    <!-- Top Header Bar (Archimak style) -->
+    <div class="top-header" id="topHeader">
+        <nav class="page-scroll-nav" aria-label="Секции">
+            <ul>
+                <li><a href="#" class="act-link" data-section="home">Начало</a></li>
+                <li><a href="#about" data-section="about">За нас</a></li>
+                <li><a href="#portfolio" data-section="portfolio">Проекти</a></li>
+                <li><a href="#services" data-section="services">Услуги</a></li>
+                <li><a href="#contact" data-section="contact">Контакт</a></li>
+            </ul>
+        </nav>
+        <a href="#contact" class="top-header-cta">
+            <i class="fas fa-envelope"></i> Свържете се
+        </a>
+        <div class="scroll-progress-bar">
+            <div class="scroll-progress-fill" id="scrollProgress"></div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div class="content-holder" id="contentHolder">
 
@@ -96,8 +117,9 @@
                             <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80')"></div>
                             <div class="hero-slide-overlay"></div>
                             <div class="hero-slide-content">
+                                <span class="hero-welcome">Добре дошли в нашия сайт</span>
                                 <span class="hero-slide-date">2024</span>
-                                <h2 class="hero-slide-title">Aura<br>Апартамент</h2>
+                                <h2 class="hero-slide-title"><span class="title-line">Aura</span><span class="title-line accent">Апартамент</span></h2>
                                 <p class="hero-slide-desc">Бургас | 142кв.м. — Модерен дизайн с класически елементи</p>
                                 <a href="#portfolio" class="hero_btn">Виж детайли</a>
                             </div>
@@ -106,8 +128,9 @@
                             <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1920&q=80')"></div>
                             <div class="hero-slide-overlay"></div>
                             <div class="hero-slide-content">
+                                <span class="hero-welcome">Добре дошли в нашия сайт</span>
                                 <span class="hero-slide-date">2024</span>
-                                <h2 class="hero-slide-title">Sea View<br>Апартамент</h2>
+                                <h2 class="hero-slide-title"><span class="title-line">Sea View</span><span class="title-line accent">Апартамент</span></h2>
                                 <p class="hero-slide-desc">Бургас | 72кв.м. — Панорамни гледки към морето</p>
                                 <a href="#portfolio" class="hero_btn">Виж детайли</a>
                             </div>
@@ -116,8 +139,9 @@
                             <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1920&q=80')"></div>
                             <div class="hero-slide-overlay"></div>
                             <div class="hero-slide-content">
+                                <span class="hero-welcome">Добре дошли в нашия сайт</span>
                                 <span class="hero-slide-date">2023</span>
-                                <h2 class="hero-slide-title">Gold Coast<br>Къща</h2>
+                                <h2 class="hero-slide-title"><span class="title-line">Gold Coast</span><span class="title-line accent">Къща</span></h2>
                                 <p class="hero-slide-desc">Сарафово | 352кв.м. — Japandi стил с естествени материали</p>
                                 <a href="#portfolio" class="hero_btn">Виж детайли</a>
                             </div>
@@ -134,9 +158,14 @@
                         <span class="current-slide" id="currentSlide">01</span>
                         <span class="total-slides">/ 03</span>
                     </div>
+                    <div class="hero-dots" role="tablist" aria-label="Слайдове">
+                        <button class="hero-dot active" aria-label="Слайд 1" role="tab"></button>
+                        <button class="hero-dot" aria-label="Слайд 2" role="tab"></button>
+                        <button class="hero-dot" aria-label="Слайд 3" role="tab"></button>
+                    </div>
                 </div>
             </div>
-            <div class="hero-scroll-down-notifer">
+            <div class="hero-scroll-down-notifer" role="button" tabindex="0" aria-label="Скрол надолу">
                 <span>Започнете да разглеждате</span>
                 <div class="scroll-down-icon"><i class="fas fa-chevron-down"></i></div>
             </div>
@@ -168,7 +197,7 @@
                         </div>
                     </div>
                     <div class="about-image">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" alt="IntoDesign Studio">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" alt="IntoDesign Studio" loading="lazy">
                         <div class="about-image-overlay"></div>
                     </div>
                 </div>
@@ -194,17 +223,22 @@
         </section>
 
         <!-- Featured Projects -->
-        <section class="scroll-section dark-bg" id="portfolio">
+        <section class="scroll-section dark-bg portfolio-section" id="portfolio">
             <div class="section-inner">
                 <div class="section-number light"><span>02</span></div>
                 <div class="section-title light">
                     <h2>Избрани проекти</h2>
                     <p>Всяко пространство е уникално и отразява индивидуалността на клиента</p>
                 </div>
+                <div class="gallery-filters">
+                    <button class="gallery-filter active" data-filter="all">Всички</button>
+                    <button class="gallery-filter" data-filter="apartment">Апартаменти</button>
+                    <button class="gallery-filter" data-filter="house">Къщи</button>
+                </div>
                 <div class="gallery-items">
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-category="apartment">
                         <div class="grid-item-holder">
-                            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80" alt="Aura">
+                            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80" alt="Aura" loading="lazy">
                             <div class="folio-overlay">
                                 <span class="folio-num">01</span>
                                 <div class="folio-content">
@@ -215,9 +249,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item gallery-item-second">
+                    <div class="gallery-item gallery-item-second" data-category="apartment">
                         <div class="grid-item-holder">
-                            <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80" alt="Sea View">
+                            <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80" alt="Sea View" loading="lazy">
                             <div class="folio-overlay">
                                 <span class="folio-num">02</span>
                                 <div class="folio-content">
@@ -228,9 +262,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-category="house">
                         <div class="grid-item-holder">
-                            <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&q=80" alt="Gold Coast">
+                            <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&q=80" alt="Gold Coast" loading="lazy">
                             <div class="folio-overlay">
                                 <span class="folio-num">03</span>
                                 <div class="folio-content">
@@ -241,9 +275,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-category="apartment">
                         <div class="grid-item-holder">
-                            <img src="https://images.unsplash.com/photo-1600566752225-53762df0b979?w=800&q=80" alt="Coziness">
+                            <img src="https://images.unsplash.com/photo-1600566752225-53762df0b979?w=800&q=80" alt="Coziness" loading="lazy">
                             <div class="folio-overlay">
                                 <span class="folio-num">04</span>
                                 <div class="folio-content">
@@ -254,9 +288,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item gallery-item-second">
+                    <div class="gallery-item gallery-item-second" data-category="house">
                         <div class="grid-item-holder">
-                            <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80" alt="Modern Wabi Sabi">
+                            <img src="https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&q=80" alt="Modern Wabi Sabi" loading="lazy">
                             <div class="folio-overlay">
                                 <span class="folio-num">05</span>
                                 <div class="folio-content">
@@ -267,9 +301,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-category="house">
                         <div class="grid-item-holder">
-                            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80" alt="Back to Black">
+                            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80" alt="Back to Black" loading="lazy">
                             <div class="folio-overlay">
                                 <span class="folio-num">06</span>
                                 <div class="folio-content">
@@ -282,8 +316,18 @@
                     </div>
                 </div>
                 <div class="section-cta">
-                    <a href="#contact" class="btn btn-light">Всички проекти</a>
+                    <a href="#contact" class="btn btn-light">Запитване за проект</a>
                 </div>
+            </div>
+            <div class="fixed-bottom-panel">
+                <div class="fbp-content">
+                    <span class="fbp-label">IntoDesign Studio</span>
+                    <span class="fbp-text">Архитектура · Дизайн · Интериор</span>
+                </div>
+                <a href="#about" class="fbp-scroll">
+                    <span>Разгледайте</span>
+                    <i class="fas fa-chevron-down"></i>
+                </a>
             </div>
         </section>
 
@@ -322,7 +366,7 @@
                         </ul>
                         <a href="#contact" class="btn">Виж детайли</a>
                     </div>
-                    <div class="serv-item">
+                    <div class="serv-item serv-featured">
                         <span class="serv-num">03</span>
                         <h4>Premium</h4>
                         <p>Комплексно решение от идея до реализация</p>
@@ -346,15 +390,15 @@
                 <div class="section-number light"><span>04</span></div>
                 <div class="video-promo-wrap">
                     <div class="video-box">
-                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80" alt="IntoDesign Video">
-                        <a href="#" class="video-box-btn" aria-label="Play video">
+                        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80" alt="IntoDesign Video" loading="lazy">
+                        <a href="#" class="video-box-btn" data-video="https://www.youtube.com/embed/jcWlWSPKbKA" aria-label="Пусни видео">
                             <i class="fas fa-play"></i>
                         </a>
                     </div>
                     <div class="video-promo-text">
                         <h3>Нашата видео презентация</h3>
                         <p>Разгледайте как създаваме уникални интериорни пространства — от първоначалната идея до финалната реализация. Всяко пространство разказва история.</p>
-                        <a href="#" class="btn btn-light">Нашият YouTube канал</a>
+                        <a href="https://www.youtube.com" target="_blank" rel="noopener" class="btn btn-light video-channel-btn">Нашият YouTube канал</a>
                     </div>
                 </div>
             </div>
@@ -463,8 +507,11 @@
                         </div>
                     </div>
                     <div class="testimonials-nav">
-                        <button class="test-nav-btn" id="testPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
-                        <button class="test-nav-btn" id="testNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+                        <div class="test-dots" id="testDots"></div>
+                        <div class="test-nav-btns">
+                            <button class="test-nav-btn" id="testPrev" aria-label="Предишен"><i class="fas fa-chevron-left"></i></button>
+                            <button class="test-nav-btn" id="testNext" aria-label="Следващ"><i class="fas fa-chevron-right"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -576,6 +623,16 @@
                 <p>&copy; 2026 IntoDesign Studio. Всички права запазени.</p>
             </div>
         </footer>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal" role="dialog" aria-label="Видео презентация">
+        <div class="video-modal-inner">
+            <button class="video-modal-close" id="videoModalClose" aria-label="Затвори"><i class="fas fa-times"></i></button>
+            <div class="video-modal-frame">
+                <iframe id="videoIframe" src="" title="IntoDesign видео" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        </div>
     </div>
 
     <!-- To Top Button -->
