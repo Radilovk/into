@@ -1,62 +1,33 @@
 <!DOCTYPE html>
 <html lang="bg">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Календар на събитията - IntoDesign</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mukta+Vaani:wght@200;300;400;500;600;700;800&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Календар на събитията - IntoDesign</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="main-header">
-        <div class="logo-holder">
-            <a href="main.html" class="logo-link">
-                <div class="logo-text">
-                    <span>I</span><span>N</span><span>T</span><span>O</span>
-                </div>
-            </a>
-        </div>
-        <div class="header-social">
-            <ul>
-                <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-                <li><a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
-            </ul>
-        </div>
-        <div class="nav-button-wrap">
-            <a href="main.html" class="nav-button but-hol" style="text-decoration:none">
-                <span class="menu-burger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-                <span class="menu-text">Назад</span>
-            </a>
-        </div>
-    </header>
-
-    <div class="subpage-header">
-        <h1>Календар на събитията</h1>
-        <p>Предстоящи събития и работилници на IntoDesign Studio</p>
+  <header class="subpage-header">
+    <div class="container">
+      <h1>Събития</h1>
+      <nav><a href="main.html">&larr; Начало</a></nav>
     </div>
+  </header>
+  <main class="container">
+    <form id="date-filter" class="events-filter">
+      <div class="form-group">
+        <label for="start-date">От:</label>
+        <input type="date" id="start-date">
+      </div>
+      <div class="form-group">
+        <label for="end-date">До:</label>
+        <input type="date" id="end-date">
+      </div>
+      <button id="filter-btn" class="form-submit-btn">Покажи</button>
+    </form>
+    <div id="events-container"><!-- Събитията ще се заредят тук --></div>
+  </main>
 
-    <main class="subpage-content">
-        <form id="date-filter" class="events-filter">
-            <div class="form-group">
-                <label for="start-date">От:</label>
-                <input type="date" id="start-date">
-            </div>
-            <div class="form-group">
-                <label for="end-date">До:</label>
-                <input type="date" id="end-date">
-            </div>
-            <button id="filter-btn" class="btn" type="button">Покажи</button>
-        </form>
-        <div id="events-container"></div>
-    </main>
-
-    <script src="calendar.js"></script>
+  <script src="calendar.js"></script>
 </body>
 </html>
