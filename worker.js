@@ -9,7 +9,7 @@ export default {
     // CORS headers
     const corsHeaders = {
       'Access-Control-Allow-Origin': 'https://radilovk.github.io',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
 
@@ -182,77 +182,6 @@ export default {
       if (pathname === '/api/health' && request.method === 'GET') {
         return new Response(
           JSON.stringify({ success: true, message: 'Service is running' }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      // ---- Site Content CMS (IntoDesign main site) ----
-      const siteAdminPassword = env.SITE_ADMIN_PASSWORD || 'intodesign2024';
-
-      const verifySiteToken = async (request) => {
-        const auth = request.headers.get('Authorization') || '';
-        const token = auth.replace(/^Bearer\s+/i, '');
-        if (!token || !env.APP_KV) return false;
-        const valid = await env.APP_KV.get(`site:admin:${token}`);
-        return valid === '1';
-      };
-
-      if (pathname === '/api/site-content' && request.method === 'GET') {
-        let content = null;
-        if (env.APP_KV) {
-          const stored = await env.APP_KV.get('site:content');
-          if (stored) {
-            try { content = JSON.parse(stored); } catch (e) { /* ignore */ }
-          }
-        }
-        if (!content) {
-          return new Response(
-            JSON.stringify({ success: false, message: 'No published content. Use site-data.json fallback.' }),
-            { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        return new Response(JSON.stringify(content), {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-
-      if (pathname === '/api/site-auth' && request.method === 'POST') {
-        const body = await request.json();
-        if (!body.password || body.password !== siteAdminPassword) {
-          return new Response(
-            JSON.stringify({ success: false, message: 'Invalid password' }),
-            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        const token = crypto.randomUUID();
-        if (env.APP_KV) {
-          await env.APP_KV.put(`site:admin:${token}`, '1', { expirationTtl: 86400 });
-        }
-        return new Response(
-          JSON.stringify({ success: true, token }),
-          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      if (pathname === '/api/site-content' && request.method === 'PUT') {
-        const authorized = await verifySiteToken(request);
-        if (!authorized) {
-          return new Response(
-            JSON.stringify({ success: false, message: 'Unauthorized. Please log in again.' }),
-            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        const content = await request.json();
-        if (!content || !content.portfolio) {
-          return new Response(
-            JSON.stringify({ success: false, message: 'Invalid site content' }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        await env.APP_KV.put('site:content', JSON.stringify(content));
-        return new Response(
-          JSON.stringify({ success: true, message: 'Content published' }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
