@@ -289,7 +289,7 @@
 
     // ---- Scroll Animations (IntersectionObserver) ----
     const fadeElements = document.querySelectorAll(
-        '.about-grid, .gallery-item, .serv-item, .team-box, .testimonial-item, .video-promo-wrap, .contact-grid, .inline-facts-container'
+        '.about-grid, .gallery-item, .serv-card, .team-box, .testimonial-item, .video-promo-wrap, .contact-grid, .inline-facts-container'
     );
 
     fadeElements.forEach((el, i) => {
@@ -350,10 +350,8 @@
             const target = document.querySelector(href);
             if (target) {
                 e.preventDefault();
-                const headerH = document.querySelector('.main-header').offsetHeight;
-                const topBarH = document.querySelector('.top-header')?.offsetHeight || 0;
-                const offset = window.innerWidth <= 1064 ? headerH : topBarH;
-                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                const headerH = document.querySelector('.top-header')?.offsetHeight || 0;
+                const top = target.getBoundingClientRect().top + window.pageYOffset - headerH;
                 window.scrollTo({ top, behavior: 'smooth' });
             }
         });
