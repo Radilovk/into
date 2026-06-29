@@ -217,9 +217,9 @@
         const h = siteData.header;
         return `
             <div class="admin-panel">
-                <div class="admin-panel-header"><h3>Горен хедър</h3><p>Текстът вляво и бутонът „Свържете се“ вдясно</p></div>
+                <div class="admin-panel-header"><h3>Горен хедър</h3><p>Таглайн в центъра и бутон „Свържете се“ вдясно</p></div>
                 <div class="admin-panel-body">
-                    ${field('Подзаглавие', '', textInput('header.subtitle', h.subtitle))}
+                    ${field('Таглайн (център)', 'напр. Архитектура · Дизайн · Интериор', textInput('header.subtitle', h.subtitle))}
                     ${field('Текст на бутона', '', textInput('header.ctaText', h.ctaText))}
                     <div class="field-row">
                         ${field('Facebook линк', '', textInput('header.social.facebook', h.social.facebook))}
