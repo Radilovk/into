@@ -352,7 +352,7 @@
 
     // ---- Active Nav on Scroll ----
     const sections = document.querySelectorAll('.scroll-section[id]');
-    const navLinks = document.querySelectorAll('.sliding-menu a[data-section]');
+    const navLinks = document.querySelectorAll('.sliding-menu a[data-section], .page-scroll-nav a[data-section]');
 
     function updateActiveNav() {
         let current = 'home';

@@ -33,6 +33,10 @@ function renderSite(data) {
     if (metaDesc) metaDesc.content = data.meta.description;
 
     const h = data.header;
+    const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setText('headerSubtitle', h.subtitle);
+    const ctaSpan = document.querySelector('#headerCta span');
+    if (ctaSpan) ctaSpan.textContent = h.ctaText;
     if (document.getElementById('socialFb')) document.getElementById('socialFb').href = h.social.facebook;
     if (document.getElementById('socialIg')) document.getElementById('socialIg').href = h.social.instagram;
     if (document.getElementById('socialPin')) document.getElementById('socialPin').href = h.social.pinterest;
