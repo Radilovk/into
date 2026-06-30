@@ -568,17 +568,17 @@
                             <h2>Изпратете запитване</h2>
                             <p>Ще се радваме да отговорим на вашите въпроси</p>
                         </div>
-                        <form class="inquiry-form" action="#" method="POST">
+                        <form class="inquiry-form" id="inquiryForm" action="#" method="POST" novalidate>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <input type="text" name="name" placeholder="Име" required>
+                                    <input type="text" name="name" id="inquiryName" placeholder="Име *" required autocomplete="name">
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" name="email" placeholder="Имейл" required>
+                                    <input type="email" name="email" id="inquiryEmail" placeholder="Имейл *" required autocomplete="email">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <input type="tel" name="phone" placeholder="Телефон (по желание)">
+                                <input type="tel" name="phone" id="inquiryPhone" placeholder="Телефон *" required autocomplete="tel">
                             </div>
                             <div class="form-group">
                                 <select name="subject">
@@ -674,6 +674,18 @@
                 <p class="panorama-hint" id="panoramaHint"><i class="fas fa-info-circle"></i> Плъзнете за интерактивен 360° преглед на проекта.</p>
             </div>
             <p class="project-modal-desc" id="projectModalDesc"></p>
+        </div>
+    </div>
+
+    <!-- Inquiry Success Modal -->
+    <div class="inquiry-modal" id="inquirySuccessModal" role="dialog" aria-modal="true" aria-labelledby="inquirySuccessTitle" hidden>
+        <div class="inquiry-modal-backdrop" id="inquirySuccessBackdrop"></div>
+        <div class="inquiry-modal-panel">
+            <button class="inquiry-modal-close" id="inquirySuccessClose" aria-label="Затвори"><i class="fas fa-times"></i></button>
+            <div class="inquiry-modal-icon"><i class="fas fa-check-circle"></i></div>
+            <h2 id="inquirySuccessTitle">Запитването е изпратено!</h2>
+            <p>Благодарим ви. Ще се свържем с вас възможно най-скоро на посочения имейл или телефон.</p>
+            <button type="button" class="btn btn-light" id="inquirySuccessOk">Добре</button>
         </div>
     </div>
 

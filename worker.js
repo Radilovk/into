@@ -9,7 +9,7 @@ export default {
     // CORS headers
     const corsHeaders = {
       'Access-Control-Allow-Origin': 'https://radilovk.github.io',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
 
@@ -253,6 +253,107 @@ export default {
         await env.APP_KV.put('site:content', JSON.stringify(content));
         return new Response(
           JSON.stringify({ success: true, message: 'Content published' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const getInquiries = async () => {
+        if (!env.APP_KV) return [];
+        const raw = await env.APP_KV.get('site:inquiries');
+        if (!raw) return [];
+        try { return JSON.parse(raw); } catch (e) { return []; }
+      };
+
+      const saveInquiries = async (list) => {
+        if (!env.APP_KV) return;
+        await env.APP_KV.put('site:inquiries', JSON.stringify(list.slice(0, 300)));
+      };
+
+      // POST /api/inquiries — public contact form
+      if (pathname === '/api/inquiries' && request.method === 'POST') {
+        const rateLimit = await checkRateLimit('inquiry:' + (request.headers.get('CF-Connecting-IP') || 'unknown'));
+        if (!rateLimit.allowed) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Твърде много заявки. Опитайте по-късно.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const body = await request.json();
+        const name = (body.name || '').trim();
+        const email = (body.email || '').trim();
+        const phone = (body.phone || '').trim();
+        const message = (body.message || '').trim();
+
+        if (!name || !email || !phone || !message) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Име, имейл, телефон и съобщение са задължителни.' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const inquiry = {
+          id: crypto.randomUUID(),
+          name,
+          email,
+          phone,
+          subject: (body.subject || 'Общо запитване').trim(),
+          message,
+          createdAt: new Date().toISOString(),
+          read: false,
+        };
+
+        const list = await getInquiries();
+        list.unshift(inquiry);
+        await saveInquiries(list);
+
+        return new Response(
+          JSON.stringify({ success: true, data: inquiry }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // GET /api/inquiries — admin only
+      if (pathname === '/api/inquiries' && request.method === 'GET') {
+        if (!await verifySiteToken(request)) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Unauthorized' }),
+            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        return new Response(
+          JSON.stringify({ success: true, data: await getInquiries() }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // PATCH /api/inquiries — mark read / delete
+      if (pathname === '/api/inquiries' && request.method === 'PATCH') {
+        if (!await verifySiteToken(request)) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Unauthorized' }),
+            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        const body = await request.json();
+        let list = await getInquiries();
+
+        if (body.action === 'markRead' && body.id) {
+          list = list.map(i => i.id === body.id ? { ...i, read: true } : i);
+        } else if (body.action === 'markAllRead') {
+          list = list.map(i => ({ ...i, read: true }));
+        } else if (body.action === 'delete' && body.id) {
+          list = list.filter(i => i.id !== body.id);
+        } else {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Invalid action' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        await saveInquiries(list);
+        return new Response(
+          JSON.stringify({ success: true, data: list }),
           { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }

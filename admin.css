@@ -25,6 +25,22 @@ body {
     justify-content: center;
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     padding: 20px;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+}
+
+.login-screen[hidden],
+body.admin-logged-in .login-screen {
+    display: none !important;
+}
+
+#adminApp[hidden] {
+    display: none !important;
+}
+
+#adminApp:not([hidden]) {
+    display: flex;
 }
 
 .login-card {
@@ -512,4 +528,138 @@ body {
     .field-row {
         grid-template-columns: 1fr;
     }
+}
+
+/* Inquiries badge */
+.nav-badge {
+    margin-left: auto;
+    background: #c0392b;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.admin-nav button .nav-badge {
+    margin-left: 8px;
+}
+
+/* Inquiries list */
+.inquiry-card {
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    background: #fff;
+}
+
+.inquiry-card.unread {
+    border-left: 4px solid var(--admin-accent);
+    background: #fffdf8;
+}
+
+.inquiry-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.inquiry-card-header h4 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.inquiry-meta {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.inquiry-meta span {
+    margin-right: 14px;
+}
+
+.inquiry-message {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #444;
+    white-space: pre-wrap;
+}
+
+.inquiry-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+/* Admin alert modal */
+.admin-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.admin-modal-overlay[hidden] {
+    display: none !important;
+}
+
+.admin-modal {
+    background: #fff;
+    border-radius: 14px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+}
+
+.admin-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--admin-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-modal-header h2 {
+    font-size: 18px;
+}
+
+.admin-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.admin-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--admin-border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #888;
+}
+
+.empty-state i {
+    font-size: 40px;
+    color: #ddd;
+    margin-bottom: 12px;
 }

@@ -39,6 +39,7 @@
                 <button type="button" data-section="video"><i class="fas fa-play-circle"></i> Видео</button>
                 <button type="button" data-section="team"><i class="fas fa-users"></i> Екип</button>
                 <button type="button" data-section="testimonials"><i class="fas fa-quote-left"></i> Отзиви</button>
+                <button type="button" data-section="inquiries" id="navInquiries"><i class="fas fa-inbox"></i> Запитвания <span class="nav-badge" id="inquiriesBadge" hidden>0</span></button>
                 <button type="button" data-section="contact"><i class="fas fa-envelope"></i> Контакти</button>
                 <button type="button" data-section="footer"><i class="fas fa-shoe-prints"></i> Футър</button>
             </nav>
@@ -62,6 +63,22 @@
     </div>
 
     <div class="admin-toast" id="toast"></div>
+
+    <!-- New inquiries alert -->
+    <div class="admin-modal-overlay" id="inquiriesAlertModal" hidden>
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h2><i class="fas fa-bell"></i> Нови клиентски запитвания</h2>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeInquiriesAlert"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="admin-modal-body" id="inquiriesAlertBody"></div>
+            <div class="admin-modal-footer">
+                <button type="button" class="btn btn-secondary" id="markAllReadBtn">Маркирай всички като прочетени</button>
+                <button type="button" class="btn btn-primary" id="goToInquiriesBtn">Виж всички запитвания</button>
+            </div>
+        </div>
+    </div>
+
     <script src="admin.js"></script>
 </body>
 </html>

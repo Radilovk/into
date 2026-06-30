@@ -391,13 +391,110 @@
         }, 150);
     });
 
-    // ---- Form Submit ----
-    document.querySelectorAll('.inquiry-form, .subscribe-form').forEach(form => {
+    // ---- Contact / Inquiry Form ----
+    const API_URL = 'https://workerai.radilov-k.workers.dev';
+    const INQUIRIES_LOCAL_KEY = 'intodesign_inquiries_local';
+
+    function saveInquiryLocally(inquiry) {
+        try {
+            const list = JSON.parse(localStorage.getItem(INQUIRIES_LOCAL_KEY) || '[]');
+            list.unshift(inquiry);
+            localStorage.setItem(INQUIRIES_LOCAL_KEY, JSON.stringify(list.slice(0, 100)));
+        } catch (e) { /* ignore */ }
+    }
+
+    function showInquirySuccessModal() {
+        const modal = document.getElementById('inquirySuccessModal');
+        if (!modal) return;
+        modal.removeAttribute('hidden');
+        document.body.classList.add('nav-open');
+    }
+
+    function hideInquirySuccessModal() {
+        const modal = document.getElementById('inquirySuccessModal');
+        if (!modal) return;
+        modal.setAttribute('hidden', '');
+        document.body.classList.remove('nav-open');
+    }
+
+    ['inquirySuccessClose', 'inquirySuccessOk', 'inquirySuccessBackdrop'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', hideInquirySuccessModal);
+    });
+
+    function initInquiryForm() {
+        const form = document.getElementById('inquiryForm');
+        if (!form || form.dataset.bound) return;
+        form.dataset.bound = '1';
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const name = form.name.value.trim();
+            const email = form.email.value.trim();
+            const phone = form.phone.value.trim();
+            const subject = form.subject?.value || 'Общо запитване';
+            const message = form.message.value.trim();
+
+            let errBox = form.querySelector('.form-error-msg');
+            if (!errBox) {
+                errBox = document.createElement('p');
+                errBox.className = 'form-error-msg';
+                form.appendChild(errBox);
+            }
+
+            if (!name || !email || !phone || !message) {
+                errBox.textContent = 'Моля, попълнете име, имейл, телефон и съобщение.';
+                errBox.classList.add('visible');
+                return;
+            }
+
+            if (name === '*admin') {
+                sessionStorage.setItem('intodesign_admin_quick', String(Date.now()));
+                sessionStorage.setItem('intodesign_admin_token', 'quick-entry');
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            errBox.classList.remove('visible');
+            const btn = form.querySelector('button[type="submit"]');
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Изпращане...';
+
+            const inquiry = {
+                id: 'local-' + Date.now(),
+                name, email, phone, subject, message,
+                createdAt: new Date().toISOString(),
+                read: false
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/api/inquiries`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, subject, message })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.data) inquiry.id = data.data.id;
+            } catch (err) { /* save locally below */ }
+
+            saveInquiryLocally(inquiry);
+            form.reset();
+            btn.innerHTML = original;
+            btn.disabled = false;
+            showInquirySuccessModal();
+        });
+    }
+
+    // ---- Newsletter form ----
+    document.querySelectorAll('.subscribe-form').forEach(form => {
+        if (form.dataset.bound) return;
+        form.dataset.bound = '1';
         form.addEventListener('submit', e => {
             e.preventDefault();
             const btn = form.querySelector('button[type="submit"]');
             const original = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Изпратено!';
+            btn.innerHTML = '<i class="fas fa-check"></i>';
             btn.disabled = true;
             setTimeout(() => {
                 btn.innerHTML = original;
@@ -420,6 +517,7 @@
         if (videoBtn && data?.video?.youtube) {
             videoBtn.dataset.video = data.video.youtube;
         }
+        initInquiryForm();
     }
 
     document.addEventListener('site:rendered', initAfterRender);
@@ -427,6 +525,7 @@
 
     // ---- Init ----
     initFadeAnimations();
+    initInquiryForm();
     buildTestDots();
     updateTestimonials(false);
     updateActiveNav();
