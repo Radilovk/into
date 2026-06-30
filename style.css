@@ -167,43 +167,38 @@ ul {
     flex-shrink: 0;
 }
 
-.logo-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.logo-text {
+.logo-link.site-logo,
+.site-logo {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1px;
+    justify-content: center;
+    line-height: 1.1;
+    text-align: center;
+    text-decoration: none;
 }
 
-.logo-text span {
+.logo-holder .logo-link.site-logo {
+    width: 100%;
+    height: 100%;
+    padding: 0 6px;
+}
+
+.mobile-logo-text {
     font-family: 'Teko', sans-serif;
-    font-size: 13px;
+    font-size: 22px;
     font-weight: 700;
     color: #fff;
-    line-height: 1;
     letter-spacing: 3px;
+    line-height: 1;
 }
 
-.logo-sub {
-    font-family: 'Mukta Vaani', sans-serif;
-    font-size: 7px;
-    letter-spacing: 0.15em;
+.mobile-logo-sub {
+    font-size: 9px;
+    letter-spacing: 0.2em;
     text-transform: lowercase;
     color: var(--accent);
-    margin-top: 3px;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    position: absolute;
-    right: -2px;
-    top: 50%;
-    transform: translateY(-50%) rotate(180deg);
-    opacity: 0.8;
+    line-height: 1.2;
 }
 
 .header-social {
@@ -425,26 +420,12 @@ ul {
     display: none;
     flex-direction: column;
     justify-content: center;
+    align-items: flex-start;
     line-height: 1.1;
     flex-shrink: 0;
     height: var(--topbar-h);
     padding: 0 20px;
     border-right: 1px solid rgba(255,255,255,0.1);
-}
-
-.mobile-logo-text {
-    font-family: 'Teko', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 3px;
-}
-
-.mobile-logo-sub {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: lowercase;
-    color: var(--accent);
 }
 
 .top-header-center {
