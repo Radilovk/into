@@ -229,6 +229,11 @@ function renderFooter(footer, header) {
     document.querySelector('.subfooter p').textContent = footer.copyright;
     const nl = document.querySelectorAll('.footer-widget p');
     if (nl[1]) nl[1].textContent = footer.newsletterText;
+    if (footer.social) {
+        const socialLinks = document.querySelectorAll('.footer-social a');
+        const urls = [footer.social.facebook, footer.social.instagram, footer.social.pinterest, footer.social.youtube];
+        socialLinks.forEach((a, i) => { if (urls[i]) a.href = urls[i]; });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

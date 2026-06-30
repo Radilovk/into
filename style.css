@@ -399,17 +399,20 @@ ul {
     background: var(--dark-1);
     border-bottom: 1px solid rgba(255,255,255,0.05);
     z-index: 99;
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
     align-items: center;
-    padding: 0 30px;
+    justify-content: space-between;
+    padding: 0 24px;
+    gap: 16px;
 }
 
 .top-header-left {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: clamp(16px, 2vw, 40px);
     min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
 }
 
 .mobile-logo {
@@ -434,27 +437,45 @@ ul {
 }
 
 .top-header-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
+    pointer-events: none;
+    max-width: min(420px, 36vw);
+    padding: 0 12px;
 }
 
 .header-tagline {
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: clamp(1px, 0.2vw, 3px);
     color: rgba(255,255,255,0.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .top-header-right {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 24px;
+    gap: clamp(12px, 1.5vw, 24px);
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.page-scroll-nav {
+    min-width: 0;
+    overflow: hidden;
 }
 
 .page-scroll-nav ul {
     display: flex;
-    gap: 28px;
+    gap: clamp(12px, 1.4vw, 28px);
     align-items: center;
     flex-wrap: nowrap;
 }
@@ -553,6 +574,8 @@ ul {
 /* ---- Main Content ---- */
 .content-holder {
     margin-left: var(--sidebar-w);
+    min-width: 0;
+    overflow-x: clip;
 }
 
 .scroll-section {
@@ -702,8 +725,9 @@ ul {
 
 /* ---- Hero Slider ---- */
 .hero-wrap {
-    height: 100vh;
-    min-height: 600px;
+    height: calc(100vh - var(--topbar-h));
+    height: calc(100dvh - var(--topbar-h));
+    min-height: 520px;
     position: relative;
     overflow: hidden;
     background: var(--dark-1);
@@ -2044,6 +2068,80 @@ ul {
     transform: translateY(0);
 }
 
+/* ---- Inquiry Success Modal ---- */
+.inquiry-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.inquiry-modal[hidden] {
+    display: none !important;
+}
+
+.inquiry-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+}
+
+.inquiry-modal-panel {
+    position: relative;
+    background: #fff;
+    border-radius: 14px;
+    padding: 40px 36px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+}
+
+.inquiry-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+}
+
+.inquiry-modal-icon {
+    font-size: 52px;
+    color: #4a7c59;
+    margin-bottom: 16px;
+}
+
+.inquiry-modal-panel h2 {
+    font-family: 'Teko', sans-serif;
+    font-size: 28px;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+.inquiry-modal-panel p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+.form-error-msg {
+    color: #c0392b;
+    font-size: 13px;
+    margin-top: 8px;
+    display: none;
+}
+
+.form-error-msg.visible {
+    display: block;
+}
+
 /* ---- Video Modal ---- */
 .video-modal {
     position: fixed;
@@ -2408,13 +2506,18 @@ textarea:focus-visible {
     .top-header-center {
         display: none;
     }
+}
 
-    .top-header {
-        grid-template-columns: 1fr auto;
+/* Large desktop — keep header stable */
+@media (min-width: 1400px) {
+    .section-inner {
+        padding-left: 80px;
+        padding-right: 80px;
     }
 
-    .page-scroll-nav ul {
-        gap: 18px;
+    .hero-slide-content {
+        left: 80px;
+        max-width: 720px;
     }
 }
 
@@ -2466,7 +2569,7 @@ textarea:focus-visible {
     .top-header {
         left: 0;
         height: var(--topbar-h);
-        grid-template-columns: 1fr auto;
+        display: flex;
         padding: 0 16px 0 0;
     }
 

@@ -4,6 +4,9 @@
     const API_URL = 'https://workerai.radilov-k.workers.dev';
     const STORAGE_TOKEN = 'intodesign_admin_token';
     const STORAGE_PREVIEW = 'intodesign_site_preview';
+    const INQUIRIES_LOCAL_KEY = 'intodesign_inquiries_local';
+    const QUICK_ENTRY_KEY = 'intodesign_admin_quick';
+    const QUICK_ENTRY_TTL = 24 * 60 * 60 * 1000;
 
     const SECTION_TITLES = {
         meta: 'Общи настройки',
@@ -15,11 +18,13 @@
         video: 'Видео секция',
         team: 'Екип',
         testimonials: 'Отзиви',
+        inquiries: 'Клиентски запитвания',
         contact: 'Контакти',
         footer: 'Футър'
     };
 
     let siteData = null;
+    let inquiriesCache = [];
     let currentSection = 'meta';
 
     const $ = id => document.getElementById(id);
@@ -69,6 +74,175 @@
             return true;
         }
         return false;
+    }
+
+    function isQuickEntry() {
+        const t = sessionStorage.getItem(QUICK_ENTRY_KEY);
+        return t && Date.now() - parseInt(t, 10) < QUICK_ENTRY_TTL;
+    }
+
+    function hasRealToken() {
+        const token = sessionStorage.getItem(STORAGE_TOKEN);
+        return token && token !== 'quick-entry' && token !== 'local-offline';
+    }
+
+    function formatDate(iso) {
+        try {
+            return new Date(iso).toLocaleString('bg-BG', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        } catch (e) { return iso; }
+    }
+
+    function syncLocalInquiries(list) {
+        try {
+            localStorage.setItem(INQUIRIES_LOCAL_KEY, JSON.stringify(list.slice(0, 100)));
+        } catch (e) { /* ignore */ }
+    }
+
+    async function loadInquiries() {
+        const local = JSON.parse(localStorage.getItem(INQUIRIES_LOCAL_KEY) || '[]');
+        if (hasRealToken()) {
+            try {
+                const res = await fetch(`${API_URL}/api/inquiries`, {
+                    headers: { Authorization: `Bearer ${sessionStorage.getItem(STORAGE_TOKEN)}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const remote = data.data || [];
+                    const merged = [...remote];
+                    local.forEach(item => {
+                        if (!merged.find(r => r.id === item.id)) merged.push(item);
+                    });
+                    merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    return merged;
+                }
+            } catch (e) { /* fallback local */ }
+        }
+        return local.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    async function patchInquiry(action, id) {
+        if (hasRealToken()) {
+            try {
+                const res = await fetch(`${API_URL}/api/inquiries`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${sessionStorage.getItem(STORAGE_TOKEN)}`
+                    },
+                    body: JSON.stringify({ action, id })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    inquiriesCache = data.data || [];
+                    syncLocalInquiries(inquiriesCache);
+                    return;
+                }
+            } catch (e) { /* local fallback */ }
+        }
+        if (action === 'markRead' && id) {
+            inquiriesCache = inquiriesCache.map(i => i.id === id ? { ...i, read: true } : i);
+        } else if (action === 'markAllRead') {
+            inquiriesCache = inquiriesCache.map(i => ({ ...i, read: true }));
+        } else if (action === 'delete' && id) {
+            inquiriesCache = inquiriesCache.filter(i => i.id !== id);
+        }
+        syncLocalInquiries(inquiriesCache);
+    }
+
+    function updateInquiriesBadge() {
+        const badge = $('inquiriesBadge');
+        if (!badge) return;
+        const unread = inquiriesCache.filter(i => !i.read).length;
+        if (unread > 0) {
+            badge.textContent = unread > 99 ? '99+' : String(unread);
+            badge.hidden = false;
+        } else {
+            badge.hidden = true;
+        }
+    }
+
+    function renderInquiryCard(inq, compact = false) {
+        return `
+            <div class="inquiry-card${inq.read ? '' : ' unread'}" data-inquiry-id="${escAttr(inq.id)}">
+                <div class="inquiry-card-header">
+                    <h4>${escHtml(inq.name)} — ${escHtml(inq.subject || 'Общо запитване')}</h4>
+                    <span class="inquiry-meta">${formatDate(inq.createdAt)}</span>
+                </div>
+                <div class="inquiry-meta">
+                    <span><i class="fas fa-envelope"></i> ${escHtml(inq.email)}</span>
+                    <span><i class="fas fa-phone"></i> ${escHtml(inq.phone)}</span>
+                </div>
+                <p class="inquiry-message">${escHtml(inq.message)}</p>
+                ${compact ? '' : `<div class="inquiry-actions">
+                    ${!inq.read ? `<button type="button" class="btn btn-secondary btn-sm" data-mark-read="${escAttr(inq.id)}"><i class="fas fa-check"></i> Прочетено</button>` : ''}
+                    <a href="mailto:${escAttr(inq.email)}" class="btn btn-secondary btn-sm"><i class="fas fa-reply"></i> Отговори</a>
+                    <button type="button" class="btn btn-danger btn-sm" data-delete-inquiry="${escAttr(inq.id)}"><i class="fas fa-trash"></i> Изтрий</button>
+                </div>`}
+            </div>`;
+    }
+
+    async function showInquiriesAlertModal() {
+        const unread = inquiriesCache.filter(i => !i.read);
+        if (!unread.length) return;
+        const body = $('inquiriesAlertBody');
+        body.innerHTML = unread.slice(0, 5).map(i => renderInquiryCard(i, true)).join('');
+        if (unread.length > 5) {
+            body.innerHTML += `<p style="text-align:center;color:#888;margin-top:12px;font-size:13px;">+ още ${unread.length - 5} непрочетени</p>`;
+        }
+        $('inquiriesAlertModal').hidden = false;
+    }
+
+    function hideInquiriesAlertModal() {
+        $('inquiriesAlertModal').hidden = true;
+    }
+
+    function bindInquiryActions(container) {
+        container.querySelectorAll('[data-mark-read]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                await patchInquiry('markRead', btn.dataset.markRead);
+                updateInquiriesBadge();
+                if (currentSection === 'inquiries') await renderInquiriesSection($('adminContent'));
+            });
+        });
+        container.querySelectorAll('[data-delete-inquiry]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Изтриване на запитването?')) return;
+                await patchInquiry('delete', btn.dataset.deleteInquiry);
+                updateInquiriesBadge();
+                if (currentSection === 'inquiries') await renderInquiriesSection($('adminContent'));
+            });
+        });
+    }
+
+    async function renderInquiriesSection(container) {
+        inquiriesCache = await loadInquiries();
+        updateInquiriesBadge();
+        const unread = inquiriesCache.filter(i => !i.read).length;
+        container.innerHTML = `
+            <div class="help-box"><i class="fas fa-inbox"></i> Всички запитвания от контактната форма на сайта. Имейл и телефон са задължителни за клиентите.</div>
+            <div class="admin-panel">
+                <div class="admin-panel-header">
+                    <h3>Клиентски запитвания ${unread ? `(${unread} нови)` : ''}</h3>
+                    <p>Общо: ${inquiriesCache.length}</p>
+                </div>
+                <div class="admin-panel-body">
+                    ${inquiriesCache.length
+                        ? `<div class="inquiry-actions" style="margin-bottom:20px">
+                            <button type="button" class="btn btn-secondary btn-sm" id="markAllInquiriesRead"><i class="fas fa-check-double"></i> Маркирай всички като прочетени</button>
+                           </div>
+                           ${inquiriesCache.map(i => renderInquiryCard(i)).join('')}`
+                        : `<div class="empty-state"><i class="fas fa-inbox"></i><p>Няма запитвания все още.</p></div>`}
+                </div>
+            </div>`;
+        $('markAllInquiriesRead')?.addEventListener('click', async () => {
+            await patchInquiry('markAllRead');
+            updateInquiriesBadge();
+            await renderInquiriesSection(container);
+        });
+        bindInquiryActions(container);
     }
 
     async function publishData(data) {
@@ -505,6 +679,7 @@
 
     function renderFooter() {
         const f = siteData.footer;
+        const s = f.social || {};
         return `
             <div class="admin-panel">
                 <div class="admin-panel-header"><h3>Футър</h3></div>
@@ -512,6 +687,14 @@
                     ${field('Кратко описание', '', textareaInput('footer.about', f.about))}
                     ${field('Текст за бюлетин', '', textareaInput('footer.newsletterText', f.newsletterText))}
                     ${field('Авторски права', '', textInput('footer.copyright', f.copyright))}
+                    <div class="field-row">
+                        ${field('Facebook', '', textInput('footer.social.facebook', s.facebook || ''))}
+                        ${field('Instagram', '', textInput('footer.social.instagram', s.instagram || ''))}
+                    </div>
+                    <div class="field-row">
+                        ${field('Pinterest', '', textInput('footer.social.pinterest', s.pinterest || ''))}
+                        ${field('YouTube', '', textInput('footer.social.youtube', s.youtube || ''))}
+                    </div>
                 </div>
             </div>`;
     }
@@ -537,6 +720,10 @@
             b.classList.toggle('active', b.dataset.section === section);
         });
         const content = $('adminContent');
+        if (section === 'inquiries') {
+            renderInquiriesSection(content);
+            return;
+        }
         content.innerHTML = RENDERERS[section]();
         bindFields(content);
         bindSectionActions(content, section);
@@ -726,6 +913,10 @@
     }
 
     async function publish() {
+        if (!hasRealToken()) {
+            toast('За публикуване онлайн е необходим вход с парола (не само *admin).', 'error');
+            return;
+        }
         collectFormData();
         try {
             await publishData(siteData);
@@ -738,9 +929,21 @@
     }
 
     function showAdmin() {
-        $('loginScreen').hidden = true;
-        $('adminApp').hidden = false;
+        document.body.classList.add('admin-logged-in');
+        const login = $('loginScreen');
+        login.hidden = true;
+        login.style.display = 'none';
+        const app = $('adminApp');
+        app.hidden = false;
+        app.style.display = 'flex';
         renderSection('meta');
+        refreshInquiriesAndAlert();
+    }
+
+    async function refreshInquiriesAndAlert() {
+        inquiriesCache = await loadInquiries();
+        updateInquiriesBadge();
+        await showInquiriesAlertModal();
     }
 
     async function init() {
@@ -767,9 +970,28 @@
         $('logoutBtn').addEventListener('click', e => {
             e.preventDefault();
             sessionStorage.removeItem(STORAGE_TOKEN);
+            sessionStorage.removeItem(QUICK_ENTRY_KEY);
+            document.body.classList.remove('admin-logged-in');
             $('adminApp').hidden = true;
-            $('loginScreen').hidden = false;
+            $('adminApp').style.display = '';
+            const login = $('loginScreen');
+            login.hidden = false;
+            login.style.display = '';
             $('adminPassword').value = '';
+            hideInquiriesAlertModal();
+        });
+
+        $('closeInquiriesAlert')?.addEventListener('click', hideInquiriesAlertModal);
+        $('goToInquiriesBtn')?.addEventListener('click', () => {
+            hideInquiriesAlertModal();
+            collectFormData();
+            renderSection('inquiries');
+        });
+        $('markAllReadBtn')?.addEventListener('click', async () => {
+            await patchInquiry('markAllRead');
+            updateInquiriesBadge();
+            hideInquiriesAlertModal();
+            if (currentSection === 'inquiries') await renderInquiriesSection($('adminContent'));
         });
 
         $('btnPreview').addEventListener('click', () => {
@@ -779,6 +1001,15 @@
 
         $('btnDownload').addEventListener('click', downloadJson);
         $('btnPublish').addEventListener('click', publish);
+
+        if (isQuickEntry()) {
+            if (!sessionStorage.getItem(STORAGE_TOKEN)) {
+                sessionStorage.setItem(STORAGE_TOKEN, 'quick-entry');
+            }
+            siteData = await loadSiteData();
+            showAdmin();
+            return;
+        }
 
         if (sessionStorage.getItem(STORAGE_TOKEN)) {
             siteData = await loadSiteData();
