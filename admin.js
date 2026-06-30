@@ -615,7 +615,7 @@
                         ${field('Телефон', '', textInput(`team.members.${i}.phone`, m.phone))}
                         ${field('Имейл', '', textInput(`team.members.${i}.email`, m.email))}
                     </div>
-                    ${imageField(`team.members.${i}.image`, m.image, 'Снимка', '')}
+                    ${imageField(`team.members.${i}.image`, m.image, 'Снимка', 'Портретен формат 3:4 — лицето трябва да е изцяло видимо. Снимката се показва без изрязване.')}
                 </div>
             </div>`).join('');
 

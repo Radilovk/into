@@ -399,20 +399,18 @@ ul {
     background: var(--dark-1);
     border-bottom: 1px solid rgba(255,255,255,0.05);
     z-index: 99;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    gap: 16px;
+    padding: 0 30px;
 }
 
 .top-header-left {
     display: flex;
     align-items: center;
-    gap: clamp(16px, 2vw, 40px);
+    gap: 40px;
     min-width: 0;
-    flex: 1 1 auto;
-    overflow: hidden;
+    justify-self: start;
 }
 
 .mobile-logo {
@@ -437,45 +435,31 @@ ul {
 }
 
 .top-header-center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
     text-align: center;
-    pointer-events: none;
-    max-width: min(420px, 36vw);
-    padding: 0 12px;
+    justify-self: center;
+    padding: 0 20px;
 }
 
 .header-tagline {
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: clamp(1px, 0.2vw, 3px);
+    letter-spacing: 3px;
     color: rgba(255,255,255,0.35);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
 }
 
 .top-header-right {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: clamp(12px, 1.5vw, 24px);
-    flex: 0 0 auto;
-    margin-left: auto;
-}
-
-.page-scroll-nav {
-    min-width: 0;
-    overflow: hidden;
+    gap: 24px;
+    justify-self: end;
 }
 
 .page-scroll-nav ul {
     display: flex;
-    gap: clamp(12px, 1.4vw, 28px);
+    gap: 28px;
     align-items: center;
     flex-wrap: nowrap;
 }
@@ -598,9 +582,16 @@ ul {
     font-size: 84px;
     font-weight: 700;
     color: #eee;
-    opacity: 0.7;
+    opacity: 0;
     line-height: 1;
     z-index: 1;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.section-number.visible {
+    opacity: 0.7;
+    transform: translateY(0);
 }
 
 .section-number.light {
@@ -620,8 +611,13 @@ ul {
     left: 0;
     bottom: 0;
     height: 1px;
-    width: 100%;
+    width: 0;
     background: #eee;
+    transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.section-title.visible::after {
+    width: 100%;
 }
 
 .section-title h2 {
@@ -1063,6 +1059,11 @@ ul {
     width: 100%;
     height: 500px;
     object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.about-image.visible img {
+    transform: scale(1.03);
 }
 
 .about-image-overlay {
@@ -1085,6 +1086,16 @@ ul {
     flex: 1;
     text-align: center;
     position: relative;
+}
+
+.inline-facts-wrap:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 1px;
+    background: rgba(255,255,255,0.12);
 }
 
 .inline-facts-wrap .num {
@@ -1548,9 +1559,25 @@ ul {
     transition: all 0.3s ease;
 }
 
+.video-box-btn::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.35);
+    animation: videoRingPulse 2s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes videoRingPulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
 .video-box-btn:hover {
     box-shadow: 0 0 0 17px rgba(255,255,255,0.2);
     color: #fff;
+    transform: scale(1.05);
 }
 
 .video-promo-text h3 {
@@ -1583,12 +1610,18 @@ ul {
     position: relative;
     overflow: hidden;
     margin-bottom: 20px;
+    aspect-ratio: 3 / 4;
+    background: #ececec;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .team-photo img {
     width: 100%;
-    height: 400px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
     transition: filter 0.5s ease;
     filter: grayscale(0%);
 }
@@ -2506,6 +2539,14 @@ textarea:focus-visible {
     .top-header-center {
         display: none;
     }
+
+    .top-header {
+        grid-template-columns: 1fr auto;
+    }
+
+    .page-scroll-nav ul {
+        gap: 18px;
+    }
 }
 
 /* Large desktop — keep header stable */
@@ -2569,7 +2610,7 @@ textarea:focus-visible {
     .top-header {
         left: 0;
         height: var(--topbar-h);
-        display: flex;
+        grid-template-columns: 1fr auto;
         padding: 0 16px 0 0;
     }
 
@@ -2789,10 +2830,6 @@ textarea:focus-visible {
 
     .video-box img {
         height: 260px;
-    }
-
-    .team-photo img {
-        height: 320px;
     }
 
     .folio-view {
