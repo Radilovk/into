@@ -1,0 +1,19 @@
+# Local development config for `wrangler dev` (the Client Portal backend in worker.js).
+#
+# The committed production `wrangler.toml` uses the legacy `[[ai]]` array syntax,
+# which modern Wrangler (v3/v4) rejects. `worker.js` does not use the AI binding
+# (that lives in worker-backend.js), so this dev config simply omits it and uses
+# local placeholder KV namespace ids that Wrangler simulates on disk.
+#
+# Usage:  npx wrangler dev -c wrangler.dev.toml --port 8787
+name = "worker-backend"
+main = "worker.js"
+compatibility_date = "2024-07-01"
+
+[[kv_namespaces]]
+binding = "SETTINGS"
+id = "settings_local_dev"
+
+[[kv_namespaces]]
+binding = "APP_KV"
+id = "app_kv_local_dev"
