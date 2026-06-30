@@ -9,3 +9,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Wrangler local dev state/cache
+.wrangler/
