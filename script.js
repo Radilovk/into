@@ -64,6 +64,15 @@
 
         currentSlide = 0;
 
+        function retriggerSlideAnimations(slide) {
+            if (!slide || prefersReducedMotion) return;
+            slide.querySelectorAll('.hero-welcome, .title-line').forEach(el => {
+                el.style.animation = 'none';
+                void el.offsetHeight;
+                el.style.animation = '';
+            });
+        }
+
         function goToSlide(index) {
             const dots = document.querySelectorAll('.hero-dot');
             slides[currentSlide].classList.remove('active');
@@ -72,6 +81,7 @@
             slides[currentSlide].classList.add('active');
             if (dots[currentSlide]) dots[currentSlide].classList.add('active');
             if (currentSlideEl) currentSlideEl.textContent = String(currentSlide + 1).padStart(2, '0');
+            retriggerSlideAnimations(slides[currentSlide]);
             resetProgress();
         }
 
@@ -284,13 +294,28 @@
 
     function initFadeAnimations() {
         const fadeElements = document.querySelectorAll(
-            '.about-grid, .gallery-item, .serv-card, .team-box, .testimonial-item, .video-promo-wrap, .contact-grid, .inline-facts-container'
+            '.about-grid, .gallery-item, .serv-card, .team-box, .testimonial-item, .video-promo-wrap, .contact-grid, .inline-facts-container, .section-title, .section-number, .about-image'
         );
 
         fadeElements.forEach((el, i) => {
-            if (!el.classList.contains('fade-in')) {
+            if (!el.classList.contains('fade-in') && !el.classList.contains('section-number')) {
                 el.classList.add('fade-in');
                 el.style.transitionDelay = `${(i % 6) * 0.08}s`;
+            }
+        });
+
+        document.querySelectorAll('.section-number').forEach(el => {
+            if (!el.dataset.observed) {
+                el.dataset.observed = '1';
+                const obs = new IntersectionObserver(entries => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.2 });
+                obs.observe(el);
             }
         });
 
