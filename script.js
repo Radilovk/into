@@ -194,15 +194,25 @@
         return Math.max(0, items.length - getVisibleCount());
     }
 
+    function syncTestimonialWidths() {
+        const slider = document.getElementById('testimonialsSlider');
+        if (!slider || !testTrack) return 0;
+        const visible = getVisibleCount();
+        const gap = parseInt(getComputedStyle(testTrack).gap, 10) || 0;
+        const slideW = Math.max(0, (slider.clientWidth - gap * (visible - 1)) / visible);
+        slider.style.setProperty('--testimonial-slide-w', `${slideW}px`);
+        return slideW;
+    }
+
     function updateTestimonials(animate = true) {
         if (!testTrack) return;
         const items = testTrack.querySelectorAll('.testimonial-item');
         if (!items.length) return;
+        const slideW = syncTestimonialWidths();
         testIndex = Math.min(testIndex, getMaxTestIndex());
-        const gap = parseInt(getComputedStyle(testTrack).gap) || 0;
-        const itemWidth = items[0].getBoundingClientRect().width;
+        const gap = parseInt(getComputedStyle(testTrack).gap, 10) || 0;
         testTrack.style.transition = animate ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none';
-        testTrack.style.transform = `translateX(-${testIndex * (itemWidth + gap)}px)`;
+        testTrack.style.transform = `translateX(-${testIndex * (slideW + gap)}px)`;
 
         if (testDots) {
             testDots.querySelectorAll('.test-dot').forEach((dot, i) => {
@@ -411,6 +421,7 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             testIndex = 0;
+            syncTestimonialWidths();
             buildTestDots();
             updateTestimonials(false);
         }, 150);
@@ -533,6 +544,7 @@
         initHeroSlider();
         testIndex = 0;
         buildTestDots();
+        syncTestimonialWidths();
         updateTestimonials(false);
         startTestAuto();
         initFadeAnimations();
@@ -552,6 +564,7 @@
     initFadeAnimations();
     initInquiryForm();
     buildTestDots();
+    syncTestimonialWidths();
     updateTestimonials(false);
     updateActiveNav();
     updateScrollProgress();

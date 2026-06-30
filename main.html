@@ -671,7 +671,7 @@
             </div>
             <div class="project-tab-panel" id="panelPanorama" role="tabpanel">
                 <div class="panorama-viewer" id="panoramaViewer"></div>
-                <p class="panorama-hint" id="panoramaHint"><i class="fas fa-info-circle"></i> Плъзнете за интерактивен 360° преглед на проекта.</p>
+                <p class="panorama-hint" id="panoramaHint"><i class="fas fa-info-circle"></i> Докоснете панорамата за цял екран · плъзнете за 360° преглед.</p>
             </div>
             <p class="project-modal-desc" id="projectModalDesc"></p>
         </div>
@@ -697,6 +697,15 @@
                 <iframe id="videoIframe" src="" title="IntoDesign видео" allow="autoplay; encrypted-media" allowfullscreen></iframe>
             </div>
         </div>
+    </div>
+
+    <!-- Fullscreen Image / Panorama Lightbox -->
+    <div class="media-lightbox" id="mediaLightbox" aria-hidden="true">
+        <button type="button" class="media-lightbox-back" id="mediaLightboxBack" aria-label="Назад">
+            <i class="fas fa-arrow-left"></i> Назад
+        </button>
+        <div class="media-lightbox-stage" id="mediaLightboxStage"></div>
+        <p class="media-lightbox-hint" id="mediaLightboxHint" hidden></p>
     </div>
 
     <!-- To Top Button -->
