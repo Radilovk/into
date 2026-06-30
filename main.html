@@ -28,24 +28,28 @@
         </div>
     </div>
 
-    <!-- Fixed Left Sidebar (desktop) -->
-    <aside class="main-header" aria-label="Странична лента">
-        <div class="logo-holder">
-            <a href="#" class="logo-link" aria-label="IntoDesign Studio">
-                <div class="logo-text">
-                    <span>I</span><span>N</span><span>T</span><span>O</span>
-                </div>
-                <span class="logo-sub">design studio</span>
-            </a>
-        </div>
-        <div class="header-social">
+    <!-- Archimak Sidebar -->
+    <header class="main-header">
+        <a href="#" class="logo-holder" aria-label="IntoDesign Studio">
+            <div class="logo-text"><span>I</span><span>N</span><span>T</span><span>O</span></div>
+        </a>
+        <div class="header_social">
             <ul>
-                <li><a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
-                <li><a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
-                <li><a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>
+                <li><a href="#" id="socialFb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a></li>
+                <li><a href="#" id="socialIg" aria-label="Instagram"><i class="fab fa-instagram"></i></a></li>
+                <li><a href="#" id="socialPin" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a></li>
             </ul>
         </div>
-    </aside>
+        <button class="nav-button but-hol" id="navToggle" aria-label="Меню" aria-expanded="false">
+            <span class="nos"></span>
+            <span class="ncs"></span>
+            <span class="nbs"></span>
+            <span class="menu-button-text">Menu</span>
+        </button>
+        <div class="progress-bar-wrap sidebar-progress">
+            <div class="progress-bar" id="sidebarProgress"></div>
+        </div>
+    </header>
 
     <!-- Slide-out Navigation -->
     <div class="nav-overlay" id="navOverlay"></div>
@@ -76,38 +80,17 @@
         </div>
     </div>
 
-    <!-- Top Header Bar -->
-    <header class="top-header" id="topHeader">
-        <div class="top-header-left">
-            <a href="#" class="mobile-logo" aria-label="IntoDesign Studio">
-                <span class="mobile-logo-text">INTO</span>
-                <span class="mobile-logo-sub">design studio</span>
-            </a>
-            <nav class="page-scroll-nav" aria-label="Секции">
-                <ul>
-                    <li><a href="#" class="act-link" data-section="home">Начало</a></li>
-                    <li><a href="#about" data-section="about">За нас</a></li>
-                    <li><a href="#portfolio" data-section="portfolio">Проекти</a></li>
-                    <li><a href="#services" data-section="services">Услуги</a></li>
-                    <li><a href="#contact" data-section="contact">Контакт</a></li>
-                </ul>
-            </nav>
-        </div>
-        <div class="top-header-center">
-            <span class="header-tagline">Архитектура · Дизайн · Интериор</span>
-        </div>
-        <div class="top-header-right">
-            <a href="tel:+359898889946" class="header-phone"><i class="fas fa-phone"></i> +359 898 889 946</a>
-            <a href="#contact" class="top-header-cta"><i class="fas fa-envelope"></i> Свържете се</a>
-            <button class="nav-button but-hol" id="navToggle" aria-label="Меню" aria-expanded="false">
-                <span class="menu-burger"><span></span><span></span><span></span></span>
-                <span class="menu-text">Menu</span>
-            </button>
-        </div>
+    <!-- Archimak Top Header -->
+    <div class="top-header top-header-half" id="topHeader">
+        <div class="page-subtitle"><span id="headerSubtitle">IntoDesign Studio</span></div>
+        <a href="#contact" class="single-page-fixed-row-link" id="headerCta">
+            <i class="far fa-envelope"></i>
+            <span>Свържете се</span>
+        </a>
         <div class="scroll-progress-bar">
             <div class="scroll-progress-fill" id="scrollProgress"></div>
         </div>
-    </header>
+    </div>
 
     <!-- Main Content -->
     <div class="content-holder" id="contentHolder">
@@ -672,15 +655,7 @@
             </div>
             <div class="project-tab-panel" id="panelPanorama" role="tabpanel">
                 <div class="panorama-viewer" id="panoramaViewer"></div>
-                <div class="panorama-upload">
-                    <label for="panoramaUpload" class="panorama-upload-label">
-                        <i class="fas fa-upload"></i>
-                        <span>Качи 360° equirectangular изображение</span>
-                        <small>JPG или PNG · панорамна проекция 2:1</small>
-                    </label>
-                    <input type="file" id="panoramaUpload" accept="image/jpeg,image/png,image/webp" hidden>
-                </div>
-                <p class="panorama-hint"><i class="fas fa-info-circle"></i> Плъзнете с мишката или пръст за интерактивен преглед. Можете да качите собствен 360° рендер.</p>
+                <p class="panorama-hint" id="panoramaHint"><i class="fas fa-info-circle"></i> Плъзнете за интерактивен 360° преглед на проекта.</p>
             </div>
             <p class="project-modal-desc" id="projectModalDesc"></p>
         </div>
@@ -702,6 +677,7 @@
     </button>
 
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="site-renderer.js"></script>
     <script src="projects.js"></script>
     <script src="script.js"></script>
 </body>
