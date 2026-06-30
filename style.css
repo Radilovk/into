@@ -12,6 +12,8 @@
     --gray-bg: #f7f7f7;
     --sidebar-w: 90px;
     --topbar-h: 90px;
+    --content-pad-x: 60px;
+    --content-max-w: 1400px;
     --transition: 0.35s cubic-bezier(0.23, 1, 0.32, 1);
     --header-z: 100;
 }
@@ -401,14 +403,14 @@ ul {
 
 .top-header-inner {
     width: 100%;
-    max-width: min(1320px, calc(100vw - var(--sidebar-w) - 40px));
     height: 100%;
-    margin: 0 auto;
-    padding: 0 clamp(20px, 3vw, 40px);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    margin: 0;
+    padding: 0 var(--content-pad-x);
+    display: flex;
     align-items: center;
-    gap: clamp(16px, 2vw, 32px);
+    justify-content: space-between;
+    gap: 32px;
+    position: relative;
 }
 
 .top-header-left {
@@ -416,7 +418,7 @@ ul {
     align-items: center;
     gap: clamp(24px, 3vw, 40px);
     min-width: 0;
-    justify-self: start;
+    flex: 1 1 auto;
 }
 
 .mobile-logo {
@@ -446,11 +448,16 @@ ul {
 }
 
 .top-header-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
-    justify-self: center;
     min-width: 0;
-    max-width: 100%;
+    max-width: min(420px, 40%);
     padding: 0 12px;
+    pointer-events: none;
+    display: none;
 }
 
 .header-tagline {
@@ -464,6 +471,7 @@ ul {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    pointer-events: auto;
 }
 
 .top-header-right {
@@ -471,8 +479,7 @@ ul {
     align-items: center;
     justify-content: flex-end;
     gap: clamp(12px, 2vw, 24px);
-    justify-self: end;
-    flex-shrink: 0;
+    flex: 0 0 auto;
 }
 
 .page-scroll-nav {
@@ -581,7 +588,7 @@ ul {
 /* ---- Main Content ---- */
 .content-holder {
     margin-left: var(--sidebar-w);
-    margin-top: 0;
+    padding-top: var(--topbar-h);
     min-width: 0;
     overflow-x: clip;
 }
@@ -591,9 +598,9 @@ ul {
 }
 
 .section-inner {
-    padding: 100px 60px;
+    padding: 100px var(--content-pad-x);
     position: relative;
-    max-width: 1400px;
+    max-width: var(--content-max-w);
     margin: 0 auto;
 }
 
@@ -751,7 +758,7 @@ ul {
     position: relative;
     overflow: hidden;
     background: var(--dark-1);
-    margin-top: var(--topbar-h);
+    margin-top: 0;
 }
 
 .hero-dec {
@@ -832,7 +839,7 @@ ul {
 .hero-slide-content {
     position: absolute;
     bottom: 140px;
-    left: 60px;
+    left: var(--content-pad-x);
     z-index: 3;
     max-width: 650px;
     color: #fff;
@@ -908,7 +915,7 @@ ul {
 
 .hero-slider-controls {
     position: absolute;
-    right: 40px;
+    right: var(--content-pad-x);
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
@@ -1011,7 +1018,7 @@ ul {
 
 .swiper-counter {
     position: absolute;
-    right: 40px;
+    right: var(--content-pad-x);
     bottom: 140px;
     z-index: 10;
     font-family: 'Teko', sans-serif;
@@ -1323,7 +1330,7 @@ ul {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 50px 0 40px;
+    padding: 0 var(--content-pad-x) 0 var(--content-pad-x);
     z-index: 5;
     border-top: 1px solid rgba(255,255,255,0.05);
 }
@@ -2543,50 +2550,34 @@ textarea:focus-visible {
     outline-offset: 3px;
 }
 
-/* Large desktop — content spacing */
-@media (min-width: 1400px) {
-    .section-inner {
-        padding-left: 80px;
-        padding-right: 80px;
-    }
-
-    .hero-slide-content {
-        left: 80px;
-        max-width: 720px;
-    }
-}
-
-/* ---- Header: desktop refinements ---- */
-@media (min-width: 1065px) and (max-width: 1280px) {
+/* ---- Desktop layout (wide screens) ---- */
+@media (min-width: 1065px) {
     .top-header-center {
         display: none;
     }
 
-    .top-header-inner {
-        grid-template-columns: minmax(0, 1fr) auto;
-        max-width: none;
-        padding: 0 28px;
-    }
-
     .page-scroll-nav ul {
-        gap: 18px;
+        gap: clamp(18px, 2vw, 28px);
     }
 }
 
-@media (min-width: 1281px) {
-    .top-header-inner {
-        max-width: min(1320px, calc(100vw - var(--sidebar-w) - 48px));
+@media (min-width: 1500px) {
+    .top-header-center {
+        display: block;
     }
 }
 
 @media (min-width: 1400px) {
+    :root {
+        --content-pad-x: 80px;
+    }
+
     .section-inner {
         padding-left: 80px;
         padding-right: 80px;
     }
 
     .hero-slide-content {
-        left: 80px;
         max-width: 720px;
     }
 }
@@ -2596,6 +2587,7 @@ textarea:focus-visible {
     :root {
         --sidebar-w: 0px;
         --topbar-h: 70px;
+        --content-pad-x: 30px;
     }
 
     .main-header {
@@ -2607,8 +2599,6 @@ textarea:focus-visible {
     }
 
     .top-header-inner {
-        max-width: none;
-        grid-template-columns: 1fr auto;
         padding: 0 16px 0 0;
         gap: 12px;
     }
@@ -2639,11 +2629,11 @@ textarea:focus-visible {
 
     .content-holder {
         margin-left: 0;
+        padding-top: 0;
         margin-top: var(--topbar-h);
     }
 
     .hero-wrap {
-        margin-top: 0;
         min-height: calc(100dvh - var(--topbar-h));
     }
 
@@ -2889,6 +2879,7 @@ textarea:focus-visible {
 @media (max-width: 480px) {
     :root {
         --topbar-h: 64px;
+        --content-pad-x: 20px;
     }
 
     .content-holder {
@@ -2909,7 +2900,7 @@ textarea:focus-visible {
     }
 
     .hero-wrap {
-        min-height: calc(100dvh - 70px);
+        min-height: calc(100dvh - var(--topbar-h));
     }
 
     .hero-slide-content {
