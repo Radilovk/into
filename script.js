@@ -17,7 +17,7 @@
     function openNav() {
         navHolder.classList.add('active');
         navOverlay.classList.add('active');
-        navToggle.classList.add('cmenu');
+        navToggle.classList.add('active');
         navToggle.setAttribute('aria-expanded', 'true');
         document.body.classList.add('nav-open');
     }
@@ -25,7 +25,7 @@
     function closeNav() {
         navHolder.classList.remove('active');
         navOverlay.classList.remove('active');
-        navToggle.classList.remove('cmenu');
+        navToggle.classList.remove('active');
         navToggle.setAttribute('aria-expanded', 'false');
         document.body.classList.remove('nav-open');
     }
@@ -327,7 +327,7 @@
 
     // ---- Active Nav on Scroll ----
     const sections = document.querySelectorAll('.scroll-section[id]');
-    const navLinks = document.querySelectorAll('.sliding-menu a[data-section]');
+    const navLinks = document.querySelectorAll('.sliding-menu a[data-section], .page-scroll-nav a[data-section]');
 
     function updateActiveNav() {
         let current = 'home';
@@ -361,12 +361,10 @@
 
     // ---- Scroll progress in top header & sidebar ----
     const scrollProgress = document.getElementById('scrollProgress');
-    const sidebarProgress = document.getElementById('sidebarProgress');
     function updateScrollProgress() {
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const pct = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
         if (scrollProgress) scrollProgress.style.width = pct + '%';
-        if (sidebarProgress) sidebarProgress.style.height = pct + '%';
     }
 
     // ---- Scroll Handler ----

@@ -35,7 +35,6 @@ function renderSite(data) {
     const h = data.header;
     const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     setText('headerSubtitle', h.subtitle);
-    setText('headerCta', h.ctaText);
     const ctaSpan = document.querySelector('#headerCta span');
     if (ctaSpan) ctaSpan.textContent = h.ctaText;
     if (document.getElementById('socialFb')) document.getElementById('socialFb').href = h.social.facebook;
