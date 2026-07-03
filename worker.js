@@ -257,6 +257,105 @@ export default {
         );
       }
 
+      const uploadImageToGitHub = async (file, env) => {
+        const githubToken = env.GITHUB_TOKEN;
+        if (!githubToken) {
+          throw new Error('GitHub upload is not configured (GITHUB_TOKEN missing)');
+        }
+
+        const repo = env.GITHUB_REPO || 'Radilovk/into';
+        const branch = env.GITHUB_BRANCH || 'main';
+        const pagesBase = (env.GITHUB_PAGES_BASE_URL || 'https://radilovk.github.io/into').replace(/\/$/, '');
+        const maxBytes = 3 * 1024 * 1024;
+
+        if (!file || file.size === 0) {
+          throw new Error('No file provided');
+        }
+        if (file.size > maxBytes) {
+          throw new Error('File too large (max 3MB)');
+        }
+
+        const allowedTypes = {
+          'image/jpeg': 'jpg',
+          'image/png': 'png',
+          'image/webp': 'webp',
+          'image/gif': 'gif',
+        };
+        const ext = allowedTypes[file.type];
+        if (!ext) {
+          throw new Error('Unsupported image type. Use JPEG, PNG, WebP or GIF.');
+        }
+
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+        const base64 = btoa(binary);
+
+        const filename = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+        const repoPath = `assets/uploads/${filename}`;
+
+        const ghRes = await fetch(`https://api.github.com/repos/${repo}/contents/${repoPath}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${githubToken}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/vnd.github+json',
+            'User-Agent': 'intodesign-worker',
+          },
+          body: JSON.stringify({
+            message: `Upload site image ${filename}`,
+            content: base64,
+            branch,
+          }),
+        });
+
+        if (!ghRes.ok) {
+          const err = await ghRes.json().catch(() => ({}));
+          console.error('GitHub upload error:', ghRes.status, err);
+          throw new Error(err.message || `GitHub upload failed (${ghRes.status})`);
+        }
+
+        return {
+          url: `${pagesBase}/${repoPath}`,
+          path: repoPath,
+          filename,
+        };
+      };
+
+      if (pathname === '/api/upload-image' && request.method === 'POST') {
+        const authorized = await verifySiteToken(request);
+        if (!authorized) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Unauthorized. Please log in again.' }),
+            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const rateLimit = await checkRateLimit('upload:' + (request.headers.get('CF-Connecting-IP') || 'unknown'));
+        if (!rateLimit.allowed) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Твърде много заявки. Опитайте по-късно.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        try {
+          const formData = await request.formData();
+          const file = formData.get('file');
+          const result = await uploadImageToGitHub(file, env);
+          return new Response(
+            JSON.stringify({ success: true, data: result }),
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (error) {
+          console.error('Image upload error:', error);
+          return new Response(
+            JSON.stringify({ success: false, message: error.message || 'Upload failed' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
       const getInquiries = async () => {
         if (!env.APP_KV) return [];
         const raw = await env.APP_KV.get('site:inquiries');
