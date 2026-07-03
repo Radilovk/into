@@ -262,6 +262,32 @@
         return res.json();
     }
 
+    async function uploadImageFile(file) {
+        if (!hasRealToken()) {
+            throw new Error('За качване на снимки е необходим вход с парола (не само *admin).');
+        }
+        if (!file) {
+            throw new Error('Няма избран файл.');
+        }
+        if (file.size > 3 * 1024 * 1024) {
+            throw new Error('Файлът е твърде голям (макс. 3MB).');
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        const token = sessionStorage.getItem(STORAGE_TOKEN);
+        const res = await fetch(`${API_URL}/api/upload-image`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success || !data.data?.url) {
+            throw new Error(data.message || 'Грешка при качване на изображението');
+        }
+        return data.data.url;
+    }
+
     function field(label, hint, inner) {
         return `<div class="field"><label>${label}</label>${inner}${hint ? `<p class="field-hint">${hint}</p>` : ''}</div>`;
     }
@@ -304,7 +330,7 @@
                     ${value ? `<img src="${escAttr(value)}" alt="">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:11px;">Няма</div>'}
                 </div>
                 <div class="image-controls">
-                    ${textInput(path, value, 'URL на изображение или качете файл')}
+                    ${textInput(path, value, 'URL на изображение или качете файл (качва се в GitHub репото)')}
                     <div class="btn-row">
                         <button type="button" class="btn btn-secondary btn-sm" data-upload="${path}" data-preview="${id}_preview"><i class="fas fa-upload"></i> Качи файл</button>
                         <button type="button" class="btn btn-danger btn-sm" data-clear-img="${path}" data-preview="${id}_preview"><i class="fas fa-trash"></i> Премахни</button>
@@ -333,23 +359,25 @@
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = () => {
+                input.onchange = async () => {
                     const file = input.files[0];
                     if (!file) return;
-                    if (file.size > 3 * 1024 * 1024) {
-                        toast('Файлът е твърде голям (макс. 3MB). Използвайте URL.', 'error');
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const path = btn.dataset.upload;
-                        setByPath(siteData, path, reader.result);
+                    const path = btn.dataset.upload;
+                    const previewId = btn.dataset.preview;
+                    btn.disabled = true;
+                    toast('Качване на изображението...');
+                    try {
+                        const url = await uploadImageFile(file);
+                        setByPath(siteData, path, url);
                         const textEl = container.querySelector(`[data-path="${path}"]`);
-                        if (textEl) textEl.value = reader.result.substring(0, 60) + '...';
-                        updatePreview(btn.dataset.preview, reader.result);
-                        toast('Изображението е качено');
-                    };
-                    reader.readAsDataURL(file);
+                        if (textEl) textEl.value = url;
+                        updatePreview(previewId, url);
+                        toast('Изображението е качено в репото');
+                    } catch (e) {
+                        toast(e.message, 'error');
+                    } finally {
+                        btn.disabled = false;
+                    }
                 };
                 input.click();
             });
@@ -803,16 +831,21 @@
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
-                    input.onchange = () => {
+                    input.onchange = async () => {
                         const file = input.files[0];
                         if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            siteData.portfolio.projects[i].images.push(reader.result);
+                        btn.disabled = true;
+                        toast('Качване на снимката...');
+                        try {
+                            const url = await uploadImageFile(file);
+                            siteData.portfolio.projects[i].images.push(url);
                             renderSection('portfolio');
-                            toast('Снимката е добавена в галерията');
-                        };
-                        reader.readAsDataURL(file);
+                            toast('Снимката е качена в репото');
+                        } catch (e) {
+                            toast(e.message, 'error');
+                        } finally {
+                            btn.disabled = false;
+                        }
                     };
                     input.click();
                 });

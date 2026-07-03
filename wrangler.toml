@@ -2,6 +2,13 @@ name = "worker-backend"
 main = "worker.js"
 compatibility_date = "2024-07-01"
 
+# Secrets for CMS image upload (wrangler secret put GITHUB_TOKEN):
+# GITHUB_TOKEN          - GitHub PAT with repo contents write access
+# GITHUB_REPO           - optional, default Radilovk/into
+# GITHUB_BRANCH         - optional, default main
+# GITHUB_PAGES_BASE_URL - optional, default https://radilovk.github.io/into
+# SITE_ADMIN_PASSWORD   - admin panel password
+
 [[kv_namespaces]]
 binding = "SETTINGS"
 id = "<your_kv_id>"
