@@ -300,6 +300,7 @@
   .voucher-cta{
     display:flex; align-items:center; justify-content:center; gap:8px;
     width:100%; padding:15px; border-radius:16px; text-decoration:none;
+    border:none; appearance:none; font-family:inherit; cursor:pointer;
     background:linear-gradient(90deg,#2c6e8f,#118ab2 45%,#06d6a0);
     color:#04231b; font-weight:800; font-size:15px; letter-spacing:.01em;
     box-shadow:0 10px 24px rgba(6,214,160,.28);
@@ -374,6 +375,16 @@
     z-index:101; backdrop-filter:blur(8px);
   }
   .close-x:active{transform:scale(.9);}
+
+  /* ---------- voucher image viewer ---------- */
+  #voucher-image-overlay{
+    position:fixed; inset:0; z-index:110; background:#000;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  #voucher-image-overlay.show{opacity:1; pointer-events:auto;}
+  #voucher-image-overlay img{max-width:100%; max-height:100%; object-fit:contain; display:block;}
+  #voucher-image-overlay .close-x{z-index:111;}
 
   .hint-tap{font-size:12px; color:rgba(255,255,255,.35); margin-top:22px;}
 </style>
@@ -530,11 +541,16 @@
           <div><span>Номер на ваучер</span><b>ADV232X39</b></div>
           <div><span>Валиден до</span><b>25.07.2027</b></div>
         </div>
-        <a class="voucher-cta" href="https://adventures.bg/book/?code=ADV232X39" target="_blank" rel="noopener noreferrer">🌊 Отвори ваучера</a>
-        <div class="voucher-hint">Линкът вече съдържа твоя код — просто избери удобна дата за резервация.</div>
+        <button type="button" class="voucher-cta" id="btn-open-voucher-image">🌊 Виж ваучера</button>
+        <div class="voucher-hint">Запази снимката на ваучера — ще ти трябва при резервацията.</div>
       </div>
     </div>
   </div>
+</div>
+
+<div id="voucher-image-overlay">
+  <button class="close-x" id="voucher-image-close">✕</button>
+  <img id="voucher-image" alt="Ваучер за eFoil — Adventures.bg" src="assets/voucher-martin.jpg">
 </div>
 
 <script>
@@ -813,6 +829,15 @@
   });
   $('secret-close').addEventListener('click', function(){
     $('secret-overlay').classList.remove('show');
+  });
+
+  /* ---------------- voucher image viewer ---------------- */
+  $('btn-open-voucher-image').addEventListener('click', function(){
+    $('voucher-image-overlay').classList.add('show');
+    vibrate(10);
+  });
+  $('voucher-image-close').addEventListener('click', function(){
+    $('voucher-image-overlay').classList.remove('show');
   });
 
 })();
