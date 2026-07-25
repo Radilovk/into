@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07060f">
+<meta name="robots" content="noindex, nofollow">
+<title>🎁 Специален подарък</title>
+<style>
+  :root{
+    --gold:#ffd166;
+    --pink:#ef476f;
+    --teal:#06d6a0;
+    --blue:#4cc9f0;
+    --violet:#9d4edd;
+    --ink:#07060f;
+    --card:rgba(255,255,255,.08);
+    --card-brd:rgba(255,255,255,.16);
+    --text:#f5f3ff;
+    --text-dim:rgba(245,243,255,.68);
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    overscroll-behavior:none; overflow:hidden;
+    background:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+    color:var(--text);
+    -webkit-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
+  #app{position:fixed; inset:0; width:100%; height:100dvh;}
+  .screen{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:calc(var(--safe-t) + 24px) 24px calc(var(--safe-b) + 24px);
+    text-align:center;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transform:scale(1.03);
+    transition:opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1);
+    overflow:hidden;
+  }
+  .screen.active{opacity:1; visibility:visible; pointer-events:auto; transform:scale(1);}
+
+  /* ---------- SPLASH ---------- */
+  #screen-splash{background:radial-gradient(ellipse at 50% 30%, #14122a 0%, #07060f 70%);}
+  .splash-mark{
+    width:84px; height:84px; color:var(--gold);
+    filter:drop-shadow(0 0 18px rgba(255,209,102,.45));
+    animation:pulseSlow 2.4s ease-in-out infinite;
+  }
+  .splash-title{
+    margin-top:22px; font-size:15px; letter-spacing:.35em; text-transform:uppercase;
+    color:var(--text-dim); font-weight:600;
+  }
+  .splash-sub{margin-top:10px; font-size:13px; color:rgba(245,243,255,.4); letter-spacing:.05em;}
+  .splash-bar{
+    margin-top:28px; width:160px; height:3px; border-radius:3px;
+    background:rgba(255,255,255,.12); overflow:hidden;
+  }
+  .splash-bar-fill{
+    height:100%; width:0%; border-radius:3px;
+    background:linear-gradient(90deg,var(--gold),var(--pink));
+    transition:width 2.1s cubic-bezier(.3,0,.2,1);
+  }
+  @keyframes pulseSlow{0%,100%{opacity:.75; transform:scale(1);}50%{opacity:1; transform:scale(1.05);}}
+
+  /* ---------- GATE (festive) ---------- */
+  #screen-gate{
+    background:
+      radial-gradient(circle at 15% 8%, rgba(239,71,111,.35), transparent 45%),
+      radial-gradient(circle at 85% 12%, rgba(76,201,240,.28), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(157,78,221,.35), transparent 55%),
+      linear-gradient(160deg,#140b2e 0%, #2a1150 45%, #4a0e63 75%, #7c1653 100%);
+  }
+  .gate-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--card); border:1px solid var(--card-brd);
+    padding:6px 14px; border-radius:100px; font-size:12px; color:var(--text-dim);
+    backdrop-filter:blur(10px); margin-bottom:26px; letter-spacing:.03em;
+  }
+  .gate-emoji-row{font-size:34px; margin-bottom:6px; letter-spacing:6px;}
+  .gate-title{
+    font-size:30px; font-weight:800; line-height:1.25; margin:6px 0 10px;
+    background:linear-gradient(90deg,var(--gold),#fff8e7 40%,var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .gate-sub{font-size:16.5px; color:var(--text); opacity:.92; max-width:340px; line-height:1.5; margin-bottom:6px;}
+  .gate-instr{font-size:13.5px; color:var(--text-dim); max-width:300px; line-height:1.5; margin:18px 0 34px;}
+  .faceid-btn{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+    border:1px solid rgba(255,255,255,.28);
+    padding:20px 34px; border-radius:26px; backdrop-filter:blur(14px);
+    color:var(--text); font-size:15.5px; font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .faceid-btn:active{transform:scale(.95);}
+  .faceid-btn svg{width:44px; height:44px; color:var(--gold);}
+  .gate-foot{position:absolute; bottom:calc(var(--safe-b) + 16px); font-size:11px; color:rgba(245,243,255,.32); letter-spacing:.04em;}
+
+  /* ---------- SCAN ---------- */
+  #screen-scan{background:#020203; padding:0; justify-content:flex-start;}
+  .scan-topbar{
+    position:absolute; top:0; left:0; right:0; padding:calc(var(--safe-t) + 14px) 20px 14px;
+    display:flex; align-items:center; justify-content:center; z-index:5;
+    background:linear-gradient(180deg,rgba(0,0,0,.55),transparent);
+  }
+  .scan-topbar span{font-size:13px; font-weight:600; letter-spacing:.06em; color:#fff;}
+  .cam-wrap{position:absolute; inset:0; background:#000;}
+  #camera-video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1);}
+  #captured-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;}
+  .mask-oval{
+    position:absolute; left:50%; top:46%; transform:translate(-50%,-50%);
+    width:66vw; max-width:300px; height:calc(66vw * 1.32); max-height:400px;
+    border-radius:50% / 42%;
+    box-shadow:0 0 0 3000px rgba(0,0,0,.5);
+    pointer-events:none;
+  }
+  .bracket{position:absolute; width:34px; height:34px; border:3px solid var(--gold); opacity:.9;}
+  .b-tl{left:calc(50% - 33vw - 14px); top:calc(46% - 33vw*1.32/1 - 14px + 33vw*1.32/2); border-right:none; border-bottom:none; border-top-left-radius:10px;}
+  /* simpler: use JS-free fixed bracket positions relative to oval via percentage box */
+  .scan-frame{
+    position:absolute; left:50%; top:46%; transform:translate(-50%,-50%);
+    width:min(66vw,300px); height:min(87vw,396px); pointer-events:none;
+  }
+  .scan-frame i{position:absolute; width:30px; height:30px; border:3px solid var(--gold); border-radius:8px; opacity:.95;}
+  .scan-frame i.tl{top:-6px; left:-6px; border-right:none; border-bottom:none;}
+  .scan-frame i.tr{top:-6px; right:-6px; border-left:none; border-bottom:none;}
+  .scan-frame i.bl{bottom:-6px; left:-6px; border-right:none; border-top:none;}
+  .scan-frame i.br{bottom:-6px; right:-6px; border-left:none; border-top:none;}
+  .scan-line{
+    position:absolute; left:6%; right:6%; height:2px; top:6%;
+    background:linear-gradient(90deg,transparent,var(--teal),var(--gold),transparent);
+    box-shadow:0 0 12px 2px rgba(6,214,160,.7);
+    animation:sweep 2.1s ease-in-out infinite;
+  }
+  @keyframes sweep{0%{top:6%;}50%{top:92%;}100%{top:6%;}}
+  .scan-status{
+    position:absolute; bottom:calc(var(--safe-b) + 150px); left:0; right:0; text-align:center;
+    font-size:14.5px; font-weight:600; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.6); z-index:4;
+    min-height:20px; transition:opacity .25s ease;
+  }
+  .shutter-wrap{position:absolute; bottom:calc(var(--safe-b) + 44px); left:0; right:0; display:flex; justify-content:center; z-index:5;}
+  .shutter{
+    width:74px; height:74px; border-radius:50%; background:#fff;
+    border:5px solid rgba(255,255,255,.35);
+    box-shadow:0 4px 18px rgba(0,0,0,.5);
+    transition:transform .1s ease;
+  }
+  .shutter:active{transform:scale(.9);}
+  .preview-actions{
+    position:absolute; bottom:calc(var(--safe-b) + 40px); left:0; right:0;
+    display:none; gap:16px; justify-content:center; z-index:6; padding:0 24px;
+  }
+  .pill-btn{
+    flex:1; max-width:170px; padding:14px 10px; border-radius:16px; font-size:14.5px; font-weight:700;
+    border:1px solid rgba(255,255,255,.25); backdrop-filter:blur(12px);
+  }
+  .pill-btn.ghost{background:rgba(255,255,255,.08); color:#fff;}
+  .pill-btn.solid{background:linear-gradient(90deg,var(--teal),var(--blue)); color:#04231b; border:none;}
+  .pill-btn:active{transform:scale(.95);}
+  .analysis-panel{
+    position:absolute; bottom:0; left:0; right:0; display:none; z-index:6;
+    padding:26px 22px calc(var(--safe-b) + 26px);
+    background:linear-gradient(180deg,transparent,rgba(0,0,0,.88) 30%);
+  }
+  .analysis-title{font-size:14px; font-weight:700; color:#fff; margin-bottom:10px; text-align:left;}
+  .analysis-bar{width:100%; height:5px; border-radius:6px; background:rgba(255,255,255,.15); overflow:hidden;}
+  .analysis-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--gold)); border-radius:6px; transition:width .5s linear;}
+  .analysis-log{margin-top:10px; font-size:12.5px; color:rgba(255,255,255,.75); text-align:left; min-height:18px;}
+  .cam-fallback{
+    position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:32px; text-align:center; background:#050308; z-index:7; gap:14px;
+  }
+  .cam-fallback svg{width:52px; height:52px; color:var(--gold);}
+  .cam-fallback p{font-size:14px; color:var(--text-dim); max-width:280px; line-height:1.5;}
+
+  /* ---------- SUCCESS ---------- */
+  #screen-success{
+    background:radial-gradient(circle at 50% 30%, rgba(6,214,160,.25), transparent 55%), #060515;
+  }
+  .check-ring{
+    width:104px; height:104px; border-radius:50%;
+    background:rgba(6,214,160,.12); border:2px solid rgba(6,214,160,.5);
+    display:flex; align-items:center; justify-content:center; margin-bottom:22px;
+    animation:ringPop .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes ringPop{0%{transform:scale(.4); opacity:0;}100%{transform:scale(1); opacity:1;}}
+  .check-ring svg{width:52px; height:52px;}
+  .check-ring svg path{
+    stroke:var(--teal); stroke-width:8; fill:none; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:60; stroke-dashoffset:60;
+    animation:draw .5s .25s ease forwards;
+  }
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  .success-label{font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); font-weight:700; margin-bottom:8px;}
+  .success-name{font-size:24px; font-weight:800; color:#fff; margin-bottom:8px;}
+  .success-sub{font-size:14px; color:var(--text-dim);}
+
+  /* ---------- REVEAL ---------- */
+  #screen-reveal{
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,209,102,.25), transparent 45%),
+      radial-gradient(circle at 80% 10%, rgba(239,71,111,.28), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(76,201,240,.25), transparent 55%),
+      linear-gradient(165deg,#0c0a22 0%,#1c0f3d 40%,#3a0d4d 75%,#5c0f3f 100%);
+    justify-content:flex-start; padding-top:calc(var(--safe-t) + 40px); overflow-y:auto;
+  }
+  #screen-reveal.active{display:flex;}
+  .reveal-scroll{width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center; padding-bottom:60px;}
+  .reveal-title{font-size:30px; font-weight:900; margin-bottom:4px;
+    background:linear-gradient(90deg,var(--gold),#fff,var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .reveal-sub{font-size:14px; color:var(--text-dim); margin-bottom:26px;}
+  .gift-card{
+    width:100%; background:var(--card); border:1px solid var(--card-brd); border-radius:22px;
+    padding:20px 20px; margin-bottom:16px; backdrop-filter:blur(14px); text-align:left;
+    box-shadow:0 10px 26px rgba(0,0,0,.25);
+    animation:cardIn .6s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .gift-card:nth-of-type(2){animation-delay:.15s;}
+  @keyframes cardIn{from{opacity:0; transform:translateY(24px) scale(.97);}to{opacity:1; transform:translateY(0) scale(1);}}
+  .gift-icon{font-size:26px; margin-bottom:8px; display:block;}
+  .gift-tag{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:6px;}
+  .gift-text{font-size:15.5px; line-height:1.5; color:#fff; font-weight:600;}
+  .reveal-note{margin-top:10px; font-size:12.5px; color:var(--text-dim); max-width:340px;}
+
+  .secret-trigger{
+    position:fixed; bottom:calc(var(--safe-b) + 14px); left:50%; transform:translateX(-50%) translateY(20px);
+    background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.15);
+    color:rgba(255,255,255,.55); font-size:11.5px; padding:9px 16px; border-radius:100px;
+    backdrop-filter:blur(8px); opacity:0; pointer-events:none; transition:opacity .6s ease, transform .6s ease;
+    z-index:20; max-width:88%;
+  }
+  .secret-trigger.show{opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0);}
+  .secret-trigger:active{transform:translateX(-50%) scale(.96);}
+
+  /* ---------- floating wishes ---------- */
+  .wish{
+    position:fixed; bottom:-60px; font-size:30px; z-index:15; pointer-events:auto;
+    animation:floatUp linear forwards; filter:drop-shadow(0 4px 10px rgba(0,0,0,.3));
+  }
+  @keyframes floatUp{
+    0%{transform:translateY(0) translateX(0) rotate(0deg); opacity:0;}
+    8%{opacity:1;}
+    100%{transform:translateY(-115vh) translateX(var(--drift,0px)) rotate(var(--rot,25deg)); opacity:0;}
+  }
+  .toast{
+    position:fixed; left:50%; top:14%; transform:translateX(-50%) translateY(-10px);
+    background:rgba(20,14,34,.92); border:1px solid rgba(255,255,255,.18);
+    color:#fff; font-size:13.5px; font-weight:600; padding:10px 18px; border-radius:100px;
+    z-index:30; opacity:0; transition:opacity .3s ease, transform .3s ease; backdrop-filter:blur(10px);
+    max-width:80%; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* ---------- confetti canvas ---------- */
+  #confetti-canvas{position:fixed; inset:0; z-index:40; pointer-events:none;}
+
+  /* ---------- secret overlay ---------- */
+  #secret-overlay{
+    position:fixed; inset:0; background:#000; z-index:100;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .35s ease;
+  }
+  #secret-overlay.show{opacity:1; pointer-events:auto;}
+  #secret-overlay img{max-width:100%; max-height:100%; object-fit:contain; display:block;}
+  .secret-placeholder{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    padding:40px; text-align:center; color:rgba(255,255,255,.7);
+  }
+  .secret-placeholder .big{font-size:52px;}
+  .secret-placeholder code{background:rgba(255,255,255,.08); padding:3px 8px; border-radius:6px; font-size:12px;}
+  .close-x{
+    position:absolute; top:calc(var(--safe-t) + 14px); right:16px; width:40px; height:40px; border-radius:50%;
+    background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; font-weight:400;
+    z-index:101; backdrop-filter:blur(8px);
+  }
+  .close-x:active{transform:scale(.9);}
+
+  .hint-tap{font-size:12px; color:rgba(255,255,255,.35); margin-top:22px;}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SPLASH -->
+  <section class="screen active" id="screen-splash">
+    <svg class="splash-mark" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round">
+      <path d="M17 32 V17 a5 5 0 0 1 5 -5 H37"/>
+      <path d="M63 12 H83 a5 5 0 0 1 5 5 V32"/>
+      <path d="M88 68 V83 a5 5 0 0 1 -5 5 H63"/>
+      <path d="M37 88 H17 a5 5 0 0 1 -5 -5 V68"/>
+      <circle cx="38" cy="47" r="3.2" fill="currentColor" stroke="none"/>
+      <circle cx="62" cy="47" r="3.2" fill="currentColor" stroke="none"/>
+      <path d="M40 62 Q50 70 60 62"/>
+    </svg>
+    <div class="splash-title">Secure Access</div>
+    <div class="splash-sub">Инициализация на защитена връзка…</div>
+    <div class="splash-bar"><div class="splash-bar-fill" id="splash-fill"></div></div>
+  </section>
+
+  <!-- GATE -->
+  <section class="screen" id="screen-gate">
+    <div class="gate-badge">🔒 Защитено съдържание</div>
+    <div class="gate-emoji-row">🎉🎂🎁</div>
+    <div class="gate-title">Честит празник,<br>Мартин!</div>
+    <div class="gate-sub">Вашият подарък ви очаква тук!</div>
+    <div class="gate-instr">За да отворите, моля продължете чрез лицева идентификация.</div>
+    <button class="faceid-btn" id="btn-start-scan">
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round">
+        <path d="M15 30 V15 a5 5 0 0 1 5 -5 H35"/>
+        <path d="M65 10 H85 a5 5 0 0 1 5 5 V30"/>
+        <path d="M90 70 V85 a5 5 0 0 1 -5 5 H65"/>
+        <path d="M35 90 H15 a5 5 0 0 1 -5 -5 V70"/>
+        <circle cx="35" cy="45" r="3" fill="currentColor" stroke="none"/>
+        <circle cx="65" cy="45" r="3" fill="currentColor" stroke="none"/>
+        <path d="M40 60 Q50 68 60 60"/>
+      </svg>
+      Продължи с Face ID
+    </button>
+    <div class="gate-foot">🎈 Направено с любов за твоя специален ден 🎈</div>
+  </section>
+
+  <!-- SCAN -->
+  <section class="screen" id="screen-scan">
+    <div class="scan-topbar"><span>Лицева идентификация</span></div>
+    <div class="cam-wrap">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <img id="captured-photo" alt="">
+    </div>
+    <div class="scan-frame" id="scan-frame">
+      <i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i>
+      <div class="scan-line"></div>
+    </div>
+    <div class="scan-status" id="scan-status">Позиционирайте лицето в рамката</div>
+
+    <div class="shutter-wrap" id="shutter-wrap">
+      <button class="shutter" id="btn-shutter" aria-label="Заснемане"></button>
+    </div>
+
+    <div class="preview-actions" id="preview-actions">
+      <button class="pill-btn ghost" id="btn-retake">↺ Повтори</button>
+      <button class="pill-btn solid" id="btn-confirm">✓ Потвърди</button>
+    </div>
+
+    <div class="analysis-panel" id="analysis-panel">
+      <div class="analysis-title" id="analysis-title">Анализиране на биометрични данни…</div>
+      <div class="analysis-bar"><div class="analysis-bar-fill" id="analysis-fill"></div></div>
+      <div class="analysis-log" id="analysis-log">Инициализация…</div>
+    </div>
+
+    <div class="cam-fallback" id="cam-fallback">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.4"/></svg>
+      <div class="success-name" style="font-size:17px;">Камерата не е достъпна</div>
+      <p>Няма проблем — самоличността ти може да бъде потвърдена и без достъп до камерата. 😉</p>
+      <button class="pill-btn solid" id="btn-fallback-continue" style="max-width:220px;">Продължи</button>
+    </div>
+  </section>
+
+  <!-- SUCCESS -->
+  <section class="screen" id="screen-success">
+    <div class="check-ring">
+      <svg viewBox="0 0 52 52"><path d="M12 27 L22 37 L42 15"/></svg>
+    </div>
+    <div class="success-label">Идентичността е потвърдена</div>
+    <div class="success-name">Мартин Наконечнюк</div>
+    <div class="success-sub">Лицето е разпознато успешно ✅</div>
+  </section>
+
+  <!-- REVEAL -->
+  <section class="screen" id="screen-reveal">
+    <div class="reveal-scroll">
+      <div class="reveal-title">🎉 Честит Рожден Ден! 🎉</div>
+      <div class="reveal-sub">Мартин, отключи своите подаръци</div>
+
+      <div class="gift-card">
+        <span class="gift-icon">🅿️🏛️</span>
+        <div class="gift-tag">Подарък №1</div>
+        <div class="gift-text">Получаваш едногодишно членство с осигурено паркомясто за клуб на пенсионера в град Бургас!</div>
+      </div>
+
+      <div class="gift-card">
+        <span class="gift-icon">📖</span>
+        <div class="gift-tag">Подарък №2 · Бонус</div>
+        <div class="gift-text">30% отстъпка при поръчка на книгата „Как да се справим с напредващите с възрастта болки в кръста и коленете“.</div>
+      </div>
+
+      <div class="reveal-note">Честита годишнина, приятелю! 🥳 Докосни балоните за още пожелания 🎈</div>
+    </div>
+  </section>
+
+</div>
+
+<button class="secret-trigger" id="secret-trigger">Ако четеш този надпис, значи все още ти е рано. Натисни тук →</button>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div id="secret-overlay">
+  <button class="close-x" id="secret-close">✕</button>
+  <img id="secret-img" alt="Изненада" src="assets/martin-secret.jpg">
+  <div class="secret-placeholder" id="secret-placeholder" style="display:none;">
+    <div class="big">📷</div>
+    <div>Тук ще се появи специалното изображение.</div>
+    <div>Добави файл в <code>assets/martin-secret.jpg</code></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+(function(){
+
+  /* ---------------- helpers ---------------- */
+  function $(id){ return document.getElementById(id); }
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    $(id).classList.add('active');
+  }
+  function vibrate(pattern){
+    if('vibrate' in navigator){ try{ navigator.vibrate(pattern); }catch(e){} }
+  }
+
+  /* ---------------- sound (synth, no external files) ---------------- */
+  var actx = null;
+  function ac(){
+    if(!actx){
+      var C = window.AudioContext || window.webkitAudioContext;
+      if(C) actx = new C();
+    }
+    if(actx && actx.state === 'suspended') actx.resume();
+    return actx;
+  }
+  function tone(freq, start, dur, type, vol){
+    var c = ac(); if(!c) return;
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.value = 0;
+    o.connect(g); g.connect(c.destination);
+    var t0 = c.currentTime + start;
+    g.gain.linearRampToValueAtTime(vol||0.12, t0+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    o.start(t0); o.stop(t0+dur+0.05);
+  }
+  function playPop(){ tone(880,0,.12,'triangle',.08); }
+  function playChime(){ tone(523,0,.28,'sine',.1); tone(659,.12,.28,'sine',.1); tone(784,.24,.4,'sine',.12); }
+  function playShutter(){ tone(1200,0,.05,'square',.05); }
+
+  /* ---------------- confetti engine ---------------- */
+  var canvas = $('confetti-canvas'), cctx = canvas.getContext('2d');
+  var colors = ['#ffd166','#ef476f','#06d6a0','#4cc9f0','#9d4edd','#ffffff'];
+  function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+  window.addEventListener('resize', resize); resize();
+
+  var particles = [], running = false;
+  function spawn(count, x, y, spread){
+    spread = spread || 1;
+    for(var i=0;i<count;i++){
+      particles.push({
+        x: x!=null ? x + (Math.random()-0.5)*40 : Math.random()*canvas.width,
+        y: y!=null ? y : -20 - Math.random()*100,
+        vx: (Math.random()-0.5)*7*spread,
+        vy: (y!=null ? -(Math.random()*6+3) : Math.random()*2+1.5),
+        g: 0.16,
+        size: Math.random()*7+4,
+        color: colors[(Math.random()*colors.length)|0],
+        rot: Math.random()*360,
+        vr: (Math.random()-0.5)*14,
+        shape: Math.random()>0.5?'rect':'circle',
+        life:0, maxLife: 220+Math.random()*140
+      });
+    }
+    if(!running){ running = true; requestAnimationFrame(loop); }
+  }
+  function loop(){
+    cctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var i=particles.length-1;i>=0;i--){
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += p.g; p.rot += p.vr; p.life++;
+      cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot*Math.PI/180);
+      cctx.fillStyle = p.color; cctx.globalAlpha = Math.max(0, 1 - p.life/p.maxLife);
+      if(p.shape==='rect') cctx.fillRect(-p.size/2,-p.size/3,p.size,p.size*0.65);
+      else { cctx.beginPath(); cctx.arc(0,0,p.size/2,0,Math.PI*2); cctx.fill(); }
+      cctx.restore();
+      if(p.life > p.maxLife || p.y > canvas.height + 60) particles.splice(i,1);
+    }
+    if(particles.length){ requestAnimationFrame(loop); } else { running = false; }
+  }
+
+  /* ---------------- toast ---------------- */
+  function toast(msg){
+    var t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){ t.classList.add('show'); });
+    setTimeout(function(){
+      t.classList.remove('show');
+      setTimeout(function(){ t.remove(); }, 350);
+    }, 1800);
+  }
+
+  /* ---------------- wishes ---------------- */
+  var wishEmojis = ['🎈','🎁','🎊','✨','🎂','🌟'];
+  var wishTexts = [
+    'Здраве, което не спира! 💪',
+    'Много усмивки всеки ден! 😄',
+    'Нови приятни изживявания! ✨',
+    'Спокойствие и радост! 🌿',
+    'Любов от близките! ❤️',
+    'Енергия за нови приключения! 🚀',
+    'Вкусни моменти с близки! 🍰',
+    'Дни, пълни със смях! 😂'
+  ];
+  var wishInterval = null;
+  function spawnWish(){
+    var el = document.createElement('div');
+    el.className = 'wish';
+    el.textContent = wishEmojis[(Math.random()*wishEmojis.length)|0];
+    var left = 8 + Math.random()*84;
+    el.style.left = left + 'vw';
+    var duration = 6 + Math.random()*3;
+    el.style.animationDuration = duration + 's';
+    el.style.setProperty('--drift', ((Math.random()-0.5)*120) + 'px');
+    el.style.setProperty('--rot', ((Math.random()-0.5)*70) + 'deg');
+    el.addEventListener('click', function(ev){
+      var r = el.getBoundingClientRect();
+      spawn(26, r.left+r.width/2, r.top+r.height/2, 1.4);
+      playPop(); vibrate(15);
+      toast(wishTexts[(Math.random()*wishTexts.length)|0]);
+      el.remove();
+    });
+    el.addEventListener('animationend', function(){ el.remove(); });
+    document.body.appendChild(el);
+  }
+  function startWishes(){
+    if(wishInterval) return;
+    spawnWish();
+    wishInterval = setInterval(spawnWish, 900);
+    setTimeout(function(){ clearInterval(wishInterval); wishInterval = null; }, 16000);
+  }
+
+  /* ---------------- splash ---------------- */
+  setTimeout(function(){ $('splash-fill').style.width = '100%'; }, 120);
+  setTimeout(function(){ showScreen('screen-gate'); }, 2400);
+
+  /* ---------------- gate -> scan ---------------- */
+  var stream = null;
+  $('btn-start-scan').addEventListener('click', function(){
+    ac(); // unlock audio on user gesture
+    showScreen('screen-scan');
+    requestCamera();
+  });
+
+  function requestCamera(){
+    $('scan-status').textContent = 'Позиционирайте лицето в рамката';
+    $('cam-fallback').style.display = 'none';
+    $('camera-video').style.display = 'block';
+    $('shutter-wrap').style.display = 'flex';
+    $('scan-frame').style.display = 'block';
+
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      return showFallback();
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width:{ideal:720}, height:{ideal:960} }, audio:false })
+      .then(function(s){
+        stream = s;
+        var v = $('camera-video');
+        v.srcObject = s; v.play();
+      })
+      .catch(function(){ showFallback(); });
+  }
+  function showFallback(){
+    $('camera-video').style.display = 'none';
+    $('scan-frame').style.display = 'none';
+    $('shutter-wrap').style.display = 'none';
+    $('scan-status').style.display = 'none';
+    $('cam-fallback').style.display = 'flex';
+  }
+  $('btn-fallback-continue').addEventListener('click', function(){
+    $('cam-fallback').style.display = 'none';
+    runAnalysis();
+  });
+
+  /* ---------------- capture ---------------- */
+  var hiddenCanvas = document.createElement('canvas');
+  $('btn-shutter').addEventListener('click', function(){
+    var v = $('camera-video');
+    var w = v.videoWidth || 720, h = v.videoHeight || 960;
+    hiddenCanvas.width = w; hiddenCanvas.height = h;
+    var hctx = hiddenCanvas.getContext('2d');
+    hctx.translate(w,0); hctx.scale(-1,1);
+    hctx.drawImage(v, 0, 0, w, h);
+    var dataUrl = hiddenCanvas.toDataURL('image/jpeg', 0.9);
+
+    var img = $('captured-photo');
+    img.src = dataUrl; img.style.display = 'block';
+    v.style.display = 'none';
+
+    playShutter(); vibrate(20);
+
+    $('shutter-wrap').style.display = 'none';
+    $('scan-status').style.display = 'none';
+    $('preview-actions').style.display = 'flex';
+  });
+
+  $('btn-retake').addEventListener('click', function(){
+    $('captured-photo').style.display = 'none';
+    $('camera-video').style.display = 'block';
+    $('preview-actions').style.display = 'none';
+    $('shutter-wrap').style.display = 'flex';
+    $('scan-status').style.display = 'block';
+  });
+
+  $('btn-confirm').addEventListener('click', function(){
+    if(stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
+    $('preview-actions').style.display = 'none';
+    runAnalysis();
+  });
+
+  /* ---------------- analysis sequence ---------------- */
+  var analysisLines = [
+    'Откриване на лице…',
+    'Анализ на 68 контролни точки…',
+    'Сравняване с база данни…',
+    'Потвърждаване на самоличност…'
+  ];
+  function runAnalysis(){
+    var panel = $('analysis-panel'), fill = $('analysis-fill'), log = $('analysis-log');
+    panel.style.display = 'block';
+    fill.style.width = '0%';
+    requestAnimationFrame(function(){
+      setTimeout(function(){ fill.style.width = '100%'; }, 50);
+    });
+    var i = 0;
+    log.textContent = analysisLines[0];
+    var step = setInterval(function(){
+      i++;
+      if(i < analysisLines.length){ log.textContent = analysisLines[i]; vibrate(8); }
+      else { clearInterval(step); }
+    }, 620);
+
+    setTimeout(function(){
+      showScreen('screen-success');
+      playChime(); vibrate([20,40,20]);
+      spawn(70, canvas.width/2, canvas.height*0.35, 1.2);
+    }, 2700);
+
+    setTimeout(function(){
+      showScreen('screen-reveal');
+      celebrate();
+    }, 4600);
+  }
+
+  /* ---------------- celebration ---------------- */
+  function celebrate(){
+    spawn(160, canvas.width*0.5, -10, 1.6);
+    setTimeout(function(){ spawn(90, canvas.width*0.15, -10, 1.2); }, 300);
+    setTimeout(function(){ spawn(90, canvas.width*0.85, -10, 1.2); }, 500);
+    setTimeout(function(){ spawn(70, canvas.width*0.5, -10, 1.4); }, 1200);
+    startWishes();
+
+    setTimeout(function(){ $('secret-trigger').classList.add('show'); }, 10000);
+  }
+
+  /* ---------------- secret overlay ---------------- */
+  $('secret-trigger').addEventListener('click', function(){
+    $('secret-overlay').classList.add('show');
+    vibrate(10);
+  });
+  $('secret-close').addEventListener('click', function(){
+    $('secret-overlay').classList.remove('show');
+  });
+  $('secret-img').addEventListener('error', function(){
+    $('secret-img').style.display = 'none';
+    $('secret-placeholder').style.display = 'flex';
+  });
+
+})();
+</script>
+</body>
+</html>
