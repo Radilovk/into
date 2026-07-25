@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a12">
+  <title>Secure Gift Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0a0a12;
+      --bg-card: rgba(18, 18, 28, 0.92);
+      --gold: #c9a962;
+      --gold-light: #e8d5a3;
+      --gold-glow: rgba(201, 169, 98, 0.35);
+      --festive-red: #e63946;
+      --festive-pink: #ff6b9d;
+      --festive-purple: #7b2cbf;
+      --text: #f5f0e8;
+      --text-muted: rgba(245, 240, 232, 0.65);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+    }
+
+    .app {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(24px + var(--safe-top)) calc(20px + var(--safe-right)) calc(24px + var(--safe-bottom)) calc(20px + var(--safe-left));
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(12px);
+      transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0.7s;
+      z-index: 1;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      z-index: 10;
+    }
+
+    /* ── Ambient background ── */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient__orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: floatOrb 12s ease-in-out infinite;
+    }
+
+    .ambient__orb--1 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(201,169,98,0.18) 0%, transparent 70%);
+      top: -80px; right: -60px;
+    }
+
+    .ambient__orb--2 {
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(123,44,191,0.12) 0%, transparent 70%);
+      bottom: 10%; left: -80px;
+      animation-delay: -4s;
+    }
+
+    .ambient__grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-20px, 30px) scale(1.08); }
+    }
+
+    /* ── Welcome screen ── */
+    .welcome {
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    .welcome__seal {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 28px;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(201,169,98,0.12), rgba(201,169,98,0.03));
+      box-shadow: 0 0 40px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.08);
+      animation: sealPulse 3s ease-in-out infinite;
+    }
+
+    .welcome__seal svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--gold-light);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    @keyframes sealPulse {
+      0%, 100% { box-shadow: 0 0 40px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.08); }
+      50% { box-shadow: 0 0 60px rgba(201,169,98,0.5), inset 0 1px 0 rgba(255,255,255,0.12); }
+    }
+
+    .welcome__badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201,169,98,0.35);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+      background: rgba(201,169,98,0.06);
+    }
+
+    .welcome__title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 8vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--gold-light) 50%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome__festive {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.15rem, 4.5vw, 1.35rem);
+      font-style: italic;
+      color: var(--festive-pink);
+      margin-bottom: 20px;
+      text-shadow: 0 0 30px rgba(255,107,157,0.3);
+    }
+
+    .welcome__subtitle {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+    }
+
+    .welcome__divider {
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 32px;
+    }
+
+    .welcome__instruction {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+      padding: 0 8px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      padding: 17px 28px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-primary--gold {
+      background: linear-gradient(135deg, #d4b876 0%, #b8944f 50%, #9a7b3c 100%);
+      color: #1a1208;
+      box-shadow: 0 4px 24px rgba(201,169,98,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    .btn-primary--gold:hover {
+      box-shadow: 0 6px 32px rgba(201,169,98,0.45), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .btn-primary svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-muted);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* ── Face ID screen ── */
+    #screen-faceid {
+      padding: 0;
+      justify-content: flex-start;
+      background: #000;
+    }
+
+    .faceid-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: calc(16px + var(--safe-top)) 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+
+    .faceid-header__back {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .faceid-header__title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .faceid-header__status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.65rem;
+      color: #34c759;
+      font-weight: 500;
+    }
+
+    .faceid-header__dot {
+      width: 6px;
+      height: 6px;
+      background: #34c759;
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .faceid-camera-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    #cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .faceid-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .faceid-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .faceid-frame {
+      position: relative;
+      width: min(72vw, 280px);
+      height: min(92vw, 360px);
+    }
+
+    .faceid-frame__oval {
+      position: absolute;
+      inset: 0;
+      border: 2.5px solid rgba(255,255,255,0.85);
+      border-radius: 50% / 48%;
+      box-shadow:
+        0 0 0 9999px rgba(0,0,0,0.55),
+        0 0 30px rgba(52,199,89,0.2),
+        inset 0 0 20px rgba(52,199,89,0.05);
+      transition: border-color 0.4s, box-shadow 0.4s;
+    }
+
+    .faceid-frame__oval.scanning {
+      border-color: #34c759;
+      animation: ovalPulse 1.2s ease-in-out infinite;
+    }
+
+    .faceid-frame__oval.detected {
+      border-color: #34c759;
+      box-shadow:
+        0 0 0 9999px rgba(0,0,0,0.55),
+        0 0 50px rgba(52,199,89,0.5),
+        inset 0 0 30px rgba(52,199,89,0.15);
+    }
+
+    @keyframes ovalPulse {
+      0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 30px rgba(52,199,89,0.2), inset 0 0 20px rgba(52,199,89,0.05); }
+      50% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 60px rgba(52,199,89,0.45), inset 0 0 30px rgba(52,199,89,0.12); }
+    }
+
+    .faceid-frame__corners {
+      position: absolute;
+      inset: -8px;
+    }
+
+    .faceid-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: #34c759;
+      border-style: solid;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .faceid-corner--tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 8px 0 0 0; }
+    .faceid-corner--tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 8px 0 0; }
+    .faceid-corner--bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 8px; }
+    .faceid-corner--br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 8px 0; }
+
+    .faceid-frame.detected .faceid-corner { opacity: 1; }
+
+    .faceid-scanline {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #34c759, transparent);
+      box-shadow: 0 0 12px #34c759;
+      opacity: 0;
+      top: 15%;
+    }
+
+    .faceid-scanline.active {
+      opacity: 1;
+      animation: scanDown 2s ease-in-out infinite;
+    }
+
+    @keyframes scanDown {
+      0% { top: 12%; opacity: 0.3; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: 88%; opacity: 0.3; }
+    }
+
+    .faceid-ui {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: 24px 24px calc(28px + var(--safe-bottom));
+      background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+      text-align: center;
+      pointer-events: auto;
+    }
+
+    .faceid-ui__status {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 6px;
+      min-height: 1.4em;
+      transition: color 0.3s;
+    }
+
+    .faceid-ui__status.success { color: #34c759; }
+
+    .faceid-ui__hint {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 20px;
+      min-height: 1.2em;
+    }
+
+    .faceid-ui__progress {
+      width: 100%;
+      max-width: 260px;
+      height: 3px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px;
+      margin: 0 auto 20px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .faceid-ui__progress.visible { opacity: 1; }
+
+    .faceid-ui__progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #34c759, #30d158);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+
+    .faceid-ui__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-capture {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: transparent;
+      padding: 4px;
+      cursor: pointer;
+      display: none;
+      transition: transform 0.15s;
+    }
+
+    .btn-capture.visible { display: block; }
+
+    .btn-capture:active { transform: scale(0.92); }
+
+    .btn-capture__inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .btn-confirm {
+      display: none;
+      width: 100%;
+      max-width: 280px;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #34c759;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-confirm.visible { display: block; }
+
+    .faceid-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(52,199,89,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52,199,89,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .faceid-metrics {
+      position: absolute;
+      top: calc(60px + var(--safe-top));
+      left: 16px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+      font-size: 9px;
+      color: rgba(52,199,89,0.6);
+      line-height: 1.6;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    /* ── Celebration screen ── */
+    #screen-celebration {
+      justify-content: flex-start;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-top: calc(32px + var(--safe-top));
+      padding-bottom: calc(80px + var(--safe-bottom));
+    }
+
+    #screen-celebration.active {
+      background: linear-gradient(160deg, #1a0a2e 0%, #2d1b4e 40%, #16213e 100%);
+    }
+
+    .celebration {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .celebration__check {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #34c759, #28a745);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 40px rgba(52,199,89,0.4);
+      animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .celebration__check svg {
+      width: 32px;
+      height: 32px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .celebration__verified {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #34c759;
+      margin-bottom: 8px;
+      animation: fadeUp 0.6s 0.2s both;
+    }
+
+    .celebration__name {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.5rem, 6vw, 1.85rem);
+      font-weight: 700;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.35s both;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .celebration__bd-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 9vw, 3rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, #ffd700, #ff6b9d, #c9a962);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeUp 0.7s 0.5s both, shimmer 3s 1.2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.15); }
+    }
+
+    .gift-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(201,169,98,0.25);
+      border-radius: 18px;
+      padding: 22px 20px;
+      margin-bottom: 16px;
+      text-align: left;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      animation: fadeUp 0.6s both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gift-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--festive-pink), var(--gold), var(--festive-purple));
+    }
+
+    .gift-card:nth-child(1) { animation-delay: 0.7s; }
+    .gift-card:nth-child(2) { animation-delay: 0.9s; }
+
+    .gift-card__label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .gift-card__text {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .gift-card__emoji {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .wishes-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .floating-wish {
+      position: absolute;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      white-space: nowrap;
+      animation: floatWish 4s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes floatWish {
+      0% { opacity: 0; transform: translateY(0) scale(0.8); }
+      15% { opacity: 1; transform: translateY(-20px) scale(1); }
+      100% { opacity: 0; transform: translateY(-120px) scale(0.9); }
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* ── Easter egg button ── */
+    .easter-egg-btn {
+      position: fixed;
+      bottom: calc(12px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s, transform 0.5s, visibility 0.5s;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.35);
+      font-size: 0.68rem;
+      padding: 8px 16px;
+      border-radius: 100px;
+      cursor: pointer;
+      max-width: 90%;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .easter-egg-btn.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .easter-egg-btn:active {
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* ── Fullscreen image modal ── */
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s, visibility 0.4s;
+    }
+
+    .image-modal.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .image-modal__close {
+      position: absolute;
+      top: calc(12px + var(--safe-top));
+      right: calc(12px + var(--safe-right));
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .image-modal__close:active {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .image-modal__img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    /* ── Sparkles on welcome ── */
+    .sparkles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      animation: sparkle 3s ease-in-out infinite;
+      box-shadow: 0 0 6px var(--gold);
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── Error state ── */
+    .camera-error {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      position: absolute;
+      inset: 0;
+      background: #111;
+      z-index: 30;
+    }
+
+    .camera-error.visible { display: flex; }
+
+    .camera-error p {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient__orb ambient__orb--1"></div>
+      <div class="ambient__orb ambient__orb--2"></div>
+      <div class="ambient__grain"></div>
+    </div>
+
+    <div class="sparkles" id="sparkles" aria-hidden="true"></div>
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+    <div class="wishes-container" id="wishesContainer" aria-hidden="true"></div>
+
+    <!-- Welcome -->
+    <section class="screen active" id="screen-welcome" aria-label="Добре дошли">
+      <div class="welcome">
+        <div class="welcome__seal" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+        </div>
+        <div class="welcome__badge">Secure Gift Portal</div>
+        <h1 class="welcome__title">Честит празник,<br>Мартин!!</h1>
+        <p class="welcome__festive">✦ Вашият подарък ви очаква тук! ✦</p>
+        <div class="welcome__divider"></div>
+        <p class="welcome__subtitle">Персонализиран достъп до вашите изненади</p>
+        <p class="welcome__instruction">За да го отворите, моля продължете чрез лицева идентификация</p>
+        <button class="btn-primary btn-primary--gold" id="btnStartFaceId" type="button">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+          Лицева идентификация
+        </button>
+      </div>
+    </section>
+
+    <!-- Face ID -->
+    <section class="screen" id="screen-faceid" aria-label="Лицева идентификация">
+      <header class="faceid-header">
+        <button class="faceid-header__back" id="btnFaceIdBack" type="button" aria-label="Назад">←</button>
+        <span class="faceid-header__title">Face Secure ID</span>
+        <span class="faceid-header__status"><span class="faceid-header__dot"></span> LIVE</span>
+      </header>
+
+      <div class="faceid-metrics" id="faceMetrics" aria-hidden="true">
+        BIO_SCAN v3.2<br>
+        MESH: ACTIVE<br>
+        LIVENESS: CHECKING
+      </div>
+
+      <div class="faceid-camera-wrap">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <canvas class="faceid-canvas" id="faceCanvas"></canvas>
+        <div class="faceid-grid"></div>
+      </div>
+
+      <div class="faceid-overlay">
+        <div class="faceid-frame" id="faceFrame">
+          <div class="faceid-frame__oval" id="faceOval"></div>
+          <div class="faceid-frame__corners">
+            <span class="faceid-corner faceid-corner--tl"></span>
+            <span class="faceid-corner faceid-corner--tr"></span>
+            <span class="faceid-corner faceid-corner--bl"></span>
+            <span class="faceid-corner faceid-corner--br"></span>
+          </div>
+          <div class="faceid-scanline" id="scanline"></div>
+        </div>
+      </div>
+
+      <div class="camera-error" id="cameraError">
+        <p>Неуспешен достъп до камерата.<br>Моля, разрешете достъп до предната камера в настройките на браузъра.</p>
+        <button class="btn-ghost" id="btnRetryCamera" type="button">Опитай отново</button>
+      </div>
+
+      <div class="faceid-ui">
+        <p class="faceid-ui__status" id="faceStatus">Инициализиране на сензорите...</p>
+        <p class="faceid-ui__hint" id="faceHint">Позиционирайте лицето си в рамката</p>
+        <div class="faceid-ui__progress" id="faceProgress">
+          <div class="faceid-ui__progress-bar" id="faceProgressBar"></div>
+        </div>
+        <div class="faceid-ui__actions">
+          <button class="btn-capture" id="btnCapture" type="button" aria-label="Заснемане">
+            <div class="btn-capture__inner"></div>
+          </button>
+          <button class="btn-confirm" id="btnConfirm" type="button">Потвърди идентификацията</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Celebration -->
+    <section class="screen" id="screen-celebration" aria-label="Празнична изненада">
+      <div class="celebration">
+        <div class="celebration__check" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <p class="celebration__verified">Идентификацията е успешна</p>
+        <p class="celebration__name">Лицето <strong>Мартин Наконечнюк</strong> е идентифицирано</p>
+        <h2 class="celebration__bd-title">Честит<br>Рожден Ден!</h2>
+
+        <div class="gift-card">
+          <div class="gift-card__emoji">🅿️🏖️</div>
+          <div class="gift-card__label">Подарък №1</div>
+          <p class="gift-card__text">Получаваш <strong>едногодишно членство</strong> с осигурено паркомясто за <strong>клуб на пенсионера</strong> в град <strong>Бургас</strong>!</p>
+        </div>
+
+        <div class="gift-card">
+          <div class="gift-card__emoji">📖✨</div>
+          <div class="gift-card__label">Подарък №2</div>
+          <p class="gift-card__text"><strong>30% отстъпка</strong> при поръчка на книгата <em>„Как да се справим с напредващите с възрастта болки в кръста и коленете"</em></p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <button class="easter-egg-btn" id="easterEggBtn" type="button" hidden>
+    ако четеш този надпис, значи все още ти е рано. Натисни тук
+  </button>
+
+  <div class="image-modal" id="imageModal" role="dialog" aria-modal="true" aria-label="Тайно изображение">
+    <button class="image-modal__close" id="modalClose" type="button" aria-label="Затвори">✕</button>
+    <!-- Заменете src с вашето изображение: assets/martin-secret.jpg -->
+    <img class="image-modal__img" id="secretImage" src="assets/martin-secret-placeholder.svg" alt="Тайна изненада">
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const WISHES = [
+        '🎂 Честит РД!', '🎉 Ура!', '✨ Здраве!', '💪 Сила!',
+        '🥳 Празник!', '🎁 Подаръци!', '🌟 Блестящ!', '🎈 Успех!',
+        '❤️ Любов!', '🍾 Просперитет!', '🏆 Шампион!', '😄 Усмивки!'
+      ];
+
+      const SECRET_IMAGE = 'assets/martin-secret.jpg';
+      const PLACEHOLDER_IMAGE = 'assets/martin-secret-placeholder.svg';
+
+      const screens = {
+        welcome: document.getElementById('screen-welcome'),
+        faceid: document.getElementById('screen-faceid'),
+        celebration: document.getElementById('screen-celebration')
+      };
+
+      const video = document.getElementById('cameraVideo');
+      const faceOval = document.getElementById('faceOval');
+      const faceFrame = document.getElementById('faceFrame');
+      const scanline = document.getElementById('scanline');
+      const faceStatus = document.getElementById('faceStatus');
+      const faceHint = document.getElementById('faceHint');
+      const faceProgress = document.getElementById('faceProgress');
+      const faceProgressBar = document.getElementById('faceProgressBar');
+      const btnCapture = document.getElementById('btnCapture');
+      const btnConfirm = document.getElementById('btnConfirm');
+      const cameraError = document.getElementById('cameraError');
+      const faceMetrics = document.getElementById('faceMetrics');
+      const easterEggBtn = document.getElementById('easterEggBtn');
+      const imageModal = document.getElementById('imageModal');
+      const secretImage = document.getElementById('secretImage');
+      const confettiCanvas = document.getElementById('confettiCanvas');
+      const wishesContainer = document.getElementById('wishesContainer');
+
+      let stream = null;
+      let scanTimer = null;
+      let progressTimer = null;
+      let faceDetected = false;
+      let captured = false;
+      let confettiAnim = null;
+      let wishInterval = null;
+      let easterTimer = null;
+
+      function vibrate(ms) {
+        if (navigator.vibrate) navigator.vibrate(ms);
+      }
+
+      function showScreen(name) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        screens[name].classList.add('active');
+      }
+
+      function createSparkles() {
+        const container = document.getElementById('sparkles');
+        for (let i = 0; i < 20; i++) {
+          const s = document.createElement('div');
+          s.className = 'sparkle';
+          s.style.left = Math.random() * 100 + '%';
+          s.style.top = Math.random() * 100 + '%';
+          s.style.animationDelay = (Math.random() * 3) + 's';
+          s.style.animationDuration = (2 + Math.random() * 2) + 's';
+          container.appendChild(s);
+        }
+      }
+
+      async function startCamera() {
+        cameraError.classList.remove('visible');
+        faceStatus.textContent = 'Инициализиране на сензорите...';
+        faceHint.textContent = 'Позиционирайте лицето си в рамката';
+        faceOval.classList.remove('detected');
+        faceOval.classList.add('scanning');
+        scanline.classList.add('active');
+        faceFrame.classList.remove('detected');
+        faceProgress.classList.remove('visible');
+        btnCapture.classList.remove('visible');
+        btnConfirm.classList.remove('visible');
+        faceDetected = false;
+        captured = false;
+
+        try {
+          if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+          }
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: 'user',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            },
+            audio: false
+          });
+          video.srcObject = stream;
+          await video.play();
+
+          faceStatus.textContent = 'Сканиране на лицеви характеристики...';
+          startScanSimulation();
+          updateMetrics();
+        } catch (err) {
+          cameraError.classList.add('visible');
+          faceStatus.textContent = 'Грешка при достъп до камерата';
+        }
+      }
+
+      function updateMetrics() {
+        const lines = [
+          'BIO_SCAN v3.2',
+          'MESH: ' + (faceDetected ? 'LOCKED' : 'ACTIVE'),
+          'LIVENESS: ' + (captured ? 'VERIFIED' : faceDetected ? 'CONFIRMED' : 'CHECKING'),
+          'CONF: ' + (faceDetected ? '99.7%' : (60 + Math.floor(Math.random() * 30)) + '%')
+        ];
+        faceMetrics.innerHTML = lines.join('<br>');
+      }
+
+      function startScanSimulation() {
+        clearTimeout(scanTimer);
+        clearInterval(progressTimer);
+        faceProgressBar.style.width = '0%';
+        faceProgress.classList.add('visible');
+
+        let progress = 0;
+        progressTimer = setInterval(() => {
+          if (faceDetected) return;
+          progress += 1.2 + Math.random() * 2;
+          if (progress > 85) progress = 85;
+          faceProgressBar.style.width = progress + '%';
+        }, 80);
+
+        scanTimer = setTimeout(() => {
+          faceDetected = true;
+          clearInterval(progressTimer);
+          faceProgressBar.style.width = '100%';
+          faceOval.classList.remove('scanning');
+          faceOval.classList.add('detected');
+          faceFrame.classList.add('detected');
+          faceStatus.textContent = 'Лице открито';
+          faceStatus.classList.add('success');
+          faceHint.textContent = 'Натиснете бутона за заснемане';
+          btnCapture.classList.add('visible');
+          vibrate(30);
+          updateMetrics();
+        }, 2800 + Math.random() * 800);
+      }
+
+      function capturePhoto() {
+        if (!faceDetected || captured) return;
+        captured = true;
+        btnCapture.classList.remove('visible');
+        faceStatus.textContent = 'Анализ на биометрични данни...';
+        faceStatus.classList.remove('success');
+        faceHint.textContent = 'Моля, изчакайте...';
+        scanline.classList.remove('active');
+        vibrate([20, 40, 20]);
+
+        setTimeout(() => {
+          faceStatus.textContent = 'Съвпадение: Мартин Наконечнюк';
+          faceStatus.classList.add('success');
+          faceHint.textContent = 'Идентичността е потвърдена';
+          btnConfirm.classList.add('visible');
+          updateMetrics();
+          vibrate(50);
+        }, 1500);
+      }
+
+      function stopCamera() {
+        clearTimeout(scanTimer);
+        clearInterval(progressTimer);
+        if (stream) {
+          stream.getTracks().forEach(t => t.stop());
+          stream = null;
+        }
+        video.srcObject = null;
+      }
+
+      function confirmIdentity() {
+        stopCamera();
+        showScreen('celebration');
+        startCelebration();
+      }
+
+      /* ── Confetti ── */
+      function startCelebration() {
+        resizeConfetti();
+        launchConfetti();
+        startWishes();
+        vibrate([50, 30, 50, 30, 100]);
+
+        easterTimer = setTimeout(() => {
+          easterEggBtn.hidden = false;
+          easterEggBtn.classList.add('visible');
+        }, 10000);
+      }
+
+      const confettiPieces = [];
+      let confettiRunning = false;
+
+      function resizeConfetti() {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      }
+
+      function launchConfetti() {
+        const colors = ['#ffd700', '#ff6b9d', '#e63946', '#7b2cbf', '#34c759', '#c9a962', '#4cc9f0'];
+        for (let i = 0; i < 150; i++) {
+          confettiPieces.push({
+            x: Math.random() * confettiCanvas.width,
+            y: -20 - Math.random() * confettiCanvas.height * 0.5,
+            w: 6 + Math.random() * 8,
+            h: 4 + Math.random() * 6,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            rotationSpeed: (Math.random() - 0.5) * 12,
+            speedY: 2 + Math.random() * 4,
+            speedX: (Math.random() - 0.5) * 3,
+            opacity: 0.7 + Math.random() * 0.3
+          });
+        }
+        if (!confettiRunning) {
+          confettiRunning = true;
+          animateConfetti();
+        }
+      }
+
+      function animateConfetti() {
+        const ctx = confettiCanvas.getContext('2d');
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+        let active = 0;
+        confettiPieces.forEach(p => {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.rotation += p.rotationSpeed;
+          p.speedY += 0.05;
+
+          if (p.y < confettiCanvas.height + 50) {
+            active++;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.globalAlpha = p.opacity;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+          }
+        });
+
+        if (active > 0 || confettiPieces.length < 200) {
+          if (Math.random() < 0.08 && confettiPieces.length < 300) {
+            launchConfetti();
+          }
+          confettiAnim = requestAnimationFrame(animateConfetti);
+        } else {
+          confettiRunning = false;
+        }
+      }
+
+      function startWishes() {
+        let count = 0;
+        const spawn = () => {
+          const wish = document.createElement('div');
+          wish.className = 'floating-wish';
+          wish.textContent = WISHES[Math.floor(Math.random() * WISHES.length)];
+          wish.style.left = (10 + Math.random() * 80) + '%';
+          wish.style.top = (30 + Math.random() * 40) + '%';
+          wish.style.animationDuration = (3 + Math.random() * 2) + 's';
+          wishesContainer.appendChild(wish);
+          setTimeout(() => wish.remove(), 5000);
+        };
+
+        for (let i = 0; i < 6; i++) setTimeout(spawn, i * 400);
+        wishInterval = setInterval(() => {
+          if (count++ > 30) { clearInterval(wishInterval); return; }
+          spawn();
+        }, 1200);
+      }
+
+      function openSecretImage() {
+        imageModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeSecretImage() {
+        imageModal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      function preloadSecretImage() {
+        const img = new Image();
+        img.onload = () => { secretImage.src = SECRET_IMAGE; };
+        img.onerror = () => { secretImage.src = PLACEHOLDER_IMAGE; };
+        img.src = SECRET_IMAGE;
+      }
+
+      /* ── Events ── */
+      document.getElementById('btnStartFaceId').addEventListener('click', () => {
+        showScreen('faceid');
+        startCamera();
+      });
+
+      document.getElementById('btnFaceIdBack').addEventListener('click', () => {
+        stopCamera();
+        showScreen('welcome');
+      });
+
+      document.getElementById('btnRetryCamera').addEventListener('click', startCamera);
+      btnCapture.addEventListener('click', capturePhoto);
+      btnConfirm.addEventListener('click', confirmIdentity);
+      easterEggBtn.addEventListener('click', openSecretImage);
+      document.getElementById('modalClose').addEventListener('click', closeSecretImage);
+
+      imageModal.addEventListener('click', (e) => {
+        if (e.target === imageModal) closeSecretImage();
+      });
+
+      window.addEventListener('resize', resizeConfetti);
+
+      createSparkles();
+      preloadSecretImage();
+    })();
+  </script>
+</body>
+</html>
