@@ -234,6 +234,14 @@
   .gift-text{font-size:15.5px; line-height:1.5; color:#fff; font-weight:600;}
   .reveal-note{margin-top:10px; font-size:12.5px; color:var(--text-dim); max-width:340px;}
 
+  .teaser-card{
+    border-style:dashed; border-color:rgba(255,255,255,.24);
+    background:rgba(255,255,255,.04); opacity:.88;
+  }
+  .teaser-card .gift-icon{display:inline-block; animation:lockPulse 2.4s ease-in-out infinite;}
+  @keyframes lockPulse{0%,100%{opacity:.65; transform:scale(1);}50%{opacity:1; transform:scale(1.14);}}
+  .teaser-hint{margin-top:8px; font-size:12px; color:var(--text-dim);}
+
   /* ---------- voucher card ---------- */
   .voucher-card{padding:0; overflow:hidden;}
   .voucher-hero{
@@ -332,20 +340,33 @@
   /* ---------- confetti canvas ---------- */
   #confetti-canvas{position:fixed; inset:0; z-index:40; pointer-events:none;}
 
-  /* ---------- secret overlay ---------- */
+  /* ---------- secret overlay (voucher unlock) ---------- */
   #secret-overlay{
-    position:fixed; inset:0; background:#000; z-index:100;
-    display:flex; align-items:center; justify-content:center;
+    position:fixed; inset:0; z-index:100;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(157,78,221,.4), transparent 55%),
+      radial-gradient(circle at 50% 100%, rgba(6,214,160,.18), transparent 55%),
+      #07050f;
+    display:flex; align-items:flex-start; justify-content:center;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:calc(var(--safe-t) + 76px) 20px calc(var(--safe-b) + 40px);
     opacity:0; pointer-events:none; transition:opacity .35s ease;
   }
   #secret-overlay.show{opacity:1; pointer-events:auto;}
-  #secret-overlay img{max-width:100%; max-height:100%; object-fit:contain; display:block;}
-  .secret-placeholder{
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
-    padding:40px; text-align:center; color:rgba(255,255,255,.7);
+  .unlock-scroll{width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center;}
+  .unlock-heading{margin-bottom:22px; text-align:center;}
+  .unlock-icon{
+    font-size:46px; margin-bottom:10px;
+    animation:unlockPop .6s cubic-bezier(.34,1.56,.64,1) both;
   }
-  .secret-placeholder .big{font-size:52px;}
-  .secret-placeholder code{background:rgba(255,255,255,.08); padding:3px 8px; border-radius:6px; font-size:12px;}
+  @keyframes unlockPop{0%{transform:scale(.3) rotate(-20deg); opacity:0;}100%{transform:scale(1) rotate(0deg); opacity:1;}}
+  .unlock-title{
+    font-size:25px; font-weight:800; margin-bottom:6px;
+    background:linear-gradient(90deg,var(--gold),#fff 45%,var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .unlock-sub{font-size:13.5px; color:var(--text-dim); max-width:300px; margin:0 auto; line-height:1.5;}
+  #secret-overlay .voucher-card{width:100%; animation:cardIn .5s .1s cubic-bezier(.2,.8,.2,1) both;}
   .close-x{
     position:absolute; top:calc(var(--safe-t) + 14px); right:16px; width:40px; height:40px; border-radius:50%;
     background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25);
@@ -463,29 +484,11 @@
         <div class="gift-text">30% отстъпка при поръчка на книгата „Как да се справим с напредващите с възрастта болки в кръста и коленете“.</div>
       </div>
 
-      <div class="gift-card voucher-card">
-        <div class="voucher-hero">
-          <div class="voucher-logo">ADVENTURES.BG</div>
-          <div class="voucher-badge">🎁 ВАУЧЕР</div>
-          <div class="voucher-stars" id="voucher-stars"></div>
-          <div class="voucher-sun"></div>
-          <div class="voucher-rider">🏄</div>
-          <div class="voucher-waves">
-            <svg class="w1" viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 30 Q50 5 100 30 T200 30 T300 30 T400 30 V60 H0 Z" fill="rgba(255,255,255,.28)"/></svg>
-            <svg class="w2" viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 35 Q50 15 100 35 T200 35 T300 35 T400 35 V60 H0 Z" fill="rgba(6,40,64,.55)"/></svg>
-          </div>
-        </div>
-        <div class="voucher-body">
-          <div class="gift-tag">Подарък №3 · Приключение</div>
-          <div class="gift-text">Урок по eFoil в Крайморие, Бургас — усещането да летиш над водата! 🌊</div>
-          <div class="voucher-wish">„Човек не остарява, когато влиза в нови приключения!“</div>
-          <div class="voucher-meta">
-            <div><span>Номер на ваучер</span><b>ADV232X39</b></div>
-            <div><span>Валиден до</span><b>25.07.2027</b></div>
-          </div>
-          <a class="voucher-cta" href="https://adventures.bg/book" target="_blank" rel="noopener noreferrer">🌊 Отвори ваучера</a>
-          <div class="voucher-hint">Влез в adventures.bg/book и въведи номера на ваучера, за да резервираш своята дата.</div>
-        </div>
+      <div class="gift-card teaser-card">
+        <span class="gift-icon">🔒</span>
+        <div class="gift-tag">Подарък №3 · Заключено</div>
+        <div class="gift-text">Специална изненада те очаква... но не е за всеки 😏</div>
+        <div class="teaser-hint">Провери надписа най-отдолу 👇</div>
       </div>
 
       <div class="reveal-note">Честита годишнина, приятелю! 🥳 Докосни балоните за още пожелания 🎈</div>
@@ -500,11 +503,37 @@
 
 <div id="secret-overlay">
   <button class="close-x" id="secret-close">✕</button>
-  <img id="secret-img" alt="Изненада" src="assets/martin-secret.jpg">
-  <div class="secret-placeholder" id="secret-placeholder" style="display:none;">
-    <div class="big">📷</div>
-    <div>Тук ще се появи специалното изображение.</div>
-    <div>Добави файл в <code>assets/martin-secret.jpg</code></div>
+  <div class="unlock-scroll">
+    <div class="unlock-heading">
+      <div class="unlock-icon" id="unlock-icon">🔓</div>
+      <div class="unlock-title">Отключено!</div>
+      <div class="unlock-sub">Явно все пак си достатъчно млад за истинско приключение 😉</div>
+    </div>
+
+    <div class="gift-card voucher-card">
+      <div class="voucher-hero">
+        <div class="voucher-logo">ADVENTURES.BG</div>
+        <div class="voucher-badge">🎁 ВАУЧЕР</div>
+        <div class="voucher-stars" id="voucher-stars"></div>
+        <div class="voucher-sun"></div>
+        <div class="voucher-rider">🏄</div>
+        <div class="voucher-waves">
+          <svg class="w1" viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 30 Q50 5 100 30 T200 30 T300 30 T400 30 V60 H0 Z" fill="rgba(255,255,255,.28)"/></svg>
+          <svg class="w2" viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 35 Q50 15 100 35 T200 35 T300 35 T400 35 V60 H0 Z" fill="rgba(6,40,64,.55)"/></svg>
+        </div>
+      </div>
+      <div class="voucher-body">
+        <div class="gift-tag">Подарък №3 · Приключение</div>
+        <div class="gift-text">Урок по eFoil в Крайморие, Бургас — усещането да летиш над водата! 🌊</div>
+        <div class="voucher-wish">„Човек не остарява, когато влиза в нови приключения!“</div>
+        <div class="voucher-meta">
+          <div><span>Номер на ваучер</span><b>ADV232X39</b></div>
+          <div><span>Валиден до</span><b>25.07.2027</b></div>
+        </div>
+        <a class="voucher-cta" href="https://adventures.bg/book/?code=ADV232X39" target="_blank" rel="noopener noreferrer">🌊 Отвори ваучера</a>
+        <div class="voucher-hint">Линкът вече съдържа твоя код — просто избери удобна дата за резервация.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -775,17 +804,15 @@
     setTimeout(function(){ $('secret-trigger').classList.add('show'); }, 10000);
   }
 
-  /* ---------------- secret overlay ---------------- */
+  /* ---------------- secret overlay (voucher unlock) ---------------- */
   $('secret-trigger').addEventListener('click', function(){
     $('secret-overlay').classList.add('show');
-    vibrate(10);
+    $('secret-overlay').scrollTop = 0;
+    playChime(); vibrate([15,30,15,30,50]);
+    spawn(110, canvas.width/2, canvas.height*0.2, 1.5);
   });
   $('secret-close').addEventListener('click', function(){
     $('secret-overlay').classList.remove('show');
-  });
-  $('secret-img').addEventListener('error', function(){
-    $('secret-img').style.display = 'none';
-    $('secret-placeholder').style.display = 'flex';
   });
 
 })();
